@@ -1,19 +1,159 @@
 import './App.css'
-import {Box, Container, Typography} from "@mui/material";
+import Root from "./Root.tsx";
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import MealsPage from "./components/meals/MealsPage.tsx";
+import Plans from "./components/plans/Plans.tsx";
+import {CssVarsProvider, extendTheme} from "@mui/material-next";
+import {AuthProvider} from "./contexts/AuthContext.tsx";
+import {GoogleOAuthProvider} from "@react-oauth/google";
+import MealPage from "./components/meals/MealPage.tsx";
+import {createTheme, responsiveFontSizes, ThemeProvider} from "@mui/material/styles";
 
-function App() {
+export default function App() {
 
-  return (
+    const router  = createBrowserRouter([
+        { path: "/", element: <Root/>, children: [
+                { path: "meals", element: <MealsPage/>},
+                { path: "meals/:mealId", element: <MealPage/>},
+                { path: "plans", element: <Plans/> }
+            ]}
+    ])
+
+    let theme = createTheme({
+        palette: {
+            mode: 'light',
+            primary: {
+                main: '#b0c985',
+            },
+            secondary: {
+                main: '#6b9992',
+            },
+            background: {
+                default: '#f5f5f5',
+                paper: '#e7eeda',
+            },
+        },
+    });
+
+    theme = responsiveFontSizes(theme);
+
+    const md3theme = extendTheme({
+        components: {
+            MuiCard: {
+                defaultProps: {
+                    variant: 'outlined',
+                    sx: {
+                        borderRadius: 3,
+                    }
+                }
+            },
+            MuiDialog: {
+                defaultProps: {
+                    PaperProps: {
+                        sx: {
+                            borderRadius: 5,
+                            padding: 3,
+                        }
+                    }
+                }
+            }
+        },
+        ref: {
+            palette: {
+                primary: {
+                    "0": "#000000",
+                    "10": "#121F00",
+                    "20": "#233602",
+                    "30": "#394D17",
+                    "40": "#50652C",
+                    "50": "#687F43",
+                    "60": "#81995A",
+                    "70": "#9BB472",
+                    "80": "#B6CF8B",
+                    "90": "#D2ECA5",
+                    "95": "#E0FAB2",
+                    "99": "#F9FFE6",
+                    "100": "#FFFFFF"
+                },
+                secondary: {
+                    "0": "#000000",
+                    "10": "#181D10",
+                    "20": "#2D3223",
+                    "30": "#434939",
+                    "40": "#5B614F",
+                    "50": "#747967",
+                    "60": "#8D9380",
+                    "70": "#A8AE99",
+                    "80": "#C4C9B4",
+                    "90": "#E0E5CF",
+                    "95": "#EEF3DD",
+                    "99": "#FAFFE8",
+                    "100": "#FFFFFF"
+                },
+                tertiary: {
+                    "0": "#000000",
+                    "10": "#03201D",
+                    "20": "#1A3532",
+                    "30": "#314C48",
+                    "40": "#486460",
+                    "50": "#607C79",
+                    "60": "#7A9692",
+                    "70": "#94B1AD",
+                    "80": "#AFCCC8",
+                    "90": "#CAE9E4",
+                    "95": "#D9F7F2",
+                    "99": "#F2FFFC",
+                    "100": "#FFFFFF"
+                },
+                neutral: {
+                    "0": "#000000",
+                    "10": "#1B1C19",
+                    "17": "#262623",
+                    "20": "#30312D",
+                    "22": "#3B3C38",
+                    "30": "#474743",
+                    "40": "#5F5E5A",
+                    "50": "#787773",
+                    "60": "#92918C",
+                    "70": "#ACABA6",
+                    "80": "#C8C6C1",
+                    "90": "#E4E2DD",
+                    "92": "#F3F1EB",
+                    "95": "#F3F1EB",
+                    "96": "#FBF9F4",
+                    "99": "#FEFCF6",
+                    "100": "#FFFFFF"
+                },
+                error: {
+                    "0": "#000000",
+                    "10": "#1B1C19",
+                    "20": "#30312D",
+                    "30": "#474743",
+                    "40": "#5F5E5A",
+                    "50": "#787773",
+                    "60": "#92918C",
+                    "70": "#ACABA6",
+                    "80": "#C8C6C1",
+                    "90": "#E4E2DD",
+                    "95": "#F3F1EB",
+                    "99": "#FEFCF6",
+                    "100": "#FFFFFF"
+                },
+            }
+        }
+    });
+
+    return (
     <>
-      <Container maxWidth="sm">
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-            Material UI Create React App example in TypeScript
-          </Typography>
-        </Box>
-      </Container>
+        <ThemeProvider theme={theme}>
+            <CssVarsProvider theme={md3theme}>
+                <AuthProvider>
+                    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+                        <RouterProvider router={router}/>
+                    </GoogleOAuthProvider>
+                </AuthProvider>
+            </CssVarsProvider>
+        </ThemeProvider>
     </>
   )
 }
-
-export default App
