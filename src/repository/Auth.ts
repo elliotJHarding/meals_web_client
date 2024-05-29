@@ -1,13 +1,13 @@
 import User from "../domain/User.ts";
 
 export default class Auth {
-    private readonly user : User;
+    private readonly user : User | null;
 
-    constructor(user : User) {
+    constructor(user : User | null) {
         this.user = user;
     }
 
-    public getUser() : User {
+    public getUser() : User | null {
         return this.user;
     }
 

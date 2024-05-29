@@ -1,11 +1,14 @@
 import {CredentialResponse, GoogleLogin} from "@react-oauth/google";
+import {useAuth} from "../../hooks/useAuth.ts";
 
 export default function GoogleAuth() {
 
+    const {login} = useAuth();
+
     const handleAuthSuccess = (credentialResponse : CredentialResponse) : void => {
         if (credentialResponse.credential != null) {
-            // auth.setToken(credentialResponse.credential)
             console.log(credentialResponse);
+            login(credentialResponse.credential);
         } else {
             console.log("JWT Token not present")
         }

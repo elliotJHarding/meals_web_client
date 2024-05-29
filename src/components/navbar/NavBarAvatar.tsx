@@ -8,15 +8,16 @@ import {userOptions} from "./Options.tsx";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 
-export default function NavBarAvatar({onClick, anchorEl, onClose}: {
+export default function NavBarAvatar({onClick, anchorEl, onClose, avatarUrl}: {
     onClick: (event: React.MouseEvent<HTMLElement>) => void,
     anchorEl: HTMLElement | null,
     onClose: () => void,
+    avatarUrl: string,
 }) {
     return <Box sx={{flexGrow: 0}}>
         <Tooltip title="Open settings">
             <IconButton onClick={onClick} sx={{p: 0}}>
-                <Avatar alt="Remy Sharp" src={''}/>
+                <Avatar alt="Remy Sharp" src={avatarUrl}/>
             </IconButton>
         </Tooltip>
         <Menu

@@ -11,16 +11,19 @@ export default class Repository {
         return {}
     }
 
-    get(path : string, onSuccess : (response : AxiosResponse) => void) : void {
+    get(path : string, onSuccess : (response : AxiosResponse) => void) : void
+    get(path : string, onSuccess : (response : AxiosResponse) => void, onFailure? : (response: AxiosResponse) => void) : void {
+        const logError = (response: AxiosResponse) => console.error(response);
         axios
             .get(
                 this.url + path,
                 {
-                    headers: this.getHeaders()
+                    headers: this.getHeaders(),
+                    withCredentials: true,
                 }
             )
             .then(onSuccess)
-            .catch(error => console.error(error));
+            .catch(onFailure ?? logError);
     }
 
     post(path : string, data : any, onSuccess : (response : AxiosResponse) => void) : void {
@@ -29,7 +32,8 @@ export default class Repository {
                 this.url + path,
                 data,
                 {
-                    headers: this.getHeaders()
+                    headers: this.getHeaders(),
+                    withCredentials: true,
                 }
             )
             .then(onSuccess)
@@ -42,7 +46,8 @@ export default class Repository {
                 this.url + path,
                 data,
                 {
-                    headers: this.getHeaders()
+                    headers: this.getHeaders(),
+                    withCredentials: true,
                 }
             )
             .then(onSuccess)

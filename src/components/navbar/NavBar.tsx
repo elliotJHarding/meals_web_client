@@ -25,7 +25,7 @@ export default function NavBar() {
     };
 
     const avatar =
-        <NavBarAvatar onClick={handleOpenUserMenu} anchorEl={anchorElUser} onClose={handleCloseUserMenu}/>
+        <NavBarAvatar onClick={handleOpenUserMenu} anchorEl={anchorElUser} onClose={handleCloseUserMenu} avatarUrl={auth.getUser()?.pictureUrl ?? ''}/>
 
     return (
         <AppBar position="sticky" color='default' elevation={0} sx={{py : {md: 0}}}>

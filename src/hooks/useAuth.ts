@@ -1,13 +1,21 @@
 import {useContext} from "react";
-import {AuthContext} from "../contexts/AuthContext.tsx";
+import {AuthContext, Token} from "../contexts/AuthContext.tsx";
 import Auth from "../repository/Auth.ts";
-// import UserRepository from "../repository/UserRepository.ts";
+import AuthRepository from "../repository/AuthRepository.ts";
+import User from "../domain/User.ts";
 
 export const useAuth = () => {
     const {auth, setAuth} : {auth : Auth, setAuth : any} = useContext(AuthContext);
 
-    // const repository = new UserRepository(auth);
+    const repository = new AuthRepository();
 
-    return {auth, setAuth}
+    const login = (token : Token) => repository.login(token, (user : User) => setAuth(new Auth(user)));
+    const whoami = () => repository.whoAmI((user: User) => setAuth(new Auth(user)), () => console.log("Failed Login"))
+
+    if (!auth.isAuthenticated()) {
+        whoami()
+    }
+
+    return {auth, login, whoami}
 
 }

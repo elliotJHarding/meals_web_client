@@ -1,13 +1,8 @@
-import Auth from "./Auth.ts";
 import {AxiosResponse} from "axios";
 import Meal from "../domain/Meal.ts";
 import ResourceRepository from "./ResourceRepository.ts";
 
 export default class MealRepository extends ResourceRepository {
-
-    constructor(auth : Auth) {
-        super(auth);
-    }
 
     getMeals(onSuccess : (meals : Meal[]) => void) : void {
         console.info("Fetching meals")

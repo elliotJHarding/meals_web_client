@@ -1,15 +1,11 @@
 import Meal from "../../domain/Meal.ts";
 import {useEffect, useState} from "react";
-import {useAuth} from "../useAuth.ts";
-import Auth from "../../repository/Auth.ts";
 import MealRepository from "../../repository/MealRepository.ts";
 import {useLocation} from "react-router-dom";
 
 export const useMeal = (mealIdParam : string | undefined) : {meal : Meal | null, setMeal : any, loading : boolean} => {
 
-    const { auth } : { auth : Auth } = useAuth();
-
-    const repository = new MealRepository(auth);
+    const repository = new MealRepository();
 
     const [loading, setLoading] = useState(true);
 

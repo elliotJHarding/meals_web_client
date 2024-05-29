@@ -1,4 +1,3 @@
-import Auth from "./Auth.ts";
 import {AxiosResponse} from "axios";
 import {Unit} from "../domain/Unit.ts";
 import ResourceRepository from "./ResourceRepository.ts";
@@ -10,10 +9,6 @@ type UnitsResponse = {
 };
 
 export default class UnitRepository extends ResourceRepository {
-
-    constructor(auth: Auth) {
-        super(auth);
-    }
 
     getUnits(onSuccess: (units: Unit[]) => void): void {
 
