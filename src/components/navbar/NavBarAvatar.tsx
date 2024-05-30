@@ -7,6 +7,7 @@ import Menu from "@mui/material/Menu";
 import {userOptions} from "./Options.tsx";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
+import {motion} from "framer-motion";
 
 export default function NavBarAvatar({onClick, anchorEl, onClose, avatarUrl}: {
     onClick: (event: React.MouseEvent<HTMLElement>) => void,
@@ -17,7 +18,12 @@ export default function NavBarAvatar({onClick, anchorEl, onClose, avatarUrl}: {
     return <Box sx={{flexGrow: 0}}>
         <Tooltip title="Open settings">
             <IconButton onClick={onClick} sx={{p: 0}}>
-                <Avatar alt="Remy Sharp" src={avatarUrl}/>
+                <Avatar alt="Remy Sharp" src={avatarUrl}
+                        component={motion.div}
+                        initial={{scale: 0, opacity: 0 }}
+                        animate={{scale: 1, opacity: 1 }}
+                        exit={{scale: 0, opacity: 0 }}
+                />
             </IconButton>
         </Tooltip>
         <Menu
