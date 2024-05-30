@@ -93,7 +93,7 @@ export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal
             </Grid>
             <Grid xs={12} md={6} component={motion.div} layout>
                 <Stack direction='row' component={motion.div} layout>
-                    <Box sx={{display: 'flex', flexDirection: 'column', gap: 2, py: 2}} component={motion.div} layout>
+                    <Stack gap={2} sx={{py: 2}} component={motion.div} layout>
                         <Typography variant='h4'>
                             {meal.name}
                         </Typography>
@@ -103,10 +103,11 @@ export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal
                             {meal.effort != undefined && <EffortChip effort={meal.effort} size={'medium'}/>}
                         </Box>
                         {meal.description != '' && <Typography>{meal.description}</Typography>}
-                        <RecipeLink recipe={meal.recipe} newMeal={newMeal} setNewMeal={setNewMeal}
-                            onConfirm={() => updateMeal(newMeal)}
-                        />
-                    </Box>
+                        <Stack direction='row'>
+                            <RecipeLink recipe={meal.recipe} newMeal={newMeal} setNewMeal={setNewMeal}
+                                onConfirm={() => updateMeal(newMeal)}/>
+                        </Stack>
+                    </Stack>
                 </Stack>
             </Grid>
             <Grid xs={12} md={2} component={motion.div} layout>
