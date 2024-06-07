@@ -3,11 +3,12 @@ import {useEffect, useState} from "react";
 import MealRepository from "../../repository/MealRepository.ts";
 import {useLocation} from "react-router-dom";
 
-export const useMeal = (mealIdParam : string | undefined) : {meal : Meal | null, setMeal : any, loading : boolean} => {
+export const useMeal = (mealIdParam : string | undefined) : {meal : Meal | null, setMeal : any, loading : boolean, failed : boolean} => {
 
     const repository = new MealRepository();
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [failed, setFailed] = useState<boolean>(false);
 
     const [meal, setMeal] : [meal : Meal | null, any] = useState({
         name: "",
@@ -50,13 +51,20 @@ export const useMeal = (mealIdParam : string | undefined) : {meal : Meal | null,
         const mealId = BigInt(safeParam);
 
         useEffect(() => {
-            repository.getMeal(mealId, (fetchedMeal) => {
-                setMeal(fetchedMeal)
-                setLoading(false)
-            });
+            repository.getMeal(
+                mealId,
+                (fetchedMeal) => {
+                    setMeal(fetchedMeal)
+                    setLoading(false)
+                },
+                // @ts-ignore
+                () => {
+                    setFailed(true);
+                }
+            );
         }, []);
 
     }
 
-    return {meal, setMeal, loading} ;
+    return {meal, setMeal, loading, failed} ;
 }

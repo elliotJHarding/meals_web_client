@@ -14,7 +14,7 @@ import ImportFromRecipeDialog from "../dialog/ImportFromRecipeDialog.tsx";
 
 export default function MealsPage() {
 
-    const {meals, loading} = useMeals();
+    const {meals, loading, failed} = useMeals();
 
     const [filter, setFilter] : [filter : MealFilter, setFilter : any] = useState(new MealFilter({
         name: null,
@@ -52,7 +52,7 @@ export default function MealsPage() {
                         <Tune/>
                     </IconButton>
                 </Stack>
-                <MealList meals={filter.filter(meals)} loading={loading}/>
+                <MealList meals={filter.filter(meals)} loading={loading} failed={failed}/>
             </Grid>
         </Grid>
     )

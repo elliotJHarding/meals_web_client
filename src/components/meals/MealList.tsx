@@ -1,13 +1,15 @@
 import Meal from "../../domain/Meal.ts";
 import MealListRow from "./MealListRow.tsx";
 import Grid from "@mui/material/Unstable_Grid2";
+import Error from "../error/Error.tsx";
+import {WarningRounded} from "@mui/icons-material";
 // import {Skeleton} from "@mui/material";
 
 const constant = {
     spacing: 1
 }
 
-export default function MealList({meals, loading} : {meals : Meal[], loading : boolean}) {
+export default function MealList({meals, loading, failed} : {meals : Meal[], loading : boolean, failed : boolean}) {
     const mealRows = meals.map((meal : Meal, index : number) => <MealListRow key={meal.id} meal={meal} index={index}/>);
 
     const skeleton =
@@ -18,8 +20,9 @@ export default function MealList({meals, loading} : {meals : Meal[], loading : b
         </>
 
     return (
-        <Grid container spacing={constant.spacing}>
-            {loading ? skeleton : mealRows}
+        <Grid container spacing={constant.spacing} sx={{height: '100%'}}>
+            {loading && skeleton}
+            {failed ? <Error message={"Error loading meals"} icon={<WarningRounded fontSize='large'/>}/> : mealRows}
         </Grid>
     )
 }

@@ -4,17 +4,18 @@ import {Fade, Stack} from "@mui/material";
 import Box from "@mui/material/Box";
 import MealDetails from "./MealDetails.tsx";
 import Button from "@mui/material-next/Button";
-import {ArrowBackIos, Delete} from "@mui/icons-material";
+import {ArrowBackIos, Delete, WarningRounded} from "@mui/icons-material";
 import Ingredients from "./ingredients/Ingredients.tsx";
 import {LayoutGroup} from "framer-motion";
 import DeleteDialog from "../dialog/DeleteDialog.tsx";
 import {useState} from "react";
+import Error from "../error/Error.tsx";
 
 export default function MealPage() {
 
     const { mealId } = useParams();
 
-    const {meal, setMeal, loading} = useMeal(mealId);
+    const {meal, setMeal, loading, failed} = useMeal(mealId);
 
     const navigate = useNavigate();
 
@@ -54,7 +55,8 @@ export default function MealPage() {
                 <Box sx={{flexGrow: 1}}/>
                 <Button startIcon={<Delete/>} onClick={handleDeleteOnClick}>Delete</Button>
             </Stack>
-            {loading ? skeleton : mealElement}
+            {loading && skeleton}
+            {failed ? <Error message={"Error loading meal"} icon={<WarningRounded fontSize="large"/>}/> : mealElement}
         </>
     )
 }
