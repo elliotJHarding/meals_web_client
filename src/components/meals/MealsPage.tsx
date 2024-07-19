@@ -11,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material-next/Button";
 import {useNavigate} from "react-router-dom";
 import ImportFromRecipeDialog from "../dialog/ImportFromRecipeDialog.tsx";
+import Meal from "../../domain/Meal.ts";
 
 export default function MealsPage() {
 
@@ -25,6 +26,8 @@ export default function MealsPage() {
     const [importRecipeOpen, setImportRecipeOpen] = useState<boolean>(false);
 
     const navigate = useNavigate();
+
+    const handleMealOnClick = (meal: Meal) => navigate(`${meal.id}`)
 
     const handleNewMealOnClick = () => navigate("/meals/new");
 
@@ -52,7 +55,7 @@ export default function MealsPage() {
                         <Tune/>
                     </IconButton>
                 </Stack>
-                <MealList meals={filter.filter(meals)} loading={loading} failed={failed}/>
+                <MealList meals={filter.filter(meals)} loading={loading} failed={failed} mealOnClick={handleMealOnClick}/>
             </Grid>
         </Grid>
     )

@@ -2,9 +2,7 @@ import Meal from "../../domain/Meal.ts";
 import Grid from "@mui/material/Unstable_Grid2";
 import {Card, CardActionArea, CardMedia, Fade, Typography} from "@mui/material";
 import EffortChip from "./chip/EffortChip.tsx";
-import {useNavigate} from "react-router-dom";
 import Box from "@mui/material/Box";
-// import ServesChip from "./chip/ServesChip.tsx";
 import PrepTimeChip from "./chip/PrepTimeChip.tsx";
 
 const constant = {
@@ -15,11 +13,9 @@ const constant = {
     cardBorderRadius: 3,
 }
 
-export default function MealListRow({meal, index} : {meal : Meal, index : number}) {
+export default function MealListRow({meal, index, onClick} : {meal : Meal, index : number, onClick: (meal : Meal) => void}) {
 
-    const navigateTo = useNavigate();
-
-    const handleClick = () => navigateTo(`${meal.id}`);
+    const handleClick = () => onClick(meal);
 
     return (
         <Fade in unmountOnExit timeout={200 * index}>
@@ -36,7 +32,6 @@ export default function MealListRow({meal, index} : {meal : Meal, index : number
                             </Typography>
                             <Box sx={{display: 'flex', gap: 1}}>
                                 <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'small'}/>
-                                {/*<ServesChip serves={meal.serves} size={'small'}/>*/}
                                 <EffortChip effort={meal.effort} size={'small'}/>
                             </Box>
                         </Box>

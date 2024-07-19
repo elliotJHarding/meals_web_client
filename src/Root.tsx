@@ -12,7 +12,7 @@ export default function Root() {
     return (
         <Box>
             <NavBar/>
-            <Container sx={{mt: 2}}>
+            <Container sx={{mt: 4}}>
                 <Outlet/>
             </Container>
         </Box>

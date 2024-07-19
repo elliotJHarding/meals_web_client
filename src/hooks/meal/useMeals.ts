@@ -19,6 +19,7 @@ export const useMeals = () : {meals : Meal[], setMeals : any, loading : boolean,
             },
             () => {
                 setFailed(true);
+                setLoading(false);
             }
         );
     }, []);

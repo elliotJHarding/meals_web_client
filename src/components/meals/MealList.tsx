@@ -9,8 +9,9 @@ const constant = {
     spacing: 1
 }
 
-export default function MealList({meals, loading, failed} : {meals : Meal[], loading : boolean, failed : boolean}) {
-    const mealRows = meals.map((meal : Meal, index : number) => <MealListRow key={meal.id} meal={meal} index={index}/>);
+export default function MealList({meals, loading, failed, mealOnClick} : {meals : Meal[], loading : boolean, failed : boolean, mealOnClick: (meal: Meal) => void}) {
+
+    const mealRows = meals.map((meal : Meal, index : number) => <MealListRow key={meal.id} meal={meal} index={index} onClick={mealOnClick} />);
 
     const skeleton =
         <>

@@ -8,6 +8,8 @@ import {AuthProvider} from "./contexts/AuthContext.tsx";
 import {GoogleOAuthProvider} from "@react-oauth/google";
 import MealPage from "./components/meals/MealPage.tsx";
 import {createTheme, responsiveFontSizes, ThemeProvider} from "@mui/material/styles";
+import PlanWizard from "./components/plans/wizard/PlanWizard.tsx";
+import type {} from '@mui/material/themeCssVarsAugmentation';
 
 export default function App() {
 
@@ -15,7 +17,8 @@ export default function App() {
         { path: "/", element: <Root/>, children: [
                 { path: "meals", element: <MealsPage/>},
                 { path: "meals/:mealId", element: <MealPage/>},
-                { path: "plans", element: <Plans/> }
+                { path: "plans", element: <Plans/> },
+                { path: "plans/create", element: <PlanWizard/>}
             ]}
     ])
 
@@ -23,7 +26,7 @@ export default function App() {
         palette: {
             mode: 'light',
             primary: {
-                main: '#b0c985',
+                main: '#50652c',
             },
             secondary: {
                 main: '#6b9992',
@@ -56,7 +59,12 @@ export default function App() {
                         }
                     }
                 }
-            }
+            },
+            MuiTypography: {
+                defaultProps: {
+                    fontFamily: 'Montserrat'
+                }
+            },
         },
         ref: {
             palette: {
