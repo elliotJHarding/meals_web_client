@@ -54,4 +54,17 @@ export default class Repository {
             .catch(error => console.error(error));
     }
 
+    delete(path : string, onSuccess : () => void) : void {
+        axios
+            .delete(
+                this.url + path,
+                {
+                    headers: this.getHeaders(),
+                    withCredentials: true,
+                }
+            )
+            .then(onSuccess)
+            .catch(error => console.error(error));
+    }
+
 }

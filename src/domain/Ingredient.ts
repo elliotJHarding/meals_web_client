@@ -1,6 +1,7 @@
 import {IngredientEdit} from "../components/meals/ingredients/Ingredients.tsx";
 import {parseUnit, Unit} from "./Unit.ts";
 import Meal from "./Meal.ts";
+import {IngredientMetadata} from "./IngredientMetadata.ts";
 
 export interface Ingredient {
     index: number;
@@ -9,6 +10,7 @@ export interface Ingredient {
     amount: number | null;
     unit: Unit | null;
     meal: Meal;
+    metadata?: IngredientMetadata;
 }
 
 export function shortFormat(ingredient : Ingredient) {
@@ -28,9 +30,9 @@ export function longFormat(ingredient : Ingredient) {
 }
 
 export function parseIngredient(edit : IngredientEdit, units : Unit[], parentMeal : Meal) : Ingredient | null {
-    let amountMatch = edit.input.match('^[0-9]+');
-    let unitMatch = edit.input.match('(?:^[0-9]+ ?)([a-zA-Z]+)(?: )');
-    let nameMatch = edit.input.match('(?:^[0-9]+ ?[a-zA-Z]* )([a-zA-Z ]+)')
+    let amountMatch = edit.input.match('^[0-9.]+');
+    let unitMatch = edit.input.match('(?:^[0-9.]+ ?)([a-zA-Z]+)(?: )');
+    let nameMatch = edit.input.match('(?:^[0-9.]+ ?[a-zA-Z]* )([a-zA-Z ]+)')
 
     if (amountMatch != null && nameMatch != null) {
         let amount = parseFloat(amountMatch[0]);

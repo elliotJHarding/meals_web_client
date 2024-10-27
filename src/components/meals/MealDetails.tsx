@@ -1,7 +1,7 @@
 import {
     Card,
     CardMedia,
-    Select,
+    Select, Skeleton,
     Stack,
     TextField,
     Typography
@@ -31,16 +31,23 @@ import {useNavigate} from "react-router-dom";
 import RecipeLink from "./recipe/RecipeLink.tsx";
 
 const constant = {
-    imageHeight: 250,
-    imageWidth: 300,
+    imageHeight: '100%',
+    imageWidth: '100%',
     borderRadius: 3,
     cardPadding: 0
 }
 
-export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal : Meal, setMeal : any, initialEdit : boolean | undefined, mealId: string | undefined}) {
+export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initialEdit, mealId, loading}: {
+    meal: Meal,
+    setMeal: any,
+    newMeal: Meal,
+    setNewMeal: any,
+    initialEdit: boolean | undefined,
+    mealId: string | undefined,
+    loading: boolean
+}) {
 
     const [edit, setEdit] = useState(initialEdit != undefined ? initialEdit : false);
-    const [newMeal, setNewMeal] = useState(meal);
     const [selectImageDialogOpen, setSelectImageDialogOpen] = useState(false);
 
     const navigate = useNavigate();
@@ -76,8 +83,7 @@ export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal
     const handleEffortOnChange = (newEffort : Effort) => setNewMeal({...newMeal, effort: newEffort});
     const handleDescOnChange = (newDesc: string) => setNewMeal({...newMeal, description: newDesc});
 
-
-    const displayMeal =
+    const skeleton =
         <Grid container spacing={3} sx={{flexGrow: 1, margin: 2}}
               component={motion.div}
               layout
@@ -85,28 +91,21 @@ export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}>
             <Grid xs={12} md={4} component={motion.div} layout>
-                <CardMedia
-                    component="img"
-                    image={meal.image?.url}
-                    sx={{ height: constant.imageHeight, borderRadius: constant.borderRadius}}
-                />
+                <Skeleton height={333}/>
             </Grid>
             <Grid xs={12} md={6} component={motion.div} layout>
                 <Stack direction='row' component={motion.div} layout>
-                    <Stack gap={2} sx={{py: 2}} component={motion.div} layout>
-                        <Typography variant='h4'>
-                            {meal.name}
-                        </Typography>
+                    <Stack gap={0} sx={{py: 2, width: '100%', height: '100%'}} component={motion.div} layout>
+                        <Skeleton variant='text' width={300} height={80}/>
                         <Box sx={{display: 'flex', gap: 1}}>
-                            <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'medium'}/>
-                            <ServesChip serves={meal.serves} size={'medium'}/>
-                            {meal.effort != undefined && <EffortChip effort={meal.effort} size={'medium'}/>}
-                        </Box>
-                        {meal.description != '' && <Typography>{meal.description}</Typography>}
-                        <Stack direction='row'>
-                            <RecipeLink recipe={meal.recipe} newMeal={newMeal} setNewMeal={setNewMeal}
-                                onConfirm={() => updateMeal(newMeal)}/>
-                        </Stack>
+                            <Skeleton variant='text' width={70} height={50}/>
+                            <Skeleton variant='text' width={70} height={50}/>
+                            <Skeleton variant='text' width={70} height={50}/>
+                        </Box >
+                        <Skeleton variant='text' width={500} height={50}/>
+                        <Skeleton variant='text' width={400} height={50}/>
+                        <Skeleton variant='text' width={600} height={50}/>
+                        <Skeleton variant='rounded' width={200} height={50}/>
                     </Stack>
                 </Stack>
             </Grid>
@@ -121,9 +120,59 @@ export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal
             </Grid>
         </Grid>
 
+
+    const image =
+        <Card sx={{height: constant.imageHeight, width: constant.imageWidth, borderRadius: constant.borderRadius}}
+                component={motion.div} layout='position'>
+            <CardMedia
+                component="img"
+                image={newMeal.image?.url}
+                sx={{height: constant.imageHeight, width: constant.imageWidth, borderRadius: constant.borderRadius}}
+                onClick={() => newMeal.name.length > 0 && setSelectImageDialogOpen(true)}
+            />
+        </Card>
+
+    const displayMeal =
+        <Grid container spacing={3} sx={{flexGrow: 1, margin: 2}}
+              component={motion.div}
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}>
+            <Grid xs={12} md={4} component={motion.div} layout>
+                {image}
+            </Grid>
+            <Grid xs={12} md={6} component={motion.div} layout>
+                    <Stack gap={2} sx={{py: 2, width: '100%', height: '100%'}} component={motion.div} layout='position'>
+                        <Typography variant='h4' component={motion.div} layout='position'>
+                            {meal.name}
+                        </Typography>
+                        <Box sx={{display: 'flex', gap: 1}} component={motion.div} layout='position'>
+                            <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'medium'}/>
+                            <ServesChip serves={meal.serves} size={'medium'}/>
+                            {meal.effort != undefined && <EffortChip effort={meal.effort} size={'medium'}/>}
+                        </Box>
+                        {meal.description != '' && <Typography>{meal.description}</Typography>}
+                        <Stack direction='row'>
+                            <RecipeLink recipe={meal.recipe} newMeal={newMeal} setNewMeal={setNewMeal}
+                                onConfirm={() => updateMeal(newMeal)}/>
+                        </Stack>
+                    </Stack>
+            </Grid>
+            <Grid xs={12} md={2} component={motion.div} layout>
+                <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'end', height: '100%'}} component={motion.div} layout>
+                    <Stack direction='row' justifyContent='end'>
+                        <ButtonGroup>
+                            <Button startIcon={<Edit/>} onClick={handleEdit} variant='text'>Edit</Button>
+                        </ButtonGroup>
+                    </Stack>
+                </Box>
+            </Grid>
+        </Grid>
+
     const imagePlaceholder =
         <Card
-            sx={{height: constant.imageHeight, borderRadius: constant.borderRadius}}
+            sx={{height: constant.imageHeight, width: constant.imageWidth, borderRadius: constant.borderRadius}}
             onClick={() => newMeal.name.length > 0 && setSelectImageDialogOpen(true)}
         >
             <Stack direction='row' justifyContent='center' alignItems='center' sx={{height: '100%'}}>
@@ -131,15 +180,6 @@ export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal
             </Stack>
         </Card>
 
-    const image =
-        <Card>
-            <CardMedia
-                component="img"
-                image={newMeal.image?.url}
-                sx={{height: constant.imageHeight, borderRadius: constant.borderRadius}}
-                onClick={() => newMeal.name.length > 0 && setSelectImageDialogOpen(true)}
-            />
-        </Card>
 
     const editMeal =
         <Grid container spacing={3} sx={{flexGrow: 1, margin: 2}}
@@ -151,7 +191,7 @@ export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal
             <Grid xs={12} md={4} component={motion.div} layout>
                 {newMeal.image == null ? imagePlaceholder : image}
             </Grid>
-            <Grid xs={12} md={4} component={motion.div} layout>
+            <Grid xs={12} md={5} component={motion.div} layout>
                 <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}} component={motion.div} layout>
                     <TextField
                         label='Name'
@@ -191,9 +231,13 @@ export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal
                             </Select>
                         </FormControl>
                     </Stack>
+                    <Stack direction='row'>
+                        <RecipeLink recipe={meal.recipe} newMeal={newMeal} setNewMeal={setNewMeal}
+                                    onConfirm={() => updateMeal(newMeal)}/>
+                    </Stack>
                 </Box>
             </Grid>
-            <Grid xs={12} md={4} >
+            <Grid xs={12} md={3} >
                 <Stack sx={{height: '100%', justifyContent: 'space-between'}} gap={2} component={motion.div} layout>
                     <TextField
                         multiline
@@ -211,7 +255,9 @@ export default function MealDetails({meal, setMeal, initialEdit, mealId} : {meal
         <>
             <Card sx={{borderRadius: constant.borderRadius, width: '100%'}} component={motion.div} layout>
                 <AnimatePresence>
-                    { edit ? editMeal : displayMeal }
+                    { loading ? skeleton :
+                        edit ? editMeal :
+                            displayMeal }
                 </AnimatePresence>
                 <SelectImageDialog
                     query={newMeal.name}

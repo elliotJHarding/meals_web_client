@@ -2,7 +2,7 @@ import {Ingredient, parseIngredient, shortFormat} from "../../../domain/Ingredie
 import {Card, Stack, Typography} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material-next/Button";
-import {Add, Close, Edit, PlaylistAdd} from "@mui/icons-material";
+import {Add, Close, ContentPaste, Edit, PlaylistAdd} from "@mui/icons-material";
 import {useState} from "react";
 import Meal from "../../../domain/Meal.ts";
 import {useMealUpdate} from "../../../hooks/meal/useMealUpdate.ts";
@@ -53,6 +53,30 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : Meal,
         setEdit(false);
     }
 
+    const handlePaste = async () => {
+        setEdit(true)
+        const clipboardContent = await navigator.clipboard.read();
+
+        for (const item of clipboardContent) {
+            if (item.types.includes('text/plain')) {
+                const blob = await item.getType('text/plain')
+                const blobText = await blob.text();
+
+                const lines = blobText.split('\n')
+                const newIngredients : IngredientEdit[] = lines.map((line, index) => {
+                    return {
+                        index: ingredientEdits.length + index,
+                        input: line
+                    }
+                })
+
+                const filterBlanks = (edits: IngredientEdit[]) => edits.filter(edit => edit.input != '');
+
+                setIngredientEdits([...filterBlanks(ingredientEdits), ...filterBlanks(newIngredients)]);
+            }
+        }
+    }
+
     const handleConfirm = () => {
         let newIngredients: Ingredient[] = ingredientEdits
             .filter(edit => edit.input != '')
@@ -91,6 +115,7 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : Meal,
                 <Typography variant='h5'>
                     Ingredients
                 </Typography>
+                {edit && <Button startIcon={<ContentPaste/>} onClick={handlePaste}>Paste</Button>}
                 <Box sx={{flexGrow: 1}}/>
                 <AnimatePresence>
                     { edit ? <ConfirmCancelButtons handleConfirm={handleConfirm} handleCancel={handleCancel}/> : displayButtons }

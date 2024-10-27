@@ -10,11 +10,13 @@ export default function WeekPlan({mealPlan} : {mealPlan: MealPlan}) {
 
     const navigate = useNavigate();
 
-    const planItems = mealPlan.plans.map((plan: Plan, i) =>
-        <DayPlan key={i} plan={plan}/>
-    );
+    const planItems = mealPlan.plans
+        .filter(plan => plan.dinner != null)
+        .map((plan: Plan, i) =>
+            <DayPlan key={i} plan={plan}/>
+        );
 
-    const onClick = () => navigate('create', {state: {mealPlan: mealPlan}})
+    const onClick = () => navigate(`create/choose?from=${mealPlan.from()}&to=${mealPlan.to()}`)
 
     const createPlan =
         <Button variant="text"
@@ -36,7 +38,7 @@ export default function WeekPlan({mealPlan} : {mealPlan: MealPlan}) {
         </Button>
 
     return (
-        <Card sx={{borderRadius: 3, padding: 2, height: '100%'}}>
+        <Card sx={{borderRadius: 3, padding: 2}}>
             {mealPlan.isEmpty() ? createPlan : plan}
         </Card>
     );

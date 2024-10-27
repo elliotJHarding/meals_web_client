@@ -3,9 +3,6 @@ import MealPlan from "../../domain/MealPlan.ts";
 import WeekPlan from "./WeekPlan.tsx";
 import Grid from "@mui/material/Unstable_Grid2";
 import {Stack, Typography} from "@mui/material";
-import Box from "@mui/material/Box";
-import {Edit} from "@mui/icons-material";
-import Button from "@mui/material-next/Button";
 
 export default function Plans() {
 
@@ -56,7 +53,7 @@ export default function Plans() {
                         {`${lastStartOfWeek.toLocaleDateString('en-gb', {day: "numeric", month: "long"})} - ${getEndOfWeek(lastStartOfWeek).toLocaleDateString('en-gb', {day: "numeric", month: "long"})}`}
                     </Typography>
                 </Stack>
-                <WeekPlan mealPlan={new MealPlan(thisWeek.plans)}/>
+                <WeekPlan mealPlan={new MealPlan(thisWeek.mealPlan.plans)}/>
             </Grid>
             <Grid xs={12} md={6}>
                 <Stack direction='row' spacing={2} alignItems="center">
@@ -67,7 +64,7 @@ export default function Plans() {
                         {`${nextStartOfWeek.toLocaleDateString('en-gb', {day: "numeric", month: "long"})} - ${getEndOfWeek(nextStartOfWeek).toLocaleDateString('en-gb', {day: "numeric", month: "long"})}`}
                     </Typography>
                 </Stack>
-                <WeekPlan mealPlan={new MealPlan(nextWeek.plans)}/>
+                <WeekPlan mealPlan={new MealPlan(nextWeek.mealPlan.plans)}/>
             </Grid>
         </Grid>
     )

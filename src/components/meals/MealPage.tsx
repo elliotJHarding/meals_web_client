@@ -15,7 +15,7 @@ export default function MealPage() {
 
     const { mealId } = useParams();
 
-    const {meal, setMeal, loading, failed} = useMeal(mealId);
+    const {meal, setMeal, newMeal, setNewMeal, loading, failed} = useMeal(mealId);
 
     const navigate = useNavigate();
 
@@ -37,11 +37,11 @@ export default function MealPage() {
             {/*</Box>*/}
         </>
 
-    const mealElement = meal == null ? null :
+    const mealElement = meal == null || newMeal == null ? null :
         <Fade in timeout={500}>
             <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
                 <LayoutGroup>
-                    <MealDetails meal={meal} setMeal={setMeal} initialEdit={mealId == 'new'} mealId={mealId}/>
+                    <MealDetails meal={meal} setMeal={setMeal} newMeal={newMeal} setNewMeal={setNewMeal} initialEdit={mealId == 'new'} mealId={mealId} loading={loading}/>
                     <Ingredients meal={meal} setMeal={setMeal} initialEdit={false}/>
                 </LayoutGroup>
             </Box>

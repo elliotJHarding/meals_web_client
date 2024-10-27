@@ -13,7 +13,7 @@ export default function RecipeLink({recipe, newMeal, setNewMeal, onConfirm} : {r
     useEffect(() => {
             newMeal?.recipe != null && lookupMetadata(newMeal.recipe.url, (metaData) => setRecipeMetadata(metaData))
         }
-    , []);
+    , [newMeal]);
 
     const [edit, setEdit] = useState<boolean>(false);
 

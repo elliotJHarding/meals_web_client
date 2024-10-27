@@ -3,14 +3,21 @@ import {useEffect, useState} from "react";
 import MealRepository from "../../repository/MealRepository.ts";
 import {useLocation} from "react-router-dom";
 
-export const useMeal = (mealIdParam : string | undefined) : {meal : Meal | null, setMeal : any, loading : boolean, failed : boolean} => {
+export const useMeal = (mealIdParam: string | undefined): {
+    meal: Meal | null,
+    setMeal: any,
+    newMeal: Meal | null,
+    setNewMeal: any,
+    loading: boolean,
+    failed: boolean
+} => {
 
     const repository = new MealRepository();
 
     const [loading, setLoading] = useState<boolean>(true);
     const [failed, setFailed] = useState<boolean>(false);
 
-    const [meal, setMeal] : [meal : Meal | null, any] = useState({
+    const [meal, setMeal]: [meal: Meal | null, any] = useState({
         name: "",
         description: "",
         serves: 2,
@@ -18,16 +25,24 @@ export const useMeal = (mealIdParam : string | undefined) : {meal : Meal | null,
         ingredients: []
     });
 
-    const parseParam = (param : string | undefined) : string => {
+    const [newMeal, setNewMeal]: [meal: Meal | null, any] = useState({
+        name: "",
+        description: "",
+        serves: 2,
+        prepTimeMinutes: 20,
+        ingredients: []
+    });
+
+
+    const parseParam = (param: string | undefined): string => {
         if (param == undefined) {
             throw new Error();
-        }
-        else {
+        } else {
             return param;
         }
     }
 
-    const safeParam : string = parseParam(mealIdParam);
+    const safeParam: string = parseParam(mealIdParam);
 
     if (safeParam == 'new') {
 
@@ -36,10 +51,11 @@ export const useMeal = (mealIdParam : string | undefined) : {meal : Meal | null,
         useEffect(() => {
             if (state != null) {
 
-                const {newMeal} = state;
+                const {createdMeal} = state;
 
-                if (newMeal != null) {
-                    setMeal(newMeal);
+                if (createdMeal != null) {
+                    setMeal(createdMeal);
+                    setNewMeal(createdMeal)
                 }
             }
 
@@ -55,6 +71,7 @@ export const useMeal = (mealIdParam : string | undefined) : {meal : Meal | null,
                 mealId,
                 (fetchedMeal) => {
                     setMeal(fetchedMeal)
+                    setNewMeal(fetchedMeal)
                     setLoading(false)
                 },
                 // @ts-ignore
@@ -66,5 +83,5 @@ export const useMeal = (mealIdParam : string | undefined) : {meal : Meal | null,
 
     }
 
-    return {meal, setMeal, loading, failed} ;
+    return {meal, setMeal, newMeal, setNewMeal, loading, failed};
 }

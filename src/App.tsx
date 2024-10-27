@@ -10,6 +10,8 @@ import MealPage from "./components/meals/MealPage.tsx";
 import {createTheme, responsiveFontSizes, ThemeProvider} from "@mui/material/styles";
 import PlanWizard from "./components/plans/wizard/PlanWizard.tsx";
 import type {} from '@mui/material/themeCssVarsAugmentation';
+import {GlobalStyles} from "@mui/material";
+import {CheckCircle, RadioButtonUnchecked} from "@mui/icons-material";
 
 export default function App() {
 
@@ -18,7 +20,7 @@ export default function App() {
                 { path: "meals", element: <MealsPage/>},
                 { path: "meals/:mealId", element: <MealPage/>},
                 { path: "plans", element: <Plans/> },
-                { path: "plans/create", element: <PlanWizard/>}
+                { path: "plans/create/:step", element: <PlanWizard/>}
             ]}
     ])
 
@@ -62,9 +64,15 @@ export default function App() {
             },
             MuiTypography: {
                 defaultProps: {
-                    fontFamily: 'Montserrat'
+                    fontFamily: 'Lora'
                 }
             },
+            MuiCheckbox: {
+                defaultProps: {
+                    icon: <RadioButtonUnchecked/>,
+                    checkedIcon: <CheckCircle/>,
+                }
+            }
         },
         ref: {
             palette: {
@@ -153,8 +161,9 @@ export default function App() {
 
     return (
     <>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={md3theme}>
             <CssVarsProvider theme={md3theme}>
+                <GlobalStyles styles={{html: {backgroundColor: theme.palette.background.default}}}/>
                 <AuthProvider>
                     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
                         <RouterProvider router={router}/>

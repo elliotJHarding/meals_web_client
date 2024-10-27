@@ -17,8 +17,8 @@ export default function NavBarLarge() {
             sx={{
                 mr: 7,
                 display: {xs: "none", md: "flex"},
-                fontFamily: "Montserrat",
-                fontWeight: 700,
+                fontFamily: "Lora",
+                fontWeight: 500,
                 opacity: 0.8,
                 textDecoration: "none",
             }}
