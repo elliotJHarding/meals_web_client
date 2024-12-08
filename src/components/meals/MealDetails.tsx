@@ -15,7 +15,7 @@ import {useState} from "react";
 import IconButton from "@mui/material-next/IconButton";
 import {Add, Edit, ImageOutlined, Person, Remove, Timer} from "@mui/icons-material";
 import {FormControl, InputLabel} from "@mui/material";
-import {Slider} from "@mui/material-next";
+import {Chip, Slider} from "@mui/material-next";
 import {formatPrepTime} from "../common/Utils.ts";
 import MenuItem from "@mui/material/MenuItem";
 import Effort from "../../domain/Effort.ts";
@@ -29,6 +29,7 @@ import SelectImageDialog from "../dialog/SelectImageDialog.tsx";
 import {useMealCreate} from "../../hooks/meal/useMealCreate.ts";
 import {useNavigate} from "react-router-dom";
 import RecipeLink from "./recipe/RecipeLink.tsx";
+import {useTags} from "../../hooks/tags/useTags.ts";
 
 const constant = {
     imageHeight: '100%',
@@ -52,6 +53,8 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
 
     const navigate = useNavigate();
 
+    const {tags, findTag} = useTags();
+
     const {updateMeal} = useMealUpdate(() => {
         setEdit(false);
         setMeal({...newMeal});
@@ -62,6 +65,7 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
         setMeal({...newMeal});
         navigate(`/meals/${createdMeal?.id}`)
     });
+
 
     const handleEdit = () => setEdit(true);
     const handleCancel = () => {
@@ -82,6 +86,9 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
     const handleServesDecrease = () => newMeal.serves > 1 && setNewMeal({...newMeal, serves: newMeal.serves - 1});
     const handleEffortOnChange = (newEffort : Effort) => setNewMeal({...newMeal, effort: newEffort});
     const handleDescOnChange = (newDesc: string) => setNewMeal({...newMeal, description: newDesc});
+    const handleTagsOnChange = (tagIds: number[]) => {
+        setNewMeal({...newMeal, tags: tagIds.map(id => findTag(id))})
+    }
 
     const skeleton =
         <Grid container spacing={3} sx={{flexGrow: 1, margin: 2}}
@@ -191,7 +198,7 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
             <Grid xs={12} md={4} component={motion.div} layout>
                 {newMeal.image == null ? imagePlaceholder : image}
             </Grid>
-            <Grid xs={12} md={5} component={motion.div} layout>
+            <Grid xs={12} md={4} component={motion.div} layout>
                 <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}} component={motion.div} layout>
                     <TextField
                         label='Name'
@@ -232,12 +239,33 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
                         </FormControl>
                     </Stack>
                     <Stack direction='row'>
+                        <FormControl fullWidth>
+                            <InputLabel id="tags-filter-label">Tags</InputLabel>
+                            <Select
+                                labelId="tags-filter-label"
+                                label="Tags"
+                                multiple
+                                renderValue={(selected) => (
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                        {selected.map((value: number) => (
+                                            <Chip key={value} label={findTag(value)?.name}/>
+                                        ))}
+                                    </Box>
+                                )}
+                                value={newMeal.tags.map(tag => tag.id)}
+                                onChange={(event) => handleTagsOnChange(event.target.value as number[])}
+                            >
+                                {tags.map(tag => <MenuItem value={tag.id}>{tag.name}</MenuItem>)}
+                            </Select>
+                        </FormControl>
+                    </Stack>
+                    <Stack direction='row'>
                         <RecipeLink recipe={meal.recipe} newMeal={newMeal} setNewMeal={setNewMeal}
                                     onConfirm={() => updateMeal(newMeal)}/>
                     </Stack>
                 </Box>
             </Grid>
-            <Grid xs={12} md={3} >
+            <Grid xs={12} md={4} >
                 <Stack sx={{height: '100%', justifyContent: 'space-between'}} gap={2} component={motion.div} layout>
                     <TextField
                         multiline

@@ -22,7 +22,8 @@ export const useMeal = (mealIdParam: string | undefined): {
         description: "",
         serves: 2,
         prepTimeMinutes: 20,
-        ingredients: []
+        ingredients: [],
+        tags: []
     });
 
     const [newMeal, setNewMeal]: [meal: Meal | null, any] = useState({
@@ -30,7 +31,8 @@ export const useMeal = (mealIdParam: string | undefined): {
         description: "",
         serves: 2,
         prepTimeMinutes: 20,
-        ingredients: []
+        ingredients: [],
+        tags: []
     });
 
 
