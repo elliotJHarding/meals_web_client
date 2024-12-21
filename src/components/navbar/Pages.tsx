@@ -1,5 +1,6 @@
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import {Explore} from "@mui/icons-material";
 
 export const pages = [
     {
@@ -12,4 +13,9 @@ export const pages = [
         icon: <CalendarMonthIcon/>,
         destination: 'plans'
     },
+    {
+        title: 'Explore',
+        icon: <Explore/>,
+        destination: 'explore'
+    }
 ];

@@ -43,14 +43,15 @@ export default function PlanWizard() {
             url: "ingredients",
             next: "shopping",
             back: "choose",
-            component: <CheckIngredients mealPlan={mealPlan}/>,
+            component: <CheckIngredients mealPlan={mealPlan}
+                                         setMealPlan={setMealPlan}/>,
         },
         {
             label: "Shopping List",
             url: "shopping",
             next: null,
             back: "ingredients",
-            component: <ShoppingList/>
+            component: <ShoppingList mealPlan={mealPlan}/>
         }
     ]
 

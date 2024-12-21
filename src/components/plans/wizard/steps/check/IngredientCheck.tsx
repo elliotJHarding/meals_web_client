@@ -2,16 +2,19 @@ import {Card, Checkbox, Stack, Typography} from "@mui/material";
 import {Ingredient} from "../../../../../domain/Ingredient.ts";
 import {CheckItemAction} from "../../../../../reducer/IngredientChecksReducer.ts";
 import {motion} from "framer-motion";
+import ShoppingListItem from "../../../../../domain/ShoppingListItem.ts";
 
-export default function IngredientCheck({ingredient, checked, dispatch}: {
+export default function IngredientCheck({ingredient, checked, dispatch, syncPlans}: {
     ingredient: Ingredient,
     checked: boolean,
-    dispatch: any
+    dispatch: any,
+    syncPlans: (items: ShoppingListItem[]) => void,
 }) {
 
     const onClick = () => {
-        ingredient.id != null &&
-            dispatch(new CheckItemAction(!checked, ingredient.id));
+        if (ingredient.id != null) {
+            dispatch(new CheckItemAction(!checked, ingredient.id, syncPlans));
+        }
     }
 
     return (

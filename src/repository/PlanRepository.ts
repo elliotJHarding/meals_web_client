@@ -54,6 +54,14 @@ export default class PlanRepository extends ResourceRepository {
         this.update(`plans/${plan.id}`, plan,() => {onSuccess()});
     }
 
+    updatePlans(plans: Plan[], onSuccess : () => void) : void {
+        console.group('Updating plans with values:');
+        console.info(plans)
+        console.groupEnd()
+
+        this.post(`plans/shoppingList`, plans, () => onSuccess())
+    }
+
     deletePlan(plan: Plan, onSuccess : () => void) : void {
         console.info('Deleting plans on date:');
         console.info(plan.date)
