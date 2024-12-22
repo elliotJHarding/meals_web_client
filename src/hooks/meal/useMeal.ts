@@ -46,29 +46,24 @@ export const useMeal = (mealIdParam: string | undefined): {
 
     const safeParam: string = parseParam(mealIdParam);
 
-    if (safeParam == 'new') {
+    const {state} = useLocation();
 
-        const {state} = useLocation();
-
-        useEffect(() => {
+    useEffect(() => {
+        if (safeParam == 'new') {
             if (state != null) {
 
-                const {createdMeal} = state;
+                const {newMeal} = state;
 
-                if (createdMeal != null) {
-                    setMeal(createdMeal);
-                    setNewMeal(createdMeal)
+                if (newMeal != null) {
+                    setMeal(newMeal);
+                    setNewMeal(newMeal);
                 }
             }
 
             setLoading(false);
-        }, []);
+        } else {
+            const mealId = BigInt(safeParam);
 
-    } else {
-
-        const mealId = BigInt(safeParam);
-
-        useEffect(() => {
             repository.getMeal(
                 mealId,
                 (fetchedMeal) => {
@@ -76,14 +71,12 @@ export const useMeal = (mealIdParam: string | undefined): {
                     setNewMeal(fetchedMeal)
                     setLoading(false)
                 },
-                // @ts-ignore
                 () => {
                     setFailed(true);
                 }
             );
-        }, []);
-
-    }
+        }
+    }, [])
 
     return {meal, setMeal, newMeal, setNewMeal, loading, failed};
 }

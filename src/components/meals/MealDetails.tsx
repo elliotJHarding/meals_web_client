@@ -69,8 +69,13 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
 
     const handleEdit = () => setEdit(true);
     const handleCancel = () => {
-        setEdit(false);
-        setNewMeal(meal);
+
+        if (mealId == 'new') {
+            navigate(-1);
+        } else {
+            setEdit(false);
+            setNewMeal(meal);
+        }
     };
     const handleConfirm = () => {
         if (mealId == 'new') {
