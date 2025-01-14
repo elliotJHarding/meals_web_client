@@ -40,8 +40,8 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : Meal,
         input: shortFormat(ingredient)
     }));
 
-    const [ingredientEdits, setIngredientEdits] : [ingredientEdits : IngredientEdit[], setIngredientEdits : any] =
-        useState(resetIngredientEdits(meal));
+    const [ingredientEdits, setIngredientEdits] =
+        useState<IngredientEdit[]>(resetIngredientEdits(meal));
 
     const handleEditOnClick = () => {
         setEdit(true)
@@ -78,12 +78,12 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : Meal,
     }
 
     const handleConfirm = () => {
-        let newIngredients: Ingredient[] = ingredientEdits
+        const newIngredients: Ingredient[] = ingredientEdits
             .filter(edit => edit.input != '')
             .map(edit => parseIngredient(edit, units, meal))
             .filter(edit => edit != null)
             .map((ingredient, index) => ({...ingredient, index: index})) as Ingredient[];
-        let newMeal = {...meal, ingredients: newIngredients};
+        const newMeal = {...meal, ingredients: newIngredients};
         updateMeal(newMeal);
         setMeal(newMeal);
         setIngredientEdits(resetIngredientEdits(newMeal));

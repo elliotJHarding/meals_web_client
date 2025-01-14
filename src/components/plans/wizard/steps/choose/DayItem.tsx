@@ -8,10 +8,12 @@ import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
 import Meal from "../../../../../domain/Meal.ts";
 import {useState} from "react";
 import IconButton from "@mui/material/IconButton";
-import {Add, Close, Edit} from "@mui/icons-material";
+import {Add, Close, Edit, NoteAdd, Restaurant} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import {usePlanDelete} from "../../../../../hooks/plan/usePlanDelete.ts";
 import {useNavigate} from "react-router-dom";
+import {motion} from "framer-motion";
+import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 
 const constant = {
     imageWidth: 50,
@@ -19,14 +21,15 @@ const constant = {
     imageBorderRadius: 2,
 }
 
-export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, mealPlan, setMealPlan}: {
+export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, mealPlan, setMealPlan, calendarEvents}: {
     index: number,
     plan: Plan,
     meals: Meal[],
     mealsLoading: boolean,
     mealsFailed: boolean,
     mealPlan: MealPlan,
-    setMealPlan: (mealPlan: MealPlan) => void
+    setMealPlan: (mealPlan: MealPlan) => void,
+    calendarEvents: CalendarEvent[]
 }) {
     const [mealChooserOpen, setMealChooserOpen] = useState<boolean>(false);
     const {createPlan} = usePlanCreate();
@@ -40,7 +43,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
     const primary = theme.sys.color.primary;
 
     const isToday = (plan: Plan) : boolean => {
-        let today: Date = new Date();
+        const today: Date = new Date();
         return (
             today.getFullYear() === plan.date.getFullYear() &&
             today.getMonth() === plan.date.getMonth() &&
@@ -52,7 +55,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
         deletePlan(plan, () => setMealPlan(new MealPlan(mealPlan.plans.filter(p => p.id != plan.id))));
     }
 
-    const meal = (meal: Meal, setMealChooserOpen : (open: boolean) => void) =>
+    const Meal = ({meal, setMealChooserOpen} : {meal: Meal, setMealChooserOpen : (open: boolean) => void}) =>
         <Stack direction='row' gap={1} alignItems='center' >
             <CardMedia
                 sx={{width: constant.imageWidth, height: constant.imageHeight, borderRadius: constant.imageBorderRadius}}
@@ -70,8 +73,36 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
             </IconButton>
         </Stack>
 
-    const addMealButton = (onClick : () => void) =>
-        <Button sx={{borderRadius: 2, width: '100%'}} startIcon={<Add/>} onClick={onClick} >Add</Button>
+    const AddActions = () => {
+        const [showActions, setShowActions] = useState<boolean>(false);
+        const onMouseEnter = () => setShowActions(true);
+        const onMouseLeave = () => setShowActions(false);
+
+        const actions =
+            <>
+                <AddMealButton onClick={() => setMealChooserOpen(true)}/>
+                <Button sx={{borderRadius: 2}} startIcon={<NoteAdd/>}>Note</Button>
+            </>
+
+        const add =
+            <IconButton><Add/></IconButton>
+
+        return (
+            <Stack direction='row' justifyContent='space-evenly' onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} component={motion.div} layout>
+                {showActions ? actions : add}
+            </Stack>
+        )
+    }
+
+    const AddMealButton = ({onClick} : {onClick : () => void}) =>
+        <Button sx={{borderRadius: 2}} startIcon={<Restaurant/>} onClick={onClick} >Meal</Button>
+
+    const calendarEventItems = calendarEvents.map(event =>
+        <Card>
+            <Typography variant='h6'>{event.time.getHours() + ":" + event.time.getMinutes()}</Typography>
+            <Typography variant='h6'>{event.name}</Typography>
+        </Card>
+    )
 
     return (
         <tr key={index}>
@@ -92,7 +123,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                              }
                          }}
             />
-            <td style={{paddingRight: '0.4rem'}}>
+            <td style={{paddingRight: '0.1rem'}}>
                 <Typography variant='h6' align="center" sx={{
                     backgroundColor: isToday(plan) ? primary : 'transparent',
                     width: '2rem',
@@ -103,20 +134,25 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                     {plan.date.toLocaleDateString('en-gb', {day: 'numeric'})}
                 </Typography>
             </td>
-            <td>
+            <td style={{paddingRight: '0.4rem'}}>
                 <Typography color={isToday(plan) ? primary : 'textSecondary'}
                             sx={{fontFamily: 'Montserrat'}}>
                     {plan.date.toLocaleDateString('en-gb', {weekday: 'short'})}
                 </Typography>
             </td>
             <td>
-                <Card>
-                    <Box sx={{padding: 1}}>
-                        {plan.dinner != null ?
-                            meal(plan.dinner, setMealChooserOpen) :
-                            addMealButton(() => setMealChooserOpen(true))}
+                <Card component={motion.div} layout>
+                    <Box sx={{padding: 1}} component={motion.div} layout>
+                        {
+                            plan.dinner != null ?
+                            <Meal meal={plan.dinner} setMealChooserOpen={setMealChooserOpen}/> :
+                            <AddActions/>
+                        }
                     </Box>
                 </Card>
+            </td>
+            <td>
+                {calendarEventItems}
             </td>
         </tr>
     )

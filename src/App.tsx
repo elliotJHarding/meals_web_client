@@ -12,11 +12,13 @@ import PlanWizard from "./components/plans/wizard/PlanWizard.tsx";
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {GlobalStyles} from "@mui/material";
 import {CheckCircle, RadioButtonUnchecked} from "@mui/icons-material";
+import LandingPage from "./components/home/LandingPage.tsx";
 
 export default function App() {
 
     const router  = createBrowserRouter([
         { path: "/", element: <Root/>, children: [
+                { path: "/" , element: <LandingPage/>},
                 { path: "meals", element: <MealsPage/>},
                 { path: "meals/:mealId", element: <MealPage/>},
                 { path: "plans", element: <Plans/> },

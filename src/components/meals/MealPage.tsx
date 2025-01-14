@@ -42,7 +42,7 @@ export default function MealPage() {
             <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
                 <LayoutGroup>
                     <MealDetails meal={meal} setMeal={setMeal} newMeal={newMeal} setNewMeal={setNewMeal} initialEdit={mealId == 'new'} mealId={mealId} loading={loading}/>
-                    <Ingredients meal={meal} setMeal={setMeal} initialEdit={false}/>
+                    <Ingredients key={meal.id} meal={meal} setMeal={setMeal} initialEdit={false}/>
                 </LayoutGroup>
             </Box>
         </Fade>;

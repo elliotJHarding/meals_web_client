@@ -7,19 +7,19 @@ import {Stack, Typography} from "@mui/material";
 export default function Plans() {
 
     const getLastStartOfWeek = () => {
-        let date = new Date();
+        const date = new Date(today);
         date.setDate(today.getDate() - dayDifference);
         return date;
     }
 
     const getNextStartOfWeek = () => {
-        let date = new Date();
+        const date = new Date(lastStartOfWeek);
         date.setDate(lastStartOfWeek.getDate() + 7);
         return date;
     }
 
     const getEndOfWeek = (startOfWeek: Date) => {
-        let date = new Date();
+        const date = new Date(startOfWeek);
         date.setDate(startOfWeek.getDate() + 6);
         return date;
     }
