@@ -26,3 +26,18 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: grubplanner.co.uk:32000/meals_web_client:latest
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v2
+        with:
+          version: 'v1.31.5'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
+          kubectl config set-context --current --kubeconfig=kubeconfig
+
+      - name: Restart deployment
+        run: |
+          kubectl rollout restart deployment meals-web-client
+
