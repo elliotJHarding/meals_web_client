@@ -28,7 +28,7 @@ jobs:
           tags: grubplanner.co.uk:32000/meals_web_client:latest
 
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v2
+        uses: azure/setup-kubectl@v4
         with:
           version: 'v1.31.5'
 
