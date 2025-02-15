@@ -42,7 +42,7 @@ export default function ChooseMeals({mealPlan, setMealPlan, meals, mealsLoading,
               exit={{x: 100, opacity: 0 }}>
             <Stack direction="row" spacing={2} sx={{padding: 2}}>
                 <Box sx={{width: '60%'}}>
-                    <table>
+                    <table style={{width:'100%'}}>
                         <tbody>
                         {dayItems}
                         </tbody>

@@ -21,7 +21,7 @@ export default function MealList({meals, loading, failed, mealOnClick} : {meals 
         </>
 
     return (
-        <Grid container spacing={constant.spacing} sx={{height: '100%'}}>
+        <Grid container spacing={constant.spacing}>
             {loading && skeleton}
             {failed ? <Error message={"Error loading meals"} icon={<WarningRounded fontSize='large'/>}/> : mealRows}
         </Grid>

@@ -2,7 +2,7 @@ import MetaDataRepository, {MetaData} from "../repository/MetaDataRepository.ts"
 import {useState} from "react";
 
 export const useMetadataLookup = () => {
-    const repository : MetaDataRepository = new MetaDataRepository('http://localhost:3000');
+    const repository : MetaDataRepository = new MetaDataRepository(import.meta.env.VITE_METADATA_URL);
 
     const [loading, setLoading] = useState<boolean>(true);
 
