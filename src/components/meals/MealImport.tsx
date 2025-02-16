@@ -36,7 +36,12 @@ export default function MealImport() {
                     setNewMeal({...newMeal,
                         name: metadata.title ?? '',
                         description: metadata.description ?? '',
-                        image: {url: metadata.image ?? ''}
+                        image: {url: metadata.image ?? ''},
+                        recipe: {
+                            title: metadata.title ?? '',
+                            url: url,
+                            image: {url: metadata.image ?? ''},
+                        }
                     });
                 });
             }
