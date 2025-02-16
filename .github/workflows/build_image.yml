@@ -42,4 +42,4 @@ jobs:
           kubectl config view
       - name: Restart deployment
         run: |
-          kubectl rollout restart deployment meals-web-client
+          kubectl rollout restart deployment meals-web-client --kubeconfig=kubeconfig
