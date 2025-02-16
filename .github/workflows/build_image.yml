@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build_image:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,6 +27,7 @@ jobs:
           push: true
           tags: grubplanner.co.uk:32000/meals_web_client:latest
   deploy:
+    needs: build_image
     runs-on: ubuntu-latest
     steps:
       - name: Set up kubectl
@@ -36,7 +37,7 @@ jobs:
 
       - name: Configure kubectl
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | tr -d '\n' | base64 -d > kubeconfig
+          echo -n "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
           kubectl config set-context --current --kubeconfig=kubeconfig
 
       - name: Restart deployment
