@@ -39,7 +39,7 @@ jobs:
         run: |
           echo -n "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
           kubectl config set-context --current --kubeconfig=kubeconfig
-
+          kubectl config view
       - name: Restart deployment
         run: |
           kubectl rollout restart deployment meals-web-client
