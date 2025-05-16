@@ -13,6 +13,9 @@ import type {} from '@mui/material/themeCssVarsAugmentation';
 import {GlobalStyles} from "@mui/material";
 import {CheckCircle, RadioButtonUnchecked} from "@mui/icons-material";
 import LandingPage from "./components/home/LandingPage.tsx";
+import Profile from "./components/user/Profile.tsx";
+import Logout from "./components/user/Logout.tsx";
+import LinkCalendar from "./components/calendar/LinkCalendar.tsx";
 
 export default function App() {
 
@@ -22,7 +25,10 @@ export default function App() {
                 { path: "meals", element: <MealsPage/>},
                 { path: "meals/:mealId", element: <MealPage/>},
                 { path: "plans", element: <Plans/> },
-                { path: "plans/create/:step", element: <PlanWizard/>}
+                { path: "plans/create/:step", element: <PlanWizard/>},
+                { path: "profile", element: <Profile/>},
+                { path: "logout", element: <Logout/>},
+                { path: "calendar/link", element: <LinkCalendar/>},
             ]}
     ])
 

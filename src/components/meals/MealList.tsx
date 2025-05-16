@@ -3,7 +3,7 @@ import MealListRow from "./MealListRow.tsx";
 import Grid from "@mui/material/Unstable_Grid2";
 import Error from "../error/Error.tsx";
 import {WarningRounded} from "@mui/icons-material";
-// import {Skeleton} from "@mui/material";
+import {Skeleton} from "@mui/material";
 
 const constant = {
     spacing: 1
@@ -15,9 +15,18 @@ export default function MealList({meals, loading, failed, mealOnClick} : {meals 
 
     const skeleton =
         <>
-            {/*<Grid xs={12}><Skeleton variant='rounded' height={100}/></Grid>*/}
-            {/*<Grid xs={12}><Skeleton variant='rounded' height={100}/></Grid>*/}
-            {/*<Grid xs={12}><Skeleton variant='rounded' height={100}/></Grid>*/}
+            {Array.from({length: 6}, (_, i) =>
+                <Grid xs={12}>
+                    <Skeleton variant='rounded'
+                              height={90}
+                              animation={'wave'}
+                              sx={{
+                                  opacity: 0.85 - (i * 0.15),
+                                  borderRadius: 4
+                              }}
+                    />
+                </Grid>
+            )}
         </>
 
     return (

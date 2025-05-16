@@ -103,7 +103,7 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}>
             <Grid xs={12} md={4} component={motion.div} layout>
-                <Skeleton height={333}/>
+                <Skeleton height={600}/>
             </Grid>
             <Grid xs={12} md={6} component={motion.div} layout>
                 <Stack direction='row' component={motion.div} layout>
@@ -288,9 +288,11 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
         <>
             <Card sx={{borderRadius: constant.borderRadius, width: '100%'}} component={motion.div} layout>
                 <AnimatePresence>
-                    { loading ? skeleton :
-                        edit ? editMeal :
-                            displayMeal }
+                    {
+                        loading ? skeleton :
+                           edit ? editMeal :
+                                  displayMeal
+                    }
                 </AnimatePresence>
                 <SelectImageDialog
                     query={newMeal.name}

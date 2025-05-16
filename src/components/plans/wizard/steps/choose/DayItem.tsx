@@ -56,7 +56,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
     }
 
     const Meal = ({meal, setMealChooserOpen} : {meal: Meal, setMealChooserOpen : (open: boolean) => void}) =>
-        <Stack direction="row" gap={1}>
+        <Stack direction="row" gap={1} sx={{padding: 1}}>
             <CardMedia
                 sx={{width: constant.imageWidth, height: constant.imageHeight, borderRadius: constant.imageBorderRadius}}
                 image={meal?.image?.url}
@@ -93,16 +93,24 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
 
         const actions =
             <>
+                <Button startIcon={<Add/>}
+                        sx={{borderRadius: 2}}
+                        variant='text'
+                        component={motion.div}
+                        initial={{x:100, opacity: 0 }}
+                        animate={{x:0, opacity: 1 }}
+                        exit={{x: 100, opacity: 0 }}
+                >New</Button>
+
                 <AddMealButton onClick={() => setMealChooserOpen(true)}/>
 
-                <AnimatePresence>
-                    <Button key={"addNoteButton"} sx={{borderRadius: 2}} startIcon={<NoteAdd/>}
-                            component={motion.div}
-                            initial={{x:-100, opacity: 0 }}
-                            animate={{x:0, opacity: 1 }}
-                            exit={{x: -100, opacity: 0 }}
-                    >Note</Button>
-                </AnimatePresence>
+                <Button key={"addNoteButton"} sx={{borderRadius: 2}} startIcon={<NoteAdd/>}
+                        variant='text'
+                        component={motion.div}
+                        initial={{x:-100, opacity: 0 }}
+                        animate={{x:0, opacity: 1 }}
+                        exit={{x: -100, opacity: 0 }}
+                >Note</Button>
             </>
 
         const add =
@@ -114,7 +122,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
             ><Add/></IconButton>
 
         return (
-            <Stack direction='row' justifyContent='center' onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} component={motion.div} layout>
+            <Stack sx={{padding: 1}} direction='row' justifyContent='center' onMouseOver={onMouseEnter} onMouseOut={onMouseLeave} component={motion.div} layout>
                 {showActions ? actions : add}
             </Stack>
         )
@@ -123,23 +131,32 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
     const AddMealButton = ({onClick} : {onClick : () => void}) =>
         <AnimatePresence>
             <Button key="AddMealButton" sx={{borderRadius: 2}} startIcon={<Restaurant/>} onClick={onClick}
+                    variant='text'
                     component={motion.div}
-                    initial={{x:100, opacity: 0 }}
-                    animate={{x:0, opacity: 1 }}
-                    exit={{x: 100, opacity: 0 }}>
+                    initial={{y:10, opacity: 0 }}
+                    animate={{y:0, opacity: 1 }}
+                    exit={{y: 10, opacity: 0 }}
+            >
                 Meal
             </Button>
         </AnimatePresence>
 
     const calendarEventItems = calendarEvents.map(event =>
-        <Card>
-            <Typography variant='h6'>{event.time.getHours() + ":" + event.time.getMinutes()}</Typography>
-            <Typography variant='h6'>{event.name}</Typography>
+        <Card variant={'elevation'} sx={{paddingY: 0.3, paddingX: 1, borderRadius: 2, margin: 1, width: 250, backgroundColor: event.colour}}
+              component={motion.div}
+              initial={{x:10, opacity: 0 }}
+              animate={{x:0, opacity: 1 }}
+              exit={{x: 10, opacity: 0 }}
+        >
+            <Stack direction={'row'} gap={1}>
+                <Typography fontWeight={'bold'}>{event.time.toLocaleTimeString('en-gb', {hour: "2-digit", minute: "2-digit", hour12: false})}</Typography>
+                <Typography>{event.name}</Typography>
+            </Stack>
         </Card>
     )
 
     return (
-        <tr key={index}>
+        <tr key={index} style={{borderBottom: '1px solid #e0e0e0'}}>
             <MealChooser meals={meals}
                          mealsLoading={mealsLoading}
                          mealsFailed={mealsFailed}
@@ -157,7 +174,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                              }
                          }}
             />
-            <td style={{paddingRight: '0.1rem'}}>
+            <td style={{paddingRight: '0.3rem'}}>
                 <Typography variant='h6' align="center" sx={{
                     backgroundColor: isToday(plan) ? primary : 'transparent',
                     width: '2rem',
@@ -168,22 +185,20 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                     {plan.date.toLocaleDateString('en-gb', {day: 'numeric'})}
                 </Typography>
             </td>
-            <td style={{paddingRight: '0.4rem'}}>
+            <td style={{paddingRight: '0.6rem'}}>
                 <Typography color={isToday(plan) ? primary : 'textSecondary'}
                             sx={{fontFamily: 'Montserrat'}}>
                     {plan.date.toLocaleDateString('en-gb', {weekday: 'short'})}
                 </Typography>
             </td>
             <td style={{width:'100%'}}>
-                <Card component={motion.div} layout>
-                    <Box sx={{padding: 1}} component={motion.div} layout>
-                        {
-                            plan.dinner != null ?
-                            <Meal meal={plan.dinner} setMealChooserOpen={setMealChooserOpen}/> :
-                            <AddActions/>
-                        }
-                    </Box>
-                </Card>
+                <Box sx={{padding: 0}} component={motion.div} layout>
+                    {
+                        plan.dinner != null ?
+                        <Meal meal={plan.dinner} setMealChooserOpen={setMealChooserOpen}/> :
+                        <AddActions/>
+                    }
+                </Box>
             </td>
             <td>
                 {calendarEventItems}

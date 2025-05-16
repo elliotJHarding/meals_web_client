@@ -44,7 +44,7 @@ export default function LandingPage() {
     const primary = theme.sys.color.primary;
 
     const Option = ({option} : {option: Option}) =>
-        <Grid xs={4} sx={{mt: 5}}>
+        <Grid xs={12} md={4}>
             <Card sx={{borderRadius: 5, ":hover": {cursor: 'pointer'}}} onClick={() => navigate(option.link)} component={motion.div}
                   whileHover={{ scale: 1.1, translateY: -20}}
                   whileTap={{ scale: 0.99 }}
@@ -61,7 +61,7 @@ export default function LandingPage() {
 
 
     return (
-        <Grid container spacing={5}>
+        <Grid container spacing={5} sx={{mt: 5}}>
             {options.map((option, index) => <Option key={index} option={option}/>)}
         </Grid>
     )

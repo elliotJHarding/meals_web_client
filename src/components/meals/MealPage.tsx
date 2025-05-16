@@ -25,18 +25,6 @@ export default function MealPage() {
 
     const handleDeleteOnClick = () => setDeleteDialogOpen(true);
 
-    const skeleton =
-        <>
-            {/*<Box sx={{display: 'flex', padding: constant.cardPadding}} >*/}
-            {/*    <Skeleton variant='rounded' height={constant.imageHeight} width={constant.imageWidth}/>*/}
-            {/*    <Box sx={{display: 'flex column'}}>*/}
-            {/*        <Skeleton variant='text'/>*/}
-            {/*        <Skeleton variant='text'/>*/}
-            {/*        <Skeleton variant='text'/>*/}
-            {/*    </Box>*/}
-            {/*</Box>*/}
-        </>
-
     const mealElement = meal == null || newMeal == null ? null :
         <Fade in timeout={500}>
             <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
@@ -55,7 +43,6 @@ export default function MealPage() {
                 <Box sx={{flexGrow: 1}}/>
                 <Button startIcon={<Delete/>} onClick={handleDeleteOnClick}>Delete</Button>
             </Stack>
-            {loading && skeleton}
             {failed ? <Error message={"Error loading meal"} icon={<WarningRounded fontSize="large"/>}/> : mealElement}
         </>
     )

@@ -34,4 +34,8 @@ export default class AuthRepository extends ResourceRepository {
         })
     }
 
+    logout(onSuccess : () => void) {
+        this.post("auth/logout", null, onSuccess);
+    }
+
 }

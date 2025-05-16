@@ -33,6 +33,7 @@ export default function PlanWizard() {
             next: "ingredients",
             back: null,
             component: <ChooseMeals mealPlan={mealPlan}
+                                    from={from} to={to}
                                     setMealPlan={setMealPlan}
                                     meals={meals}
                                     mealsLoading={loading}

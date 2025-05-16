@@ -8,6 +8,8 @@ import {userOptions} from "./Options.tsx";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import {motion} from "framer-motion";
+import {Stack} from "@mui/material";
+import {useNavigate} from "react-router-dom";
 
 export default function NavBarAvatar({onClick, anchorEl, onClose, avatarUrl}: {
     onClick: (event: React.MouseEvent<HTMLElement>) => void,
@@ -15,6 +17,9 @@ export default function NavBarAvatar({onClick, anchorEl, onClose, avatarUrl}: {
     onClose: () => void,
     avatarUrl: string,
 }) {
+
+    const navigate = useNavigate();
+
     return <Box sx={{flexGrow: 0}}>
         <Tooltip title="Open settings">
             <IconButton onClick={onClick} sx={{p: 0}}>
@@ -44,11 +49,11 @@ export default function NavBarAvatar({onClick, anchorEl, onClose, avatarUrl}: {
             onClose={onClose}
         >
             {userOptions.map((option) => (
-                <MenuItem key={option.title} onClick={onClose}>
-                    <Box>
+                <MenuItem key={option.title} onClick={() => navigate(option.link)}>
+                    <Stack direction="row" alignItems="center" gap={1}>
                         {option.icon}
-                    </Box>
-                    <Typography textAlign="center">{option.title}</Typography>
+                        <Typography textAlign="center">{option.title}</Typography>
+                    </Stack>
                 </MenuItem>
             ))}
         </Menu>
