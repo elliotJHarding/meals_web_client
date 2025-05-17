@@ -141,15 +141,32 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
             </Button>
         </AnimatePresence>
 
-    const calendarEventItems = calendarEvents.map(event =>
-        <Card variant={'elevation'} sx={{paddingY: 0.3, paddingX: 1, borderRadius: 2, margin: 1, width: 250, backgroundColor: event.colour}}
+    const calendarEventItems = calendarEvents
+        .sort((a, b) => {
+            if (a.allDay && b.allDay) {
+                return 0
+            }
+            if (a.allDay && !b.allDay) {
+                return -1
+            }
+            if (!a.allDay && b.allDay) {
+                return 1
+            }
+            if (a.time === null || b.time === null) {
+                return 0;
+            } else {
+                return a.time.getTime() - b.time.getTime();
+            }
+        })
+        .map(event =>
+        <Card variant={'outlined'} sx={{paddingY: 0.3, paddingX: 1, borderRadius: 1, margin: 1, width: 250, backgroundColor: event.colour}}
               component={motion.div}
               initial={{x:10, opacity: 0 }}
               animate={{x:0, opacity: 1 }}
               exit={{x: 10, opacity: 0 }}
         >
             <Stack direction={'row'} gap={1}>
-                <Typography fontWeight={'bold'} color={event.textColour}>{event.time.toLocaleTimeString('en-gb', {hour: "2-digit", minute: "2-digit", hour12: false})}</Typography>
+                {!event.allDay && <Typography fontWeight={'bold'} color={event.textColour}>{event.time.toLocaleTimeString('en-gb', {hour: "2-digit", minute: "2-digit", hour12: false})}</Typography>}
                 <Typography>{event.name}</Typography>
             </Stack>
         </Card>

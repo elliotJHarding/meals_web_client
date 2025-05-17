@@ -4,4 +4,5 @@ export default interface CalendarEvent {
     time : Date,
     colour: string,
     textColour: string,
+    allDay: boolean,
 }
