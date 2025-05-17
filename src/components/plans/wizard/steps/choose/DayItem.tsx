@@ -149,7 +149,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
               exit={{x: 10, opacity: 0 }}
         >
             <Stack direction={'row'} gap={1}>
-                <Typography fontWeight={'bold'}>{event.time.toLocaleTimeString('en-gb', {hour: "2-digit", minute: "2-digit", hour12: false})}</Typography>
+                <Typography fontWeight={'bold'} color={event.textColour}>{event.time.toLocaleTimeString('en-gb', {hour: "2-digit", minute: "2-digit", hour12: false})}</Typography>
                 <Typography>{event.name}</Typography>
             </Stack>
         </Card>
