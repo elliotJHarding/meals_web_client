@@ -1,68 +1,276 @@
-import {Card, Stack, Typography, useTheme} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import {CalendarMonth, Explore, Restaurant} from "@mui/icons-material";
-import {ReactNode} from "react";
-import Box from "@mui/material/Box";
-import {useNavigate} from "react-router-dom";
-import {motion} from "framer-motion";
-
-type Option = {
-    name: string;
-    tagLine: string;
-    icon: ReactNode;
-    link: string;
-}
-
-const options : Option[] = [
-    {
-        name: "Meals",
-        tagLine: "Add to a library of meals",
-        icon: <Restaurant fontSize='large'/>,
-        link: "/meals"
-    },
-    {
-        name: "Plan",
-        tagLine: "Create a meal plan",
-        icon: <CalendarMonth fontSize='large'/>,
-        link: "/plans"
-    },
-    {
-        name: "Explore",
-        tagLine: "Explore new recipes",
-        icon: <Explore fontSize='large'/>,
-        link: "/explore"
-    },
-]
+import {Typography, Box, Button, useTheme, useMediaQuery, Container, Paper} from "@mui/material";
+import { motion } from "framer-motion";
+import {ShoppingCart, Restaurant} from "@mui/icons-material";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 
 export default function LandingPage() {
-
     const theme = useTheme();
-    const navigate = useNavigate();
-
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     // @ts-ignore
-    const primary = theme.sys.color.primary;
+    const primaryColor = theme.sys.color.primary;
 
-    const Option = ({option} : {option: Option}) =>
-        <Grid xs={12} md={4}>
-            <Card sx={{borderRadius: 5, ":hover": {cursor: 'pointer'}}} onClick={() => navigate(option.link)} component={motion.div}
-                  whileHover={{ scale: 1.1, translateY: -20}}
-                  whileTap={{ scale: 0.99 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}>
-                <Stack sx={{padding: 5}} direction="column" gap={5} alignItems="center">
-                    <Box sx={{backgroundColor: primary, padding: 2, borderRadius: 999999, color: 'white'}}>
-                        {option.icon}
-                    </Box>
-                    <Typography variant='h3'>{option.name}</Typography>
-                    <Typography>{option.tagLine}</Typography>
-                </Stack>
-            </Card>
-        </Grid>
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: { 
+            opacity: 1,
+            transition: { 
+                staggerChildren: 0.3,
+                delayChildren: 0.2
+            }
+        }
+    };
 
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: { 
+            y: 0, 
+            opacity: 1,
+            transition: { 
+                type: "spring", 
+                stiffness: 100 
+            }
+        }
+    };
 
     return (
-        <Grid container spacing={5} sx={{mt: 5}}>
-            {options.map((option, index) => <Option key={index} option={option}/>)}
-        </Grid>
+        <Container maxWidth="xl">
+            <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+            >
+                {/* Hero Section */}
+                <Grid container spacing={5} sx={{ mt: isMobile ? 2 : 5, mb: 10 }}>
+                    <Grid xs={12} md={6} display="flex" flexDirection="column" justifyContent="center">
+                        <motion.div variants={itemVariants}>
+                            <Typography 
+                                variant="h2" 
+                                component="h1" 
+                                fontWeight="bold" 
+                                gutterBottom
+                                sx={{ 
+                                    fontSize: isMobile ? '2.5rem' : '3.5rem'
+                                }}
+                            >
+                                Make Meal Planning Effortless
+                            </Typography>
+                        </motion.div>
+
+                        <motion.div variants={itemVariants}>
+                            <Typography 
+                                variant="h5" 
+                                component="p" 
+                                sx={{ 
+                                    mb: 4,
+                                    color: 'text.secondary',
+                                    fontSize: isMobile ? '1.2rem' : '1.5rem'
+                                }}
+                            >
+                                Take the stress out of your weekly shop
+                            </Typography>
+                        </motion.div>
+
+                        <motion.div variants={itemVariants}>
+                            <Button 
+                                variant="contained"
+                                size="large"
+                                sx={{
+                                    backgroundColor: primaryColor,
+                                    fontSize: '1.1rem',
+                                    fontFamily: 'Roboto',
+                                }}
+                            >
+                                Get Started
+                            </Button>
+                        </motion.div>
+                    </Grid>
+
+                </Grid>
+
+                {/* How It Works Section */}
+                <Paper sx={{ mb: 10, borderRadius: 4, p: isMobile ? 4 : 8, textAlign: 'center' }}>
+                    <Typography 
+                        variant="h3" 
+                        component="h2" 
+                        textAlign="center" 
+                        fontWeight="bold"
+                        sx={{ 
+                            mb: 6,
+                            fontSize: isMobile ? '2rem' : '2.5rem'
+                        }}
+                    >
+                        How It Works
+                    </Typography>
+
+                    <Grid container spacing={isMobile ? 4 : 8}>
+                        <Grid xs={12} md={4}>
+                            <motion.div
+                                variants={itemVariants}
+                                whileHover={{ y: -5 }}
+                            >
+                                <Box 
+                                    sx={{ 
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        textAlign: 'center',
+                                        p: 2
+                                    }}
+                                >
+                                    <Box 
+                                        sx={{ 
+                                            backgroundColor: `${primaryColor}20`,
+                                            p: 3,
+                                            borderRadius: '50%',
+                                            mb: 3
+                                        }}
+                                    >
+                                        <Restaurant sx={{ fontSize: 60, color: primaryColor }} />
+                                    </Box>
+                                    <Typography variant="h5" component="h3" fontWeight="bold" gutterBottom>
+                                        1. Add Your Meals
+                                    </Typography>
+                                    <Typography variant="body1" color="text.secondary">
+                                        Create your collection of favorite recipes or add quick meal ideas.
+                                    </Typography>
+                                </Box>
+                            </motion.div>
+                        </Grid>
+
+                        <Grid xs={12} md={4}>
+                            <motion.div
+                                variants={itemVariants}
+                                whileHover={{ y: -5 }}
+                            >
+                                <Box 
+                                    sx={{ 
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        textAlign: 'center',
+                                        p: 2
+                                    }}
+                                >
+                                    <Box 
+                                        sx={{ 
+                                            backgroundColor: `${primaryColor}20`,
+                                            p: 3,
+                                            borderRadius: '50%',
+                                            mb: 3
+                                        }}
+                                    >
+                                        <CalendarMonthIcon sx={{ fontSize: 60, color: primaryColor }} />
+                                    </Box>
+                                    <Typography variant="h5" component="h3" fontWeight="bold" gutterBottom>
+                                        2. Create Your Plan
+                                    </Typography>
+                                    <Typography variant="body1" color="text.secondary">
+                                        Add meals to you meal plan, or let AI do it for you.
+                                    </Typography>
+                                </Box>
+                            </motion.div>
+                        </Grid>
+
+                        <Grid xs={12} md={4}>
+                            <motion.div
+                                variants={itemVariants}
+                                whileHover={{ y: -5 }}
+                            >
+                                <Box 
+                                    sx={{ 
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        textAlign: 'center',
+                                        p: 2
+                                    }}
+                                >
+                                    <Box 
+                                        sx={{ 
+                                            backgroundColor: `${primaryColor}20`,
+                                            p: 3,
+                                            borderRadius: '50%',
+                                            mb: 3
+                                        }}
+                                    >
+                                        <ShoppingCart sx={{ fontSize: 60, color: primaryColor }} />
+                                    </Box>
+                                    <Typography variant="h5" component="h3" fontWeight="bold" gutterBottom>
+                                        3. Get Shopping List
+                                    </Typography>
+                                    <Typography variant="body1" color="text.secondary">
+                                        Automatically generate your shopping list based on your meal plan.
+                                    </Typography>
+                                </Box>
+                            </motion.div>
+                        </Grid>
+                    </Grid>
+                </Paper>
+
+                {/* CTA Section */}
+                <motion.div
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                >
+                    <Box 
+                        sx={{ 
+                            backgroundColor: primaryColor,
+                            borderRadius: 4,
+                            p: isMobile ? 4 : 8,
+                            textAlign: 'center',
+                            mb: 10
+                        }}
+                    >
+                        <Typography 
+                            variant="h3" 
+                            component="h2" 
+                            fontWeight="bold"
+                            sx={{ 
+                                mb: 3,
+                                color: 'white',
+                                fontSize: isMobile ? '1.8rem' : '2.5rem'
+                            }}
+                        >
+                            Ready to Simplify Your Meal Planning?
+                        </Typography>
+
+                        <Typography 
+                            variant="h6" 
+                            component="p"
+                            sx={{ 
+                                mb: 4,
+                                color: 'white',
+                                opacity: 0.9,
+                                maxWidth: '800px',
+                                mx: 'auto'
+                            }}
+                        >
+                            Join thousands of home cooks who have transformed their meal preparation routine.
+                        </Typography>
+
+                        <Button 
+                            variant="contained" 
+                            size="large" 
+                            sx={{ 
+                                borderRadius: 2,
+                                py: 1.5,
+                                px: 4,
+                                fontSize: '1.1rem',
+                                backgroundColor: 'white',
+                                color: primaryColor,
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                }
+                            }}
+                        >
+                            Get Started Now
+                        </Button>
+                    </Box>
+                </motion.div>
+            </motion.div>
+        </Container>
     )
 }
