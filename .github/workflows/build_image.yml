@@ -11,6 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create .env.production file
+        run: |
+          echo "${{ secrets.PRODUCTION_DOT_ENV }}" > .env.production
+
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
