@@ -155,13 +155,73 @@ export default function LandingPage() {
                                 >
                                     <Box 
                                         sx={{ 
-                                            backgroundColor: `${primaryColor}20`,
-                                            p: 3,
-                                            borderRadius: '50%',
+                                            position: 'relative',
                                             mb: 3
                                         }}
                                     >
-                                        <CalendarMonthIcon sx={{ fontSize: 60, color: primaryColor }} />
+                                        {/* Orange circle with fire-like glow for AI indication */}
+                                        <motion.div
+                                            animate={{
+                                                rotate: [0, 120, 240, 360, 0],
+                                                scale: [1, 1.15, 1, 1.05, 1],
+                                                boxShadow: [
+                                                    '0 0 10px 5px rgba(255, 165, 0, 0.8), 0 0 20px 10px rgba(255, 69, 0, 0.3)',
+                                                ]
+                                            }}
+                                            transition={{
+                                                duration: 4,
+                                                ease: "easeInOut",
+                                                repeat: Infinity,
+                                                repeatType: 'mirror',
+                                                type: "tween"
+                                            }}
+                                            style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                borderRadius: '50%',
+                                                backgroundColor: '#FFCC80',
+                                                zIndex: 0
+                                            }}
+                                        />
+                                        {/* Additional fire-like swirling layer */}
+                                        {/*<motion.div*/}
+                                        {/*    animate={{*/}
+                                        {/*        rotate: [360, 240, 120, 0, 360],*/}
+                                        {/*        scale: [1, 1.18, 0.96, 1],*/}
+                                        {/*        opacity: [0.5, 0.7, 0.6, 0.5],*/}
+                                        {/*    }}*/}
+                                        {/*    transition={{*/}
+                                        {/*        duration: 4.5,*/}
+                                        {/*        ease: "easeInOut",*/}
+                                        {/*        repeat: Infinity,*/}
+                                        {/*        repeatType: 'loop',*/}
+                                        {/*        type: "tween"*/}
+                                        {/*    }}*/}
+                                        {/*    style={{*/}
+                                        {/*        position: 'absolute',*/}
+                                        {/*        top: -5,*/}
+                                        {/*        left: -5,*/}
+                                        {/*        right: -5,*/}
+                                        {/*        bottom: -5,*/}
+                                        {/*        borderRadius: '50%',*/}
+                                        {/*        background: 'radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,69,0,0.4) 60%, rgba(255,140,0,0.2) 80%, transparent 100%)',*/}
+                                        {/*        zIndex: 0*/}
+                                        {/*    }}*/}
+                                        {/*/>*/}
+                                        <Box 
+                                            sx={{ 
+                                                backgroundColor: 'white',
+                                                p: 3,
+                                                borderRadius: '50%',
+                                                position: 'relative',
+                                                zIndex: 1
+                                            }}
+                                        >
+                                            <CalendarMonthIcon sx={{ fontSize: 60, color: primaryColor }} />
+                                        </Box>
                                     </Box>
                                     <Typography variant="h5" component="h3" fontWeight="bold" gutterBottom>
                                         2. Create Your Plan
