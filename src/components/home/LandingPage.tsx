@@ -187,33 +187,32 @@ export default function LandingPage() {
                                             }}
                                         />
                                         {/* Additional fire-like swirling layer */}
-                                        {/*<motion.div*/}
-                                        {/*    animate={{*/}
-                                        {/*        rotate: [360, 240, 120, 0, 360],*/}
-                                        {/*        scale: [1, 1.18, 0.96, 1],*/}
-                                        {/*        opacity: [0.5, 0.7, 0.6, 0.5],*/}
-                                        {/*    }}*/}
-                                        {/*    transition={{*/}
-                                        {/*        duration: 4.5,*/}
-                                        {/*        ease: "easeInOut",*/}
-                                        {/*        repeat: Infinity,*/}
-                                        {/*        repeatType: 'loop',*/}
-                                        {/*        type: "tween"*/}
-                                        {/*    }}*/}
-                                        {/*    style={{*/}
-                                        {/*        position: 'absolute',*/}
-                                        {/*        top: -5,*/}
-                                        {/*        left: -5,*/}
-                                        {/*        right: -5,*/}
-                                        {/*        bottom: -5,*/}
-                                        {/*        borderRadius: '50%',*/}
-                                        {/*        background: 'radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,69,0,0.4) 60%, rgba(255,140,0,0.2) 80%, transparent 100%)',*/}
-                                        {/*        zIndex: 0*/}
-                                        {/*    }}*/}
-                                        {/*/>*/}
+                                        <motion.div
+                                            animate={{
+                                                rotate: [360, 240, 120, 0, 0],
+                                                scale: [1, 1.08, 0.96, 1, 1],
+                                                opacity: [0.5, 0.7, 0.6, 0.5, 0.5]
+                                            }}
+                                            transition={{
+                                                duration: 4.5,
+                                                ease: "easeInOut",
+                                                repeat: Infinity,
+                                                repeatType: 'mirror'
+                                            }}
+                                            style={{
+                                                position: 'absolute',
+                                                top: -5,
+                                                left: -5,
+                                                right: -5,
+                                                bottom: -5,
+                                                borderRadius: '50%',
+                                                background: 'radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,69,0,0.4) 60%, rgba(255,140,0,0.2) 80%, transparent 100%)',
+                                                zIndex: 0
+                                            }}
+                                        />
                                         <Box 
                                             sx={{ 
-                                                backgroundColor: 'white',
+                                                backgroundColor: `${primaryColor}20`,
                                                 p: 3,
                                                 borderRadius: '50%',
                                                 position: 'relative',
