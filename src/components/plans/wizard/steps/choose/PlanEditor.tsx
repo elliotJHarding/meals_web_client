@@ -10,6 +10,7 @@ import {useCalendarEvents} from "../../../../../hooks/calendar/useCalendarEvents
 import CalendarEvents from "./CalendarEvents.tsx";
 import {useState, useCallback} from "react";
 import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
+import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
 import MealItem from "./MealItem.tsx";
 import MealChooser from "../../../../dialog/MealChooser.tsx";
 import Meal from "../../../../../domain/Meal.ts";
@@ -35,6 +36,7 @@ interface PlanEditorProps {
 export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPlanUpdate}: PlanEditorProps) {
     const navigate = useNavigate();
     const {updatePlan} = usePlanUpdate();
+    const {createPlan} = usePlanCreate();
     const [currentPlan, setCurrentPlan] = useState<Plan>({
         ...plan,
         planMeals: plan.planMeals || []
@@ -43,27 +45,35 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
 
     const {calendarEvents} = useCalendarEvents(MealPlan.formatDate(plan.date), MealPlan.formatDate(plan.date));
 
-    // Debounced plan update function
-    const debouncedUpdatePlan = useCallback(
-        debounce((updatedPlan: Plan) => {
-            if (updatedPlan.id) {
-                updatePlan(updatedPlan, () => {
-                    console.log("Plan updated successfully");
-                });
-            }
-        }, 500),
-        [updatePlan]
-    );
+    // Function to sync plan to backend (create or update)
+    const syncPlanToBackend = useCallback((updatedPlan: Plan) => {
+        if (updatedPlan.id) {
+            console.log("Updating existing plan in backend:", updatedPlan);
+            updatePlan(updatedPlan, () => {
+                console.log("Plan updated successfully");
+            });
+        } else {
+            console.log("Creating new plan in backend:", updatedPlan);
+            createPlan(updatedPlan, (createdPlan: Plan) => {
+                console.log("Plan created successfully:", createdPlan);
+                // Update local state with the newly created plan (now has ID)
+                setCurrentPlan(createdPlan);
+                onPlanUpdate(createdPlan);
+            });
+        }
+    }, [updatePlan, createPlan, onPlanUpdate]);
 
-    const handlePlanChange = (updatedPlan: Plan) => {
-        setCurrentPlan(updatedPlan);
-        onPlanUpdate(updatedPlan);
-        debouncedUpdatePlan(updatedPlan);
-    };
+    // Debounced version for text changes
+    const debouncedSyncPlan = useCallback(
+        debounce(syncPlanToBackend, 500),
+        [syncPlanToBackend]
+    );
 
     const handleNoteChange = (note: string) => {
         const updatedPlan = { ...currentPlan, note };
-        handlePlanChange(updatedPlan);
+        setCurrentPlan(updatedPlan);
+        onPlanUpdate(updatedPlan);
+        debouncedSyncPlan(updatedPlan);
     };
 
     const handleServingsChange = (planMealIndex: number, newServings: number) => {
@@ -73,13 +83,19 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
             requiredServings: newServings
         };
         const updatedPlan = { ...currentPlan, planMeals: updatedPlanMeals };
-        handlePlanChange(updatedPlan);
+        setCurrentPlan(updatedPlan);
+        onPlanUpdate(updatedPlan);
+        debouncedSyncPlan(updatedPlan);
     };
 
     const handleRemoveMeal = (planMealIndex: number) => {
         const updatedPlanMeals = (currentPlan.planMeals || []).filter((_, index) => index !== planMealIndex);
         const updatedPlan = { ...currentPlan, planMeals: updatedPlanMeals };
-        handlePlanChange(updatedPlan);
+        setCurrentPlan(updatedPlan);
+        onPlanUpdate(updatedPlan);
+        
+        // Immediate sync for meal removal
+        syncPlanToBackend(updatedPlan);
     };
 
     const handleAddMeal = (meal: Meal) => {
@@ -91,7 +107,12 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
             ...currentPlan,
             planMeals: [...(currentPlan.planMeals || []), newPlanMeal]
         };
-        handlePlanChange(updatedPlan);
+        setCurrentPlan(updatedPlan);
+        onPlanUpdate(updatedPlan);
+        
+        // Immediate sync for meal addition
+        syncPlanToBackend(updatedPlan);
+        
         setMealChooserOpen(false);
     };
 

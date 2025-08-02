@@ -7,6 +7,7 @@ import {useAuth} from "../../hooks/useAuth.ts";
 import NavBarAvatar from "./NavBarAvatar.tsx";
 import NavBarSmall from "./NavBarSmall.tsx";
 import NavBarLarge from "./NavBarLarge.tsx";
+import NavBarMinimal from "./NavBarMinimal.tsx";
 import GoogleAuth from "../common/GoogleAuth.tsx";
 
 
@@ -30,8 +31,14 @@ export default function NavBar() {
     return (
         <AppBar position="sticky" color='default' elevation={0} sx={{py : {md: 0}}}>
             <Toolbar>
-                <NavBarLarge/>
-                <NavBarSmall/>
+                {auth.isAuthenticated() ? (
+                    <>
+                        <NavBarLarge/>
+                        <NavBarSmall/>
+                    </>
+                ) : (
+                    <NavBarMinimal/>
+                )}
                 <Box sx={{flexGrow: 1}}></Box>
                 {auth.isAuthenticated() ? avatar : <GoogleAuth/>}
             </Toolbar>
