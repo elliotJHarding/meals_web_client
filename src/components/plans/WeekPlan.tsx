@@ -11,7 +11,7 @@ export default function WeekPlan({mealPlan} : {mealPlan: MealPlan}) {
     const navigate = useNavigate();
 
     const planItems = mealPlan.plans
-        .filter(plan => plan.meals.length > 0)
+        .filter(plan => plan.planMeals.length > 0)
         .map((plan: Plan, i) =>
             <DayPlan key={i} plan={plan}/>
         );

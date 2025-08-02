@@ -6,6 +6,7 @@ import Plan from "../../../../../domain/Plan.ts";
 import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
 import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
 import Meal from "../../../../../domain/Meal.ts";
+import PlanMeal from "../../../../../domain/PlanMeal.ts";
 import {useState} from "react";
 import {usePlanDelete} from "../../../../../hooks/plan/usePlanDelete.ts";
 import {useNavigate} from "react-router-dom";
@@ -54,7 +55,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
     const onClick = () => navigate(`?from=${mealPlan.from()}&to=${mealPlan.to()}&selected=${MealPlan.formatDate(plan.date)}`)
 
     const onDelete = () => {
-        deletePlan(plan, () => setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.id != plan.id), {date: plan.date, meals: [], shoppingListItems: []}])));
+        deletePlan(plan, () => setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.id != plan.id), {date: plan.date, planMeals: [], shoppingListItems: []}])));
     }
 
     const Meal = ({meal, setMealChooserOpen} : {meal: Meal, setMealChooserOpen : (open: boolean) => void}) =>
@@ -103,7 +104,8 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                          open={mealChooserOpen}
                          setOpen={setMealChooserOpen}
                          onConfirm={(meal) => {
-                             const newPlan = {...plan, meals: plan.meals.concat(meal)}
+                             const newPlanMeal: PlanMeal = { meal, requiredServings: meal.serves };
+                             const newPlan = {...plan, planMeals: [...(plan.planMeals || []), newPlanMeal]}
                              if (newPlan.id == null) {
                                  createPlan(newPlan, (returnedPlan) =>
                                      setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.date !== plan.date), returnedPlan]))
@@ -134,9 +136,9 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
             <motion.td layout style={{width:'100%'}}>
                 <Box sx={{padding: 0}} component={motion.div} layout>
                     {
-                        plan.meals.map((meal, i) =>
-                            <Meal key={i} meal={meal} setMealChooserOpen={setMealChooserOpen}/>
-                        )
+                        plan.planMeals?.map((planMeal, i) =>
+                            <Meal key={i} meal={planMeal.meal} setMealChooserOpen={setMealChooserOpen}/>
+                        ) || []
                     }
                 </Box>
             </motion.td>

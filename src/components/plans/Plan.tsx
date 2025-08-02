@@ -24,7 +24,7 @@ export default function DayPlan({plan} : {plan: Plan}) {
                 {plan.date.toLocaleDateString('en-gb', {weekday: "long"})}
             </Typography>
             <Stack direction='row' gap={1}>
-                <MealItems meals={plan.meals}/>
+                <MealItems meals={plan.planMeals?.map(pm => pm.meal) || []}/>
             </Stack>
         </Stack>
     )

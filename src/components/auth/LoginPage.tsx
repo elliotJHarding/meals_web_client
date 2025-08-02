@@ -1,4 +1,4 @@
-import { Box, Typography, Container, useTheme, useMediaQuery } from "@mui/material";
+import {Box, Typography, Container, useTheme, useMediaQuery, Stack} from "@mui/material";
 import { motion } from "framer-motion";
 import GoogleAuth from "../common/GoogleAuth.tsx";
 
@@ -57,7 +57,9 @@ export default function LoginPage() {
                             Sign in with your Google account to access your meal plans, recipes, and shopping lists.
                         </Typography>
 
-                        <GoogleAuth variant={"medium"} />
+                        <Stack justifyContent="center" alignItems={"center"}>
+                            <GoogleAuth variant={"medium"} />
+                        </Stack>
 
                     </Box>
                 </motion.div>

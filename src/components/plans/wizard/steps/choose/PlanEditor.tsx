@@ -1,67 +1,236 @@
 import Plan from "../../../../../domain/Plan.ts";
-import {Box, InputAdornment, Stack, TextField, Typography} from "@mui/material";
+import {Box, InputAdornment, Stack, TextField, Typography, Divider} from "@mui/material";
 import {motion} from "framer-motion";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import {useNavigate} from "react-router-dom";
-import {ArrowBackIos, Edit, EditNote, EditNoteRounded, Note, Search} from "@mui/icons-material";
+import {ArrowBackIos, EditNoteRounded, Add} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import Grid from "@mui/material/Unstable_Grid2";
 import {useCalendarEvents} from "../../../../../hooks/calendar/useCalendarEvents.ts";
 import CalendarEvents from "./CalendarEvents.tsx";
+import {useState, useCallback} from "react";
+import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
+import MealItem from "./MealItem.tsx";
+import MealChooser from "../../../../dialog/MealChooser.tsx";
+import Meal from "../../../../../domain/Meal.ts";
+import PlanMeal from "../../../../../domain/PlanMeal.ts";
+
+// Simple debounce implementation
+const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    return (...args: Parameters<T>) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
+    };
+};
 
 interface PlanEditorProps {
-    plan: Plan
+    plan: Plan;
+    meals: Meal[];
+    mealsLoading: boolean;
+    mealsFailed: boolean;
+    onPlanUpdate: (updatedPlan: Plan) => void;
 }
 
-export default function PlanEditor({plan}: PlanEditorProps) {
-
+export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPlanUpdate}: PlanEditorProps) {
     const navigate = useNavigate();
+    const {updatePlan} = usePlanUpdate();
+    const [currentPlan, setCurrentPlan] = useState<Plan>({
+        ...plan,
+        planMeals: plan.planMeals || []
+    });
+    const [mealChooserOpen, setMealChooserOpen] = useState(false);
 
-    const {calendarEvents} = useCalendarEvents(MealPlan.formatDate(plan.date), MealPlan.formatDate(plan.date))
+    const {calendarEvents} = useCalendarEvents(MealPlan.formatDate(plan.date), MealPlan.formatDate(plan.date));
+
+    // Debounced plan update function
+    const debouncedUpdatePlan = useCallback(
+        debounce((updatedPlan: Plan) => {
+            if (updatedPlan.id) {
+                updatePlan(updatedPlan, () => {
+                    console.log("Plan updated successfully");
+                });
+            }
+        }, 500),
+        [updatePlan]
+    );
+
+    const handlePlanChange = (updatedPlan: Plan) => {
+        setCurrentPlan(updatedPlan);
+        onPlanUpdate(updatedPlan);
+        debouncedUpdatePlan(updatedPlan);
+    };
+
+    const handleNoteChange = (note: string) => {
+        const updatedPlan = { ...currentPlan, note };
+        handlePlanChange(updatedPlan);
+    };
+
+    const handleServingsChange = (planMealIndex: number, newServings: number) => {
+        const updatedPlanMeals = [...(currentPlan.planMeals || [])];
+        updatedPlanMeals[planMealIndex] = {
+            ...updatedPlanMeals[planMealIndex],
+            requiredServings: newServings
+        };
+        const updatedPlan = { ...currentPlan, planMeals: updatedPlanMeals };
+        handlePlanChange(updatedPlan);
+    };
+
+    const handleRemoveMeal = (planMealIndex: number) => {
+        const updatedPlanMeals = (currentPlan.planMeals || []).filter((_, index) => index !== planMealIndex);
+        const updatedPlan = { ...currentPlan, planMeals: updatedPlanMeals };
+        handlePlanChange(updatedPlan);
+    };
+
+    const handleAddMeal = (meal: Meal) => {
+        const newPlanMeal: PlanMeal = {
+            meal,
+            requiredServings: meal.serves
+        };
+        const updatedPlan = {
+            ...currentPlan,
+            planMeals: [...(currentPlan.planMeals || []), newPlanMeal]
+        };
+        handlePlanChange(updatedPlan);
+        setMealChooserOpen(false);
+    };
 
     return (
-        <Box padding={2} component={motion.div} layout width={'100%'}>
-            <Stack direction="row" spacing={2} alignItems={'center'} width={'100%'}>
-                <Button variant={'text'} size={'medium'} sx={{borderRadius: 2, paddingX: 1, paddingY: 1}} startIcon={<ArrowBackIos/>}
-                        onClick={() => navigate(-1)} component={motion.div} layout>
-
-                    <Typography id={`day-number-${MealPlan.formatDate(plan.date)}`} component={motion.div} layout
-                                variant='h6' align="center" sx={{
-                        width: '2rem',
-                        height: '2rem',
-                        borderRadius: '9999999px',
-                        marginRight: 0.5
-                    }}
-                    >
-                        {plan.date.toLocaleDateString('en-gb', {day: 'numeric'})}
-                    </Typography>
-                    <Typography
-                        id={`day-${MealPlan.formatDate(plan.date)}`}
-                        sx={{fontFamily: 'Montserrat'}} component={motion.div} layout>
-                        {plan.date.toLocaleDateString('en-gb', {weekday: 'long'})}
-                    </Typography>
+        <Box component={motion.div} layout width={'100%'}>
+            {/* Header */}
+            <Stack direction="row" spacing={2} alignItems={'center'} sx={{ p: 2, pb: 1 }}>
+                <Button 
+                    variant={'text'} 
+                    size={'medium'} 
+                    sx={{borderRadius: 2, paddingX: 1, paddingY: 1, minWidth: 'auto'}} 
+                    startIcon={<ArrowBackIos/>}
+                    onClick={() => navigate(-1)} 
+                    component={motion.div} 
+                    layout
+                >
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography 
+                            variant='h6' 
+                            sx={{
+                                width: '2rem',
+                                height: '2rem',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            {plan.date.toLocaleDateString('en-gb', {day: 'numeric'})}
+                        </Typography>
+                        <Typography
+                            sx={{fontFamily: 'Montserrat', fontSize: '1rem', fontWeight: 500}} 
+                        >
+                            {plan.date.toLocaleDateString('en-gb', {weekday: 'long'})}
+                        </Typography>
+                    </Stack>
                 </Button>
-                <TextField size={'small'} InputProps={{
-                    startAdornment: (
-                        <InputAdornment position='start'>
-                            <EditNoteRounded/>
-                        </InputAdornment>
-                    ),
-                    placeholder: 'Add a note',
-                    sx: {borderRadius: 999999, width: 400}
-                }}/>
+                
+                <TextField 
+                    size={'small'} 
+                    fullWidth
+                    value={currentPlan.note || ''}
+                    onChange={(e) => handleNoteChange(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position='start'>
+                                <EditNoteRounded sx={{ fontSize: '1rem' }}/>
+                            </InputAdornment>
+                        ),
+                        placeholder: 'Add a note for this day',
+                        sx: { borderRadius: 2 }
+                    }}
+                />
             </Stack>
-            <Grid container spacing={1}>
-                <Grid xs={3}>
-                    <Typography>Meals</Typography>
-                </Grid>
-                <Grid xs={6}>
 
+            <Box sx={{ px: 2, pb: 2 }}>
+                <Grid container spacing={2}>
+                    {/* Meals Section */}
+                    <Grid xs={12} md={8}>
+                        <Stack spacing={2}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                <Typography variant="h6" fontWeight="600">
+                                    Meals ({(currentPlan.planMeals || []).length})
+                                </Typography>
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    startIcon={<Add />}
+                                    onClick={() => setMealChooserOpen(true)}
+                                    sx={{ borderRadius: 2 }}
+                                >
+                                    Add Meal
+                                </Button>
+                            </Stack>
+                            
+                            <Divider />
+
+                            {(currentPlan.planMeals || []).length === 0 ? (
+                                <Box 
+                                    sx={{ 
+                                        textAlign: 'center', 
+                                        py: 3, 
+                                        color: 'text.secondary',
+                                        backgroundColor: 'grey.50',
+                                        borderRadius: 2,
+                                        border: '2px dashed',
+                                        borderColor: 'grey.300'
+                                    }}
+                                >
+                                    <Typography variant="body1" sx={{ mb: 1 }}>
+                                        No meals planned for this day
+                                    </Typography>
+                                    <Button
+                                        variant="text"
+                                        onClick={() => setMealChooserOpen(true)}
+                                        sx={{ textTransform: 'none' }}
+                                    >
+                                        Add your first meal
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <Stack spacing={1}>
+                                    {(currentPlan.planMeals || []).map((planMeal, index) => (
+                                        <MealItem
+                                            key={index}
+                                            planMeal={planMeal}
+                                            onServingsChange={(newServings) => handleServingsChange(index, newServings)}
+                                            onRemove={() => handleRemoveMeal(index)}
+                                        />
+                                    ))}
+                                </Stack>
+                            )}
+                        </Stack>
+                    </Grid>
+
+                    {/* Calendar Events Section */}
+                    <Grid xs={12} md={4}>
+                        <Stack spacing={2}>
+                            <Typography variant="h6" fontWeight="600">
+                                Calendar Events
+                            </Typography>
+                            <Divider />
+                            <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+                                <CalendarEvents calendarEvents={calendarEvents} />
+                            </Box>
+                        </Stack>
+                    </Grid>
                 </Grid>
-                <Grid xs={3}>
-                    <CalendarEvents calendarEvents={calendarEvents} />
-                </Grid>
-            </Grid>
+            </Box>
+
+            {/* Meal Chooser Dialog */}
+            <MealChooser
+                meals={meals}
+                mealsLoading={mealsLoading}
+                mealsFailed={mealsFailed}
+                open={mealChooserOpen}
+                setOpen={setMealChooserOpen}
+                onConfirm={handleAddMeal}
+            />
         </Box>
     );
 }

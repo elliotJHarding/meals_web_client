@@ -14,7 +14,7 @@ export const useAuth = () => {
     const login = (token : Token) =>
         repository.login(token, (user : User) => {
             setAuth(new Auth(user));
-            navigate(0);
+            navigate("/plans");
         })
     const whoami = () => repository.whoAmI((user: User) => setAuth(new Auth(user)), () => console.log("Failed Login"))
     const logout = ()=>  repository.logout(

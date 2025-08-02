@@ -23,7 +23,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
     mealsFailed: boolean,
 }) {
 
-    const {calendarEvents, isAuthorized} = useCalendarEvents(from, to);
+    const {calendarEvents, isAuthorized} = useCalendarEvents(from || '', to || '');
     const {authorizeCalendar} = useLinkCalendar();
     const selectedPlan : Plan | undefined = mealPlan.findPlan(selected)
 
@@ -75,7 +75,19 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
               initial={{x:100, opacity: 0 }}
               animate={{x:0, opacity: 1 }}
               exit={{x: 100, opacity: 0 }}>
-            {selectedPlan ? <PlanEditor plan={selectedPlan}/> : <WholePlan/>}
+            {selectedPlan ? (
+                <PlanEditor 
+                    plan={selectedPlan}
+                    meals={meals}
+                    mealsLoading={mealsLoading}
+                    mealsFailed={mealsFailed}
+                    onPlanUpdate={(updatedPlan) => {
+                        setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.date !== updatedPlan.date), updatedPlan]));
+                    }}
+                />
+            ) : (
+                <WholePlan/>
+            )}
         </Card>
     );
 }

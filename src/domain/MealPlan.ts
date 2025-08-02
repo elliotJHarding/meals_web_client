@@ -24,7 +24,7 @@ export default class MealPlan {
     }
 
     isEmpty() {
-        return this.plans.find(plan => plan.meals.length > 0) == null;
+        return this.plans.find(plan => plan.planMeals.length > 0) == null;
     }
 
     from() {
