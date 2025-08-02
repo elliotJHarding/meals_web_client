@@ -16,12 +16,14 @@ import LandingPage from "./components/home/LandingPage.tsx";
 import Profile from "./components/user/Profile.tsx";
 import Logout from "./components/user/Logout.tsx";
 import LinkCalendar from "./components/calendar/LinkCalendar.tsx";
+import LoginPage from "./components/auth/LoginPage.tsx";
 
 export default function App() {
 
     const router  = createBrowserRouter([
         { path: "/", element: <Root/>, children: [
                 { path: "/" , element: <LandingPage/>},
+                { path: "login", element: <LoginPage/>},
                 { path: "meals", element: <MealsPage/>},
                 { path: "meals/:mealId", element: <MealPage/>},
                 { path: "plans", element: <Plans/> },

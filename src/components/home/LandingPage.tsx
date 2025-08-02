@@ -1,335 +1,199 @@
-import Grid from "@mui/material/Unstable_Grid2";
-import {Typography, Box, Button, useTheme, useMediaQuery, Container, Paper} from "@mui/material";
+import {Typography, Box, useTheme, useMediaQuery, Container} from "@mui/material";
 import { motion } from "framer-motion";
-import {ShoppingCart, Restaurant} from "@mui/icons-material";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-
+import {ShoppingCart, Restaurant, CalendarMonth} from "@mui/icons-material";
+import Button from "@mui/material-next/Button";
+import {Link as RouterLink} from "react-router-dom";
 
 export default function LandingPage() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    // @ts-ignore
+    // @ts-expect-error - MUI theme system type not fully defined
     const primaryColor = theme.sys.color.primary;
 
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: { 
-            opacity: 1,
-            transition: { 
-                staggerChildren: 0.3,
-                delayChildren: 0.2
-            }
-        }
-    };
-
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: { 
-            y: 0, 
-            opacity: 1,
-            transition: { 
-                type: "spring", 
-                stiffness: 100 
-            }
-        }
+    const fadeInUp = {
+        initial: { opacity: 0, y: 30 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.6, ease: "easeOut" }
     };
 
     return (
-        <Container maxWidth="xl">
-            <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={containerVariants}
-            >
-                {/* Hero Section */}
-                <Grid container spacing={5} sx={{ mt: isMobile ? 2 : 5, mb: 10 }}>
-                    <Grid xs={12} md={6} display="flex" flexDirection="column" justifyContent="center">
-                        <motion.div variants={itemVariants}>
-                            <Typography 
-                                variant="h2" 
-                                component="h1" 
-                                fontWeight="bold" 
-                                gutterBottom
-                                sx={{ 
-                                    fontSize: isMobile ? '2.5rem' : '3.5rem'
-                                }}
-                            >
-                                Make Meal Planning Effortless
-                            </Typography>
-                        </motion.div>
-
-                        <motion.div variants={itemVariants}>
-                            <Typography 
-                                variant="h5" 
-                                component="p" 
-                                sx={{ 
-                                    mb: 4,
-                                    color: 'text.secondary',
-                                    fontSize: isMobile ? '1.2rem' : '1.5rem'
-                                }}
-                            >
-                                Take the stress out of your weekly shop
-                            </Typography>
-                        </motion.div>
-
-                        <motion.div variants={itemVariants}>
-                            <Button 
-                                variant="contained"
-                                size="large"
-                                sx={{
-                                    backgroundColor: primaryColor,
-                                    fontSize: '1.1rem',
-                                    fontFamily: 'Roboto',
-                                }}
-                            >
-                                Get Started
-                            </Button>
-                        </motion.div>
-                    </Grid>
-
-                </Grid>
-
-                {/* How It Works Section */}
-                <Paper sx={{ mb: 10, borderRadius: 4, p: isMobile ? 4 : 8, textAlign: 'center' }}>
+        <Container maxWidth="lg" sx={{ py: 8 }}>
+            {/* Hero Section */}
+            <Box sx={{ textAlign: 'center', mb: 12 }}>
+                <motion.div {...fadeInUp}>
                     <Typography 
-                        variant="h3" 
-                        component="h2" 
-                        textAlign="center" 
-                        fontWeight="bold"
+                        variant="h1" 
+                        component="h1" 
+                        sx={{ 
+                            fontSize: isMobile ? '2.5rem' : '4rem',
+                            fontWeight: 300,
+                            mb: 3,
+                            letterSpacing: '-0.02em'
+                        }}
+                    >
+                        Effortless Meal Planning
+                    </Typography>
+                </motion.div>
+
+                <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.2 }}>
+                    <Typography 
+                        variant="h5" 
+                        component="p" 
                         sx={{ 
                             mb: 6,
-                            fontSize: isMobile ? '2rem' : '2.5rem'
+                            color: 'text.secondary',
+                            fontWeight: 300,
+                            maxWidth: 600,
+                            mx: 'auto',
+                            lineHeight: 1.6
                         }}
                     >
-                        How It Works
+                        Plan your meals, organize your kitchen, and simplify your shopping — all in one place.
                     </Typography>
+                </motion.div>
 
-                    <Grid container spacing={isMobile ? 4 : 8}>
-                        <Grid xs={12} md={4}>
-                            <motion.div
-                                variants={itemVariants}
-                                whileHover={{ y: -5 }}
-                            >
-                                <Box 
-                                    sx={{ 
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        textAlign: 'center',
-                                        p: 2
-                                    }}
-                                >
-                                    <Box 
-                                        sx={{ 
-                                            backgroundColor: `${primaryColor}20`,
-                                            p: 3,
-                                            borderRadius: '50%',
-                                            mb: 3
-                                        }}
-                                    >
-                                        <Restaurant sx={{ fontSize: 60, color: primaryColor }} />
-                                    </Box>
-                                    <Typography variant="h5" component="h3" fontWeight="bold" gutterBottom>
-                                        1. Add Your Meals
-                                    </Typography>
-                                    <Typography variant="body1" color="text.secondary">
-                                        Create your collection of favorite recipes or add quick meal ideas.
-                                    </Typography>
-                                </Box>
-                            </motion.div>
-                        </Grid>
-
-                        <Grid xs={12} md={4}>
-                            <motion.div
-                                variants={itemVariants}
-                                whileHover={{ y: -5 }}
-                            >
-                                <Box 
-                                    sx={{ 
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        textAlign: 'center',
-                                        p: 2
-                                    }}
-                                >
-                                    <Box 
-                                        sx={{ 
-                                            position: 'relative',
-                                            mb: 3
-                                        }}
-                                    >
-                                        {/* Orange circle with fire-like glow for AI indication */}
-                                        <motion.div
-                                            animate={{
-                                                rotate: [0, 120, 240, 360, 0],
-                                                scale: [1, 1.15, 1, 1.05, 1],
-                                                boxShadow: [
-                                                    '0 0 10px 5px rgba(255, 165, 0, 0.8), 0 0 20px 10px rgba(255, 69, 0, 0.3)',
-                                                ]
-                                            }}
-                                            transition={{
-                                                duration: 4,
-                                                ease: "easeInOut",
-                                                repeat: Infinity,
-                                                repeatType: 'mirror',
-                                                type: "tween"
-                                            }}
-                                            style={{
-                                                position: 'absolute',
-                                                top: 0,
-                                                left: 0,
-                                                right: 0,
-                                                bottom: 0,
-                                                borderRadius: '50%',
-                                                backgroundColor: '#FFCC80',
-                                                zIndex: 0
-                                            }}
-                                        />
-                                        {/* Additional fire-like swirling layer */}
-                                        <motion.div
-                                            animate={{
-                                                rotate: [360, 240, 120, 0, 0],
-                                                scale: [1, 1.08, 0.96, 1, 1],
-                                                opacity: [0.5, 0.7, 0.6, 0.5, 0.5]
-                                            }}
-                                            transition={{
-                                                duration: 4.5,
-                                                ease: "easeInOut",
-                                                repeat: Infinity,
-                                                repeatType: 'mirror'
-                                            }}
-                                            style={{
-                                                position: 'absolute',
-                                                top: -5,
-                                                left: -5,
-                                                right: -5,
-                                                bottom: -5,
-                                                borderRadius: '50%',
-                                                background: 'radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,69,0,0.4) 60%, rgba(255,140,0,0.2) 80%, transparent 100%)',
-                                                zIndex: 0
-                                            }}
-                                        />
-                                        <Box 
-                                            sx={{ 
-                                                backgroundColor: `${primaryColor}20`,
-                                                p: 3,
-                                                borderRadius: '50%',
-                                                position: 'relative',
-                                                zIndex: 1
-                                            }}
-                                        >
-                                            <CalendarMonthIcon sx={{ fontSize: 60, color: primaryColor }} />
-                                        </Box>
-                                    </Box>
-                                    <Typography variant="h5" component="h3" fontWeight="bold" gutterBottom>
-                                        2. Create Your Plan
-                                    </Typography>
-                                    <Typography variant="body1" color="text.secondary">
-                                        Add meals to you meal plan, or let AI do it for you.
-                                    </Typography>
-                                </Box>
-                            </motion.div>
-                        </Grid>
-
-                        <Grid xs={12} md={4}>
-                            <motion.div
-                                variants={itemVariants}
-                                whileHover={{ y: -5 }}
-                            >
-                                <Box 
-                                    sx={{ 
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        textAlign: 'center',
-                                        p: 2
-                                    }}
-                                >
-                                    <Box 
-                                        sx={{ 
-                                            backgroundColor: `${primaryColor}20`,
-                                            p: 3,
-                                            borderRadius: '50%',
-                                            mb: 3
-                                        }}
-                                    >
-                                        <ShoppingCart sx={{ fontSize: 60, color: primaryColor }} />
-                                    </Box>
-                                    <Typography variant="h5" component="h3" fontWeight="bold" gutterBottom>
-                                        3. Get Shopping List
-                                    </Typography>
-                                    <Typography variant="body1" color="text.secondary">
-                                        Automatically generate your shopping list based on your meal plan.
-                                    </Typography>
-                                </Box>
-                            </motion.div>
-                        </Grid>
-                    </Grid>
-                </Paper>
-
-                {/* CTA Section */}
-                <motion.div
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 400 }}
-                >
-                    <Box 
-                        sx={{ 
-                            backgroundColor: primaryColor,
-                            borderRadius: 4,
-                            p: isMobile ? 4 : 8,
-                            textAlign: 'center',
-                            mb: 10
+                <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.4 }}>
+                    <Button 
+                        variant="filled"
+                        size="large"
+                        component={RouterLink}
+                        to="/login"
+                        sx={{
+                            py: 2,
+                            px: 6,
+                            fontSize: '1.1rem',
+                            fontWeight: 500,
+                            borderRadius: 3,
                         }}
                     >
-                        <Typography 
-                            variant="h3" 
-                            component="h2" 
-                            fontWeight="bold"
-                            sx={{ 
-                                mb: 3,
-                                color: 'white',
-                                fontSize: isMobile ? '1.8rem' : '2.5rem'
-                            }}
-                        >
-                            Ready to Simplify Your Meal Planning?
-                        </Typography>
+                        Get Started
+                    </Button>
+                </motion.div>
+            </Box>
 
-                        <Typography 
-                            variant="h6" 
-                            component="p"
-                            sx={{ 
-                                mb: 4,
-                                color: 'white',
-                                opacity: 0.9,
-                                maxWidth: '800px',
-                                mx: 'auto'
-                            }}
-                        >
-                            Join thousands of home cooks who have transformed their meal preparation routine.
+            {/* Features Section */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 6, mb: 12 }}>
+                <motion.div 
+                    {...fadeInUp} 
+                    transition={{ ...fadeInUp.transition, delay: 0.6 }}
+                >
+                    <Box sx={{ textAlign: 'center' }}>
+                        <Box sx={{ mb: 3 }}>
+                            <Restaurant sx={{ fontSize: 48, color: primaryColor }} />
+                        </Box>
+                        <Typography variant="h6" component="h3" sx={{ mb: 2, fontWeight: 500 }}>
+                            Organize Your Meals
                         </Typography>
-
-                        <Button 
-                            variant="contained" 
-                            size="large" 
-                            sx={{ 
-                                borderRadius: 2,
-                                py: 1.5,
-                                px: 4,
-                                fontSize: '1.1rem',
-                                backgroundColor: 'white',
-                                color: primaryColor,
-                                '&:hover': {
-                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                }
-                            }}
-                        >
-                            Get Started Now
-                        </Button>
+                        <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                            Create and manage your favorite recipes with ingredients and cooking instructions.
+                        </Typography>
                     </Box>
                 </motion.div>
-            </motion.div>
+
+                <motion.div 
+                    {...fadeInUp} 
+                    transition={{ ...fadeInUp.transition, delay: 0.8 }}
+                >
+                    <Box sx={{ textAlign: 'center' }}>
+                        <Box sx={{ mb: 3, position: 'relative', display: 'inline-block' }}>
+                            {/* Outer fire glow */}
+                            <motion.div
+                                animate={{
+                                    rotate: [0, 360],
+                                    scale: [1, 1.1, 1],
+                                }}
+                                transition={{
+                                    duration: 8,
+                                    ease: "easeInOut",
+                                    repeat: Infinity,
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    top: -12,
+                                    left: -12,
+                                    right: -12,
+                                    bottom: -12,
+                                    borderRadius: '50%',
+                                    background: 'radial-gradient(circle, rgba(255,193,7,0.3) 0%, rgba(255,152,0,0.2) 40%, rgba(255,87,34,0.1) 70%, transparent 100%)',
+                                    filter: 'blur(8px)',
+                                }}
+                            />
+                            
+                            {/* Inner fire ring */}
+                            <motion.div
+                                animate={{
+                                    rotate: [360, 0],
+                                    opacity: [0.6, 0.9, 0.6],
+                                }}
+                                transition={{
+                                    duration: 6,
+                                    ease: "easeInOut",
+                                    repeat: Infinity,
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    top: -8,
+                                    left: -8,
+                                    right: -8,
+                                    bottom: -8,
+                                    borderRadius: '50%',
+                                    background: 'conic-gradient(from 0deg, rgba(255,193,7,0.4), rgba(255,152,0,0.6), rgba(255,87,34,0.4), rgba(255,193,7,0.4))',
+                                    filter: 'blur(4px)',
+                                }}
+                            />
+                            
+                            {/* Central pulsing glow */}
+                            <motion.div
+                                animate={{
+                                    scale: [1, 1.05, 1],
+                                    opacity: [0.4, 0.7, 0.4],
+                                }}
+                                transition={{
+                                    duration: 3,
+                                    ease: "easeInOut",
+                                    repeat: Infinity,
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    top: -4,
+                                    left: -4,
+                                    right: -4,
+                                    bottom: -4,
+                                    borderRadius: '50%',
+                                    backgroundColor: 'rgba(255,193,7,0.2)',
+                                    filter: 'blur(2px)',
+                                }}
+                            />
+                            
+                            <CalendarMonth sx={{ fontSize: 48, color: primaryColor, position: 'relative', zIndex: 1 }} />
+                        </Box>
+                        <Typography variant="h6" component="h3" sx={{ mb: 2, fontWeight: 500 }}>
+                            Plan Your Week
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                            Schedule meals for each day and let our AI suggest the perfect combination.
+                        </Typography>
+                    </Box>
+                </motion.div>
+
+                <motion.div 
+                    {...fadeInUp} 
+                    transition={{ ...fadeInUp.transition, delay: 1.0 }}
+                >
+                    <Box sx={{ textAlign: 'center' }}>
+                        <Box sx={{ mb: 3 }}>
+                            <ShoppingCart sx={{ fontSize: 48, color: primaryColor }} />
+                        </Box>
+                        <Typography variant="h6" component="h3" sx={{ mb: 2, fontWeight: 500 }}>
+                            Smart Shopping Lists
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                            Automatically generate organized shopping lists from your meal plans.
+                        </Typography>
+                    </Box>
+                </motion.div>
+            </Box>
+
         </Container>
     )
 }

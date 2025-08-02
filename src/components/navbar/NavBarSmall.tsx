@@ -4,8 +4,10 @@ import Typography from "@mui/material/Typography";
 import {pages} from "./Pages.tsx";
 import {Link as RouterLink} from "react-router-dom";
 import {PROPERTIES} from "../../constants/properties.ts";
+import {useAuth} from "../../hooks/useAuth.ts";
 
 export default function NavBarSmall() {
+    const {auth} = useAuth();
     const [value, setValue] = React.useState(0);
 
     const navigationOnChange = (_event : any, newValue : number) => setValue(newValue);
@@ -30,25 +32,28 @@ export default function NavBarSmall() {
         >
             {PROPERTIES.APP_NAME}
         </Typography>
-        <Paper sx={{
-            display: {xs: "block", md: "none"},
-            pb: 1,
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            right: 0,
-        }}
-        >
-            <BottomNavigation
-                showLabels
-                value={value}
-                onChange={navigationOnChange}
+        {auth.isAuthenticated() && (
+            <Paper sx={{
+                display: {xs: "block", md: "none"},
+                pb: 1,
+                position: "fixed",
+                bottom: 0,
+                top: 'auto',
+                left: 0,
+                right: 0,
+            }}
             >
-                {pages.map(page =>
-                    <BottomNavigationAction key={page.title} label={page.title} icon={page.icon} component={RouterLink}
-                                            to={page.destination}/>
-                )}
-            </BottomNavigation>
-        </Paper>
+                <BottomNavigation
+                    showLabels
+                    value={value}
+                    onChange={navigationOnChange}
+                >
+                    {pages.map(page =>
+                        <BottomNavigationAction key={page.title} label={page.title} icon={page.icon} component={RouterLink}
+                                                to={page.destination}/>
+                    )}
+                </BottomNavigation>
+            </Paper>
+        )}
     </>;
 }

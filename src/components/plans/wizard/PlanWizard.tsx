@@ -18,7 +18,7 @@ export default function PlanWizard() {
 
     const [searchParams] = useSearchParams();
 
-    const {from, to} = {from: searchParams.get('from'), to: searchParams.get('to')}
+    const {from, to, selected} = {from: searchParams.get('from'), to: searchParams.get('to'), selected: searchParams.get('selected')};
 
     const {fromDate, toDate} = {fromDate: new Date(from ?? ''), toDate: new Date(to ?? '')}
 
@@ -33,7 +33,7 @@ export default function PlanWizard() {
             next: "ingredients",
             back: null,
             component: <ChooseMeals mealPlan={mealPlan}
-                                    from={from} to={to}
+                                    from={from} to={to} selected={selected}
                                     setMealPlan={setMealPlan}
                                     meals={meals}
                                     mealsLoading={loading}
@@ -63,30 +63,30 @@ export default function PlanWizard() {
     const back = steps[activeStep].back;
 
     const stepItems = steps.map(step =>
-        <Step key={step.label}>
+        <Step key={step.label} component={motion.div} layout>
             <StepLabel>{step.label}</StepLabel>
         </Step>
     )
 
     return (
-        <Box sx={{width: '100%'}}>
-            <Stepper activeStep={activeStep} alternativeLabel sx={{mt: 6, mb: 4}}>
+        <Box id='container-wizard' sx={{width: '100%'}} component={motion.div} layout>
+            <Stepper id='wizard-stepper' activeStep={activeStep} alternativeLabel sx={{mt: 6, mb: 4}}>
                 {stepItems}
             </Stepper>
-            <Stack spacing={2} sx={{paddingLeft: 2, marginBottom: 1}} direction='row' alignItems='end' component={motion.div}>
-                <Typography variant='h6'>
+            <Stack id='wizard-plan-dates' spacing={2} sx={{paddingLeft: 2, marginBottom: 1}} direction='row' alignItems='end' component={motion.div} layout>
+                <Typography variant='h6' component={motion.div} layout>
                     {`${fromDate?.toLocaleDateString('en-gb', {
                         day: "numeric",
                         month: "long"
                     })} - ${toDate?.toLocaleDateString('en-gb', {day: "numeric", month: "long"})}`}
                 </Typography>
                 <Box flexGrow={1}/>
-                <Stack direction='row'  gap={2} component={motion.div} layout="position">
+                <Stack direction='row' gap={2} component={motion.div} layout="position">
                     {back != null && <Button component={motion.div} startIcon={<ArrowBackIos/>} onClick={() => navigate(`/plans/create/${back}?from=${from}&to=${to}`)}>Back</Button>}
                     {next != null && <Button component={motion.div} endIcon={<ArrowForwardIos/>} variant='filled' onClick={() => navigate(`/plans/create/${next}?from=${from}&to=${to}`)}>Next</Button>}
                 </Stack>
             </Stack>
-            <Box component={motion.div}>
+            <Box id='wizard-step-holder' component={motion.div} layout>
                 {component}
             </Box>
         </Box>

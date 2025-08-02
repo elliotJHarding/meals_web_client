@@ -1,7 +1,7 @@
 import {CredentialResponse, GoogleLogin} from "@react-oauth/google";
 import {useAuth} from "../../hooks/useAuth.ts";
 
-export default function GoogleAuth() {
+export default function GoogleAuth({variant} : {variant : "small" | "large" | "medium" }) {
 
     const {login} = useAuth();
 
@@ -20,7 +20,7 @@ export default function GoogleAuth() {
 
     return (
         <GoogleLogin
-            size={"large"}
+            size={variant}
             shape={"pill"}
             onSuccess={handleAuthSuccess}
             onError={handleAuthFailure}

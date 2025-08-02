@@ -7,17 +7,24 @@ export default class MealPlan {
         return `${date.getUTCFullYear()}-${date.toLocaleDateString('en-gb', {month: '2-digit'})}-${date.toLocaleDateString('en-gb', {day: '2-digit'})}`
     }
 
+    findPlan(date: string | null) {
+        if (date == null) {
+            return undefined;
+        }
+        const parsedDate = new Date(Date.parse(date))
+        return this.plans.find((plan) =>
+            plan.date.getUTCFullYear() === parsedDate.getUTCFullYear() &&
+            plan.date.getUTCMonth() === parsedDate.getUTCMonth() &&
+            plan.date.getUTCDate() === parsedDate.getUTCDate()
+        )
+    }
 
     constructor(plans: Plan[]) {
         this.plans = plans?.sort((a, b) => a.date.getTime() - b.date.getTime()) ?? [];
     }
 
-    isComplete() {
-        return this.plans.find(plan => plan.dinner == null) == null;
-    }
-
     isEmpty() {
-        return this.plans.find(plan => plan.dinner != null) == null;
+        return this.plans.find(plan => plan.meals.length > 0) == null;
     }
 
     from() {

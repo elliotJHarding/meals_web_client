@@ -2,7 +2,7 @@ import {Card, Stack} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import Box from "@mui/material/Box";
 import Meal from "../../../../../domain/Meal.ts";
-import {motion} from "framer-motion";
+import {LayoutGroup, motion} from "framer-motion";
 import DayItem from "./DayItem.tsx";
 import {useCalendarEvents} from "../../../../../hooks/calendar/useCalendarEvents.ts";
 import Plan from "../../../../../domain/Plan.ts";
@@ -10,12 +10,14 @@ import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 import {CalendarMonth} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import {useLinkCalendar} from "../../../../../hooks/calendar/useLinkCalendar.ts";
+import PlanEditor from "./PlanEditor.tsx";
 
-export default function ChooseMeals({mealPlan, from, to, setMealPlan, meals, mealsLoading, mealsFailed}: {
+export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, meals, mealsLoading, mealsFailed}: {
     mealPlan: MealPlan,
-    from: string,
-    to: string,
-    setMealPlan: (mealPlan: MealPlan) => void,
+    setMealPlan: (MealPlan: MealPlan) => void,
+    from: string | null,
+    to: string | null,
+    selected: string | null,
     meals: Meal[],
     mealsLoading: boolean,
     mealsFailed: boolean,
@@ -23,6 +25,7 @@ export default function ChooseMeals({mealPlan, from, to, setMealPlan, meals, mea
 
     const {calendarEvents, isAuthorized} = useCalendarEvents(from, to);
     const {authorizeCalendar} = useLinkCalendar();
+    const selectedPlan : Plan | undefined = mealPlan.findPlan(selected)
 
     const filterEventsByPlan = (events: CalendarEvent[], plan: Plan) : CalendarEvent[] => {
         return events.filter(event =>
@@ -38,8 +41,23 @@ export default function ChooseMeals({mealPlan, from, to, setMealPlan, meals, mea
             <Button variant='outlined' size='large' sx={{borderRadius: 3, padding: 4, width: '100%', height: '100%', margin: 3}} startIcon={<CalendarMonth/>} onClick={authorizeCalendar}>Link Calendar</Button>
         </Stack>
 
+    const WholePlan = () =>
+        <Stack direction="row" spacing={2} sx={{padding: 2}} component={motion.div} layout>
+            <Box sx={{width: !isAuthorized ? '60%' : '100%'}} component={motion.div} layout>
+                <LayoutGroup>
+                    <motion.table layout style={{width:'100%', borderCollapse: 'collapse'}}>
+                        <motion.tbody layout>
+                            {dayItems}
+                        </motion.tbody>
+                    </motion.table>
+                </LayoutGroup>
+            </Box>
+            {!isAuthorized && <LinkCalendarButton/>}
+        </Stack>
+
     const dayItems = mealPlan.plans.map((plan, i) =>
         <DayItem index={i}
+                 key={i}
                  plan={plan}
                  meals={meals}
                  mealsLoading={mealsLoading}
@@ -52,19 +70,12 @@ export default function ChooseMeals({mealPlan, from, to, setMealPlan, meals, mea
     return (
         <Card component={motion.div}
               layout
+              variant={'outlined'}
+              style={{borderRadius: 10, boxShadow: 'none', border: 'none'}}
               initial={{x:100, opacity: 0 }}
               animate={{x:0, opacity: 1 }}
               exit={{x: 100, opacity: 0 }}>
-            <Stack direction="row" spacing={2} sx={{padding: 2}}>
-                <Box sx={{width: !isAuthorized ? '60%' : '100%'}}>
-                    <table style={{width:'100%', borderCollapse: 'collapse'}}>
-                        <tbody>
-                        {dayItems}
-                        </tbody>
-                    </table>
-                </Box>
-                {!isAuthorized && <LinkCalendarButton/>}
-            </Stack>
+            {selectedPlan ? <PlanEditor plan={selectedPlan}/> : <WholePlan/>}
         </Card>
     );
 }
