@@ -13,7 +13,7 @@ import {motion} from "framer-motion";
 
 export default function Profile() {
 
-    const {auth} = useAuth();
+    const {auth} = useAuth(true);
 
     const {group, setGroup, createGroup} = useGroup()
 

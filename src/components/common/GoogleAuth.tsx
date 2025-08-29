@@ -3,7 +3,7 @@ import {useAuth} from "../../hooks/useAuth.ts";
 
 export default function GoogleAuth({variant} : {variant : "small" | "large" | "medium" }) {
 
-    const {login} = useAuth();
+    const {login} = useAuth(false);
 
     const handleAuthSuccess = (credentialResponse : CredentialResponse) : void => {
         if (credentialResponse.credential != null) {

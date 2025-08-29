@@ -17,6 +17,7 @@ import Profile from "./components/user/Profile.tsx";
 import Logout from "./components/user/Logout.tsx";
 import LinkCalendar from "./components/calendar/LinkCalendar.tsx";
 import LoginPage from "./components/auth/LoginPage.tsx";
+import ProtectedRoute from "./components/auth/ProtectedRoute.tsx";
 
 export default function App() {
 
@@ -24,13 +25,13 @@ export default function App() {
         { path: "/", element: <Root/>, children: [
                 { path: "/" , element: <LandingPage/>},
                 { path: "login", element: <LoginPage/>},
-                { path: "meals", element: <MealsPage/>},
-                { path: "meals/:mealId", element: <MealPage/>},
-                { path: "plans", element: <Plans/> },
-                { path: "plans/create/:step", element: <PlanWizard/>},
-                { path: "profile", element: <Profile/>},
-                { path: "logout", element: <Logout/>},
-                { path: "calendar/link", element: <LinkCalendar/>},
+                { path: "meals", element: <ProtectedRoute><MealsPage/></ProtectedRoute>},
+                { path: "meals/:mealId", element: <ProtectedRoute><MealPage/></ProtectedRoute>},
+                { path: "plans", element: <ProtectedRoute><Plans/></ProtectedRoute> },
+                { path: "plans/create/:step", element: <ProtectedRoute><PlanWizard/></ProtectedRoute>},
+                { path: "profile", element: <ProtectedRoute><Profile/></ProtectedRoute>},
+                { path: "logout", element: <ProtectedRoute><Logout/></ProtectedRoute>},
+                { path: "calendar/link", element: <ProtectedRoute><LinkCalendar/></ProtectedRoute>},
             ]}
     ])
 

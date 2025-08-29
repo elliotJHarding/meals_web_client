@@ -13,7 +13,7 @@ import GoogleAuth from "../common/GoogleAuth.tsx";
 
 export default function NavBar() {
 
-    const {auth} = useAuth();
+    const {auth} = useAuth(false);
 
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -40,7 +40,7 @@ export default function NavBar() {
                     <NavBarMinimal/>
                 )}
                 <Box sx={{flexGrow: 1}}></Box>
-                {auth.isAuthenticated() ? avatar : <GoogleAuth/>}
+                {auth.isAuthenticated() ? avatar : <GoogleAuth variant={'large'}/>}
             </Toolbar>
         </AppBar>
     );

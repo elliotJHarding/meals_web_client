@@ -7,7 +7,7 @@ import {PROPERTIES} from "../../constants/properties.ts";
 import {useAuth} from "../../hooks/useAuth.ts";
 
 export default function NavBarSmall() {
-    const {auth} = useAuth();
+    const {auth} = useAuth(false);
     const [value, setValue] = React.useState(0);
 
     const navigationOnChange = (_event : any, newValue : number) => setValue(newValue);

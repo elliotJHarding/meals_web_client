@@ -3,7 +3,7 @@ import {useEffect} from "react";
 
 export default function Logout() {
 
-    const {logout} = useAuth();
+    const {logout} = useAuth(false);
 
     useEffect(logout, []);
 

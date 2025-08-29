@@ -3,10 +3,11 @@ import {AuthContext, Token} from "../contexts/AuthContext.tsx";
 import Auth from "../repository/Auth.ts";
 import AuthRepository from "../repository/AuthRepository.ts";
 import User from "../domain/User.ts";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useLocation} from "react-router-dom";
 
-export const useAuth = () => {
+export const useAuth = (protect: boolean)  => {
     const {auth, setAuth} : {auth : Auth, setAuth : any} = useContext(AuthContext);
+    const location = useLocation();
 
     const repository = new AuthRepository();
     const navigate = useNavigate();
@@ -14,9 +15,16 @@ export const useAuth = () => {
     const login = (token : Token) =>
         repository.login(token, (user : User) => {
             setAuth(new Auth(user));
-            navigate("/plans");
+            // Redirect to intended destination or default to /plans
+            const from = (location.state as any)?.from?.pathname || "/plans";
+            navigate(from, { replace: true });
         })
-    const whoami = () => repository.whoAmI((user: User) => setAuth(new Auth(user)), () => console.log("Failed Login"))
+    const whoami = () => repository.whoAmI(
+        (user: User) =>
+                setAuth(new Auth(user)),
+        () =>
+                protect && navigate("/login", { replace: true })
+    );
     const logout = ()=>  repository.logout(
         setAuth(new Auth(null))
     );

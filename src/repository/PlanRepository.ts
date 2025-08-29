@@ -1,4 +1,4 @@
-import {AxiosResponse} from "axios";
+import axios, {AxiosResponse} from "axios";
 import ResourceRepository from "./ResourceRepository.ts";
 import Plan from "../domain/Plan.ts";
 
@@ -67,6 +67,44 @@ export default class PlanRepository extends ResourceRepository {
         console.info(plan.date)
 
         this.delete(`plans/${formatDate(plan.date)}`, () => onSuccess());
+    }
+
+    generateMealPlan(startDate: Date, endDate: Date, prompt: string, onSuccess: (plans: Plan[]) => void, onFailure: () => void): void {
+        console.group("Generating AI meal plan from start, end, prompt:");
+        console.info(startDate);
+        console.info(endDate);
+        console.info(prompt);
+        console.groupEnd();
+
+        const request = {
+            weekStartDate: startDate,
+            weekEndDate: endDate,
+            prompt: prompt
+        };
+
+        // Custom axios call with error handling for AI generation
+        axios
+            .post(
+                this.url + 'plans/generate',
+                request,
+                {
+                    headers: this.getHeaders(),
+                    withCredentials: true,
+                }
+            )
+            .then((response: AxiosResponse) => {
+                response.data.forEach((plan: Plan) => {
+                    plan.date = new Date(plan.date);
+                });
+                console.group("Successfully generated meal plans");
+                console.info(response.data);
+                console.groupEnd();
+                onSuccess(response.data);
+            })
+            .catch((error) => {
+                console.error("Failed to generate meal plans", error);
+                onFailure();
+            });
     }
 
 }

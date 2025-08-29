@@ -48,6 +48,7 @@ export function parseIngredient(edit : IngredientEdit, units : Unit[], parentMea
 
         let ingredient : Ingredient = {
             index: edit.index,
+            id: edit.id,
             name: name,
             amount: amount,
             unit: unit,

@@ -8,7 +8,7 @@ import {PROPERTIES} from "../../constants/properties.ts";
 import {useAuth} from "../../hooks/useAuth.ts";
 
 export default function NavBarLarge() {
-    const {auth} = useAuth();
+    const {auth} = useAuth(false);
 
     return <>
         <Icon sx={{fontSize: 60, opacity: 0.8, borderRadius: "50%", display: {xs: "none", md: "flex"}, mr: 1}}>

@@ -2,13 +2,20 @@ import {Typography, Box, useTheme, useMediaQuery, Container} from "@mui/material
 import { motion } from "framer-motion";
 import {ShoppingCart, Restaurant, CalendarMonth} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
-import {Link as RouterLink} from "react-router-dom";
+import {Link as RouterLink, Navigate} from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
 
 export default function LandingPage() {
+    const { auth } = useContext(AuthContext);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     // @ts-expect-error - MUI theme system type not fully defined
     const primaryColor = theme.sys.color.primary;
+    
+    if (auth.isAuthenticated()) {
+        return <Navigate to="/plans" replace />;
+    }
 
     const fadeInUp = {
         initial: { opacity: 0, y: 30 },
