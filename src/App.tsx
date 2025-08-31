@@ -5,6 +5,8 @@ import MealsPage from "./components/meals/MealsPage.tsx";
 import Plans from "./components/plans/Plans.tsx";
 import {CssVarsProvider, extendTheme} from "@mui/material-next";
 import {AuthProvider} from "./contexts/AuthContext.tsx";
+import {MealsCacheProvider} from "./contexts/MealsCacheContext.tsx";
+import {CalendarEventsCacheProvider} from "./contexts/CalendarEventsCacheContext.tsx";
 import {GoogleOAuthProvider} from "@react-oauth/google";
 import MealPage from "./components/meals/MealPage.tsx";
 import {createTheme, responsiveFontSizes, ThemeProvider} from "@mui/material/styles";
@@ -176,9 +178,13 @@ export default function App() {
             <CssVarsProvider theme={md3theme}>
                 <GlobalStyles styles={{html: {backgroundColor: theme.palette.background.default}}}/>
                 <AuthProvider>
-                    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-                        <RouterProvider router={router}/>
-                    </GoogleOAuthProvider>
+                    <MealsCacheProvider>
+                        <CalendarEventsCacheProvider defaultTtlMs={10 * 60 * 1000}>
+                            <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+                                <RouterProvider router={router}/>
+                            </GoogleOAuthProvider>
+                        </CalendarEventsCacheProvider>
+                    </MealsCacheProvider>
                 </AuthProvider>
             </CssVarsProvider>
         </ThemeProvider>

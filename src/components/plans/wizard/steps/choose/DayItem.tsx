@@ -122,6 +122,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                     width: '2rem',
                     height: '2rem',
                     borderRadius: '9999999px',
+                    my: 0.5,
                     color: isToday(plan) ? 'white' : 'textSecondary',
                 }}>
                     {plan.date.toLocaleDateString('en-gb', {day: 'numeric'})}

@@ -65,7 +65,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
             <Card 
                 variant="outlined" 
                 sx={{ 
-                    p: 3, 
+                    p: 1,
                     borderRadius: 3,
                     background: 'linear-gradient(135deg, rgba(255,152,0,0.05) 0%, rgba(255,193,7,0.08) 100%)',
                     border: '1px solid rgba(255,152,0,0.2)'
@@ -154,8 +154,8 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                             disabled={aiLoading || mealPlan.plans.length === 0}
                             sx={{
                                 borderRadius: 3,
-                                px: 4,
-                                py: 2,
+                                px: 2,
+                                py: 1.5,
                                 // fontSize: '1.1rem',
                                 fontWeight: 500,
                                 background: 'linear-gradient(135deg, #ff9800 0%, #ff5722 100%)',
@@ -254,6 +254,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                     onPlanUpdate={(updatedPlan) => {
                         setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.date !== updatedPlan.date), updatedPlan]));
                     }}
+                    calendarEvents={calendarEvents}
                 />
             ) : (
                 <WholePlan/>

@@ -12,7 +12,7 @@ export const useLinkCalendar = () => {
 
     const linkCalendar = (token: string) => {
         repository.linkCalendar(token, () =>{
-            navigate(-1);
+            navigate("/plans");
         })
     }
 

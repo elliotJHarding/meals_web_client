@@ -15,6 +15,7 @@ import MealItem from "./MealItem.tsx";
 import MealChooser from "../../../../dialog/MealChooser.tsx";
 import Meal from "../../../../../domain/Meal.ts";
 import PlanMeal from "../../../../../domain/PlanMeal.ts";
+import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 
 // Simple debounce implementation
 const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => {
@@ -31,9 +32,10 @@ interface PlanEditorProps {
     mealsLoading: boolean;
     mealsFailed: boolean;
     onPlanUpdate: (updatedPlan: Plan) => void;
+    calendarEvents: CalendarEvent[];
 }
 
-export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPlanUpdate}: PlanEditorProps) {
+export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPlanUpdate, calendarEvents}: PlanEditorProps) {
     const navigate = useNavigate();
     const {updatePlan} = usePlanUpdate();
     const {createPlan} = usePlanCreate();
@@ -43,7 +45,12 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
     });
     const [mealChooserOpen, setMealChooserOpen] = useState(false);
 
-    const {calendarEvents} = useCalendarEvents(MealPlan.formatDate(plan.date), MealPlan.formatDate(plan.date));
+    // Filter calendar events to only show events on the plan date
+    const filteredCalendarEvents = calendarEvents.filter(event => {
+        const eventDate = new Date(event.time);
+        const planDate = new Date(plan.date);
+        return eventDate.toDateString() === planDate.toDateString();
+    });
 
     // Function to sync plan to backend (create or update)
     const syncPlanToBackend = useCallback((updatedPlan: Plan) => {
@@ -236,7 +243,7 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
                             </Typography>
                             <Divider />
                             <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
-                                <CalendarEvents calendarEvents={calendarEvents} />
+                                <CalendarEvents calendarEvents={filteredCalendarEvents} />
                             </Box>
                         </Stack>
                     </Grid>

@@ -36,9 +36,6 @@ export default function CalendarEvents({calendarEvents}: CalendarEventsProps) {
                 }}
                       key={event.name}
                       component={motion.div} layout
-                      initial={{x: 10, opacity: 0}}
-                      animate={{x: 0, opacity: 1}}
-                      exit={{x: 10, opacity: 0}}
                 >
                     <Stack direction={'row'} gap={1} component={motion.div} layout>
                         {!event.allDay && <Typography component={motion.div} layout fontWeight={'bold'}
