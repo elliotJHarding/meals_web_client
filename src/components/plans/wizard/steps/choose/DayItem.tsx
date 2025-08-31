@@ -1,6 +1,6 @@
 import MealChooser from "../../../../dialog/MealChooser.tsx";
 import MealPlan from "../../../../../domain/MealPlan.ts";
-import {Card, CardMedia, Stack, Typography, useTheme} from "@mui/material";
+import {Card, CardMedia, Stack, Typography, useTheme, Tooltip} from "@mui/material";
 import Box from "@mui/material/Box";
 import Plan from "../../../../../domain/Plan.ts";
 import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
@@ -13,6 +13,9 @@ import {useNavigate} from "react-router-dom";
 import {motion} from "framer-motion";
 import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 import CalendarEvents from "./CalendarEvents.tsx";
+import ServesChip from "../../../../meals/chip/ServesChip.tsx";
+import EffortChip from "../../../../meals/chip/EffortChip.tsx";
+import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
 
 const constant = {
     imageWidth: 30,
@@ -58,41 +61,46 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
         deletePlan(plan, () => setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.id != plan.id), {date: plan.date, planMeals: [], shoppingListItems: []}])));
     }
 
-    const Meal = ({meal, setMealChooserOpen} : {meal: Meal, setMealChooserOpen : (open: boolean) => void}) =>
-        <Card onClick={() => setMealChooserOpen(true)} sx={{margin: 1, backgroundColor: 'beige'}}>
-            <Stack direction="row" gap={1} sx={{padding: 1}}>
-                <CardMedia
-                    sx={{
-                        width: constant.imageWidth,
-                        height: constant.imageHeight,
-                        borderRadius: constant.imageBorderRadius
-                    }}
-                    image={meal?.image?.url}
-                />
-                <Stack direction='row' gap={1} alignItems='center'>
-                    <Typography noWrap={true} sx={{cursor: 'pointer'}}
-                                onClick={() => navigate(`/meals/${meal.id}`)}>
-                        {meal?.name}
-                    </Typography>
-                </Stack>
-                {/*<Stack direction='row' gap={1} alignItems='center'>*/}
-                {/*    <IconButton sx={{padding: 0.1}}>*/}
-                {/*        <Remove/>*/}
-                {/*    </IconButton>*/}
-                {/*    <Person/>*/}
-                {/*    <Typography>1</Typography>*/}
-                {/*    <IconButton size={'small'} sx={{padding: 0.1, marginRight: 1}}>*/}
-                {/*        <Add/>*/}
-                {/*    </IconButton>*/}
-                {/*    <IconButton size={'small'} onClick={() => setMealChooserOpen(true)} sx={{padding: 0.1}}>*/}
-                {/*        <Edit/>*/}
-                {/*    </IconButton>*/}
-                {/*    <IconButton onClick={onDelete} sx={{padding: 0.1}}>*/}
-                {/*        <Close/>*/}
-                {/*    </IconButton>*/}
-                {/*</Stack>*/}
-        </Stack>
-        </Card>
+    const MealComponent = ({planMeal, setMealChooserOpen} : {planMeal: PlanMeal, setMealChooserOpen : (open: boolean) => void}) => {
+        const meal = planMeal.meal;
+        
+        return (
+            <Stack>
+                {planMeal.note && <Typography  sx={{color: 'text.secondary', mb: 0, mt: 0.5, fontWeight: 'bold'}}>{planMeal.note}</Typography>}
+
+                <Card onClick={() => setMealChooserOpen(true)} sx={{backgroundColor: 'beige', my: 0.3}}>
+                    <Stack direction="row" gap={1} sx={{padding: 1}}>
+                        <CardMedia
+                            sx={{
+                                width: constant.imageWidth,
+                                height: constant.imageHeight,
+                                borderRadius: constant.imageBorderRadius,
+                                flexShrink: 0
+                            }}
+                            image={meal?.image?.url}
+                        />
+                        <Typography noWrap={true} sx={{cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
+                            {meal?.name}
+                        </Typography>
+
+                        <Box flexGrow={1} />
+
+                        <Stack direction="row" gap={0.5} alignItems="center" sx={{ mt: 0.2 }}>
+                            {/* Effort */}
+                            <EffortChip effort={meal?.effort} size="small" />
+
+                            {/* Required Servings */}
+                            <ServesChip serves={planMeal.requiredServings} size="small" />
+
+                            {/* Prep Time */}
+                            <PrepTimeChip prepTimeMinutes={meal?.prepTimeMinutes} size="small" />
+                        </Stack>
+                    </Stack>
+                </Card>
+            </Stack>
+        );
+    }
 
 
     return (
@@ -138,7 +146,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                 <Box sx={{padding: 0}} component={motion.div} layout>
                     {
                         plan.planMeals?.map((planMeal, i) =>
-                            <Meal key={i} meal={planMeal.meal} setMealChooserOpen={setMealChooserOpen}/>
+                            <MealComponent key={i} planMeal={planMeal} setMealChooserOpen={setMealChooserOpen}/>
                         ) || []
                     }
                 </Box>

@@ -164,8 +164,8 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
                             <ServesChip serves={meal.serves} size={'medium'}/>
                             {meal.effort != undefined && <EffortChip effort={meal.effort} size={'medium'}/>}
                         </Box>
-                        {meal.description != '' && <Typography>{meal.description}</Typography>}
-                        <Stack direction='row'>
+                        {meal.description != '' && <Typography component={motion.div} layout='position'>{meal.description}</Typography>}
+                        <Stack direction='row' component={motion.div} layout='position'>
                             <RecipeLink recipe={meal.recipe} newMeal={newMeal} setNewMeal={setNewMeal}
                                 onConfirm={() => updateMeal(newMeal)}/>
                         </Stack>
@@ -173,7 +173,7 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
             </Grid>
             <Grid xs={12} md={2} component={motion.div} layout>
                 <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'end', height: '100%'}} component={motion.div} layout>
-                    <Stack direction='row' justifyContent='end'>
+                    <Stack direction='row' justifyContent='end'  component={motion.div} layout>
                         <ButtonGroup>
                             <Button startIcon={<Edit/>} onClick={handleEdit} variant='text'>Edit</Button>
                         </ButtonGroup>

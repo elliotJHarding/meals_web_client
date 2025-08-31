@@ -28,8 +28,8 @@ export default function ShoppingList({mealPlan} : {mealPlan: MealPlan}) {
               initial={{x:200, opacity: 0 }}
               animate={{x:0, opacity: 1 }}
               exit={{x: -200, opacity: 0 }}>
-            <Box sx={{padding: 3}}>
-                <Stack direction='row' justifyContent='space-between' spacing={2}>
+            <Box sx={{padding: 3}} component={motion.div} layout>
+                <Stack direction='row' justifyContent='space-between' spacing={2} component={motion.div} layout>
                     <Typography variant='h6'>Shopping List</Typography>
                     <Button startIcon={<ContentCopy/>} onClick={onCopy}>Copy</Button>
                 </Stack>

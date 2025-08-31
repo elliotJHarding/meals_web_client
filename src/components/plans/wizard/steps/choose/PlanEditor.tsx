@@ -95,6 +95,18 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
         debouncedSyncPlan(updatedPlan);
     };
 
+    const handleMealNoteChange = (planMealIndex: number, newNote: string) => {
+        const updatedPlanMeals = [...(currentPlan.planMeals || [])];
+        updatedPlanMeals[planMealIndex] = {
+            ...updatedPlanMeals[planMealIndex],
+            note: newNote
+        };
+        const updatedPlan = { ...currentPlan, planMeals: updatedPlanMeals };
+        setCurrentPlan(updatedPlan);
+        onPlanUpdate(updatedPlan);
+        debouncedSyncPlan(updatedPlan);
+    };
+
     const handleRemoveMeal = (planMealIndex: number) => {
         const updatedPlanMeals = (currentPlan.planMeals || []).filter((_, index) => index !== planMealIndex);
         const updatedPlan = { ...currentPlan, planMeals: updatedPlanMeals };
@@ -227,6 +239,7 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
                                             key={index}
                                             planMeal={planMeal}
                                             onServingsChange={(newServings) => handleServingsChange(index, newServings)}
+                                            onNoteChange={(newNote) => handleMealNoteChange(index, newNote)}
                                             onRemove={() => handleRemoveMeal(index)}
                                         />
                                     ))}

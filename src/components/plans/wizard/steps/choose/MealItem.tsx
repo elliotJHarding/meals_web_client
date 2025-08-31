@@ -1,5 +1,5 @@
-import { Card, CardMedia, IconButton, Stack, TextField, Typography } from "@mui/material";
-import { Add, Remove, Delete } from "@mui/icons-material";
+import { Card, CardMedia, IconButton, Stack, TextField, Typography, InputAdornment } from "@mui/material";
+import {Add, Remove, Delete, NotesRounded, Person} from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import PlanMeal from "../../../../../domain/PlanMeal.ts";
@@ -8,17 +8,24 @@ import { useNavigate } from "react-router-dom";
 interface MealItemProps {
     planMeal: PlanMeal;
     onServingsChange: (newServings: number) => void;
+    onNoteChange: (newNote: string) => void;
     onRemove: () => void;
 }
 
-export default function MealItem({ planMeal, onServingsChange, onRemove }: MealItemProps) {
+export default function MealItem({ planMeal, onServingsChange, onNoteChange, onRemove }: MealItemProps) {
     const navigate = useNavigate();
     const [servings, setServings] = useState(planMeal.requiredServings);
+    const [note, setNote] = useState(planMeal.note || "");
 
     const handleServingsChange = (newServings: number) => {
         if (newServings < 1) return;
         setServings(newServings);
         onServingsChange(newServings);
+    };
+
+    const handleNoteChange = (newNote: string) => {
+        setNote(newNote);
+        onNoteChange(newNote);
     };
 
     const handleMealClick = () => {
@@ -43,8 +50,8 @@ export default function MealItem({ planMeal, onServingsChange, onRemove }: MealI
                 {/* Meal Image and Info */}
                 <CardMedia
                     sx={{
-                        width: 50,
-                        height: 40,
+                        width: 70,
+                        height: 60,
                         borderRadius: 1.5,
                         cursor: 'pointer',
                         flexShrink: 0
@@ -54,23 +61,52 @@ export default function MealItem({ planMeal, onServingsChange, onRemove }: MealI
                 />
                 
                 <Stack sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography 
-                        variant="subtitle1" 
-                        noWrap 
+                    <Typography
+                        variant="subtitle1"
+                        noWrap
                         sx={{ cursor: 'pointer', fontWeight: 500 }}
                         onClick={handleMealClick}
                     >
                         {planMeal.meal?.name}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                        Original: {planMeal.meal?.serves} servings
-                    </Typography>
+
+                    <TextField
+                        size="small"
+                        placeholder="Add a note..."
+                        value={note}
+                        onChange={(e) => handleNoteChange(e.target.value)}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <NotesRounded sx={{ fontSize: '0.875rem', opacity: 0.7 }} />
+                                </InputAdornment>
+                            ),
+                            sx: { fontSize: '0.875rem', height: '32px', py: 0, pl: 0.5 }
+                        }}
+                        sx={{ 
+                            mt: 0.5,
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    border: 'none',
+                                },
+                                '&:hover fieldset': {
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                },
+                                '&.Mui-focused fieldset': {
+                                    border: '1px solid',
+                                    borderColor: 'primary.main',
+                                },
+                            },
+                        }}
+                    />
                 </Stack>
 
                 {/* Servings Controls */}
                 <Stack direction="row" alignItems="center" gap={0.5} sx={{ flexShrink: 0 }}>
+                    <Person/>
                     <Typography variant="body2" color="text.secondary" sx={{ mr: 0.5 }}>
-                        Servings:
+                        Portions
                     </Typography>
                     <IconButton 
                         size="small" 

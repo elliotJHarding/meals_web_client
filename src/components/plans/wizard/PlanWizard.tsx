@@ -4,7 +4,7 @@ import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import ChooseMeals from "./steps/choose/ChooseMeals.tsx";
 import {useMeals} from "../../../hooks/meal/useMeals.ts";
 import Button from "@mui/material-next/Button";
-import {ArrowBackIos, ArrowForwardIos} from "@mui/icons-material";
+import {ArrowBackIos, ArrowForwardIos, Check} from "@mui/icons-material";
 import {motion} from "framer-motion";
 import CheckIngredients from "./steps/check/CheckIngredients.tsx";
 import {usePlans} from "../../../hooks/plan/usePlans.ts";
@@ -84,6 +84,7 @@ export default function PlanWizard() {
                 <Stack direction='row' gap={2} component={motion.div} layout="position">
                     {back != null && <Button component={motion.div} startIcon={<ArrowBackIos/>} onClick={() => navigate(`/plans/create/${back}?from=${from}&to=${to}`)}>Back</Button>}
                     {next != null && <Button component={motion.div} endIcon={<ArrowForwardIos/>} variant='filled' onClick={() => navigate(`/plans/create/${next}?from=${from}&to=${to}`)}>Next</Button>}
+                    {next == null && <Button component={motion.div} endIcon={<Check/>} variant='filled' onClick={() => navigate(`/plans`)}>Done</Button>}
                 </Stack>
             </Stack>
             <Box id='wizard-step-holder' component={motion.div} layout>

@@ -8,6 +8,7 @@ interface BackendPlanMeal {
         id: bigint;
     };
     requiredServings: number;
+    note?: string;
 }
 
 interface BackendPlan {
@@ -30,7 +31,8 @@ const transformPlanForBackend = (plan: Plan): BackendPlan => {
             meal: {
                 id: planMeal.meal.id!
             },
-            requiredServings: planMeal.requiredServings
+            requiredServings: planMeal.requiredServings,
+            note: planMeal.note
         })),
         shoppingListItems: plan.shoppingListItems,
         note: plan.note

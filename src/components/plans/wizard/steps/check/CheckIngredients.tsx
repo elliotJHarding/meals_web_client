@@ -56,8 +56,8 @@ export default function CheckIngredients({mealPlan, setMealPlan} : {mealPlan: Me
               initial={{x:200, opacity: 0 }}
               animate={{x:0, opacity: 1 }}
               exit={{x: -200, opacity: 0 }}>
-            <Box sx={{padding: 3}}>
-                <Stack gap={1} direction='row' alignItems='center'>
+            <Box sx={{padding: 3}} component={motion.div} layout>
+                <Stack gap={1} direction='row' alignItems='center' component={motion.div} layout>
                     <KitchenOutlined/>
                     <Typography variant='h6'>Fresh</Typography>
                 </Stack>
