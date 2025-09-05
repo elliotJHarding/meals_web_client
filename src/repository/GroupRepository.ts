@@ -1,4 +1,4 @@
-import {AxiosResponse} from "axios";
+import axios, {AxiosResponse} from "axios";
 import ResourceRepository from "./ResourceRepository.ts";
 import FamilyGroup from "../domain/FamilyGroup.ts";
 
@@ -29,5 +29,25 @@ export default class GroupRepository extends ResourceRepository {
                 onSuccess(response.data);
             }
         )
+    }
+
+    joinGroup(uuid: string, onSuccess: () => void, onFailure: () => void): void {
+        console.info("Joining Group", uuid)
+
+        axios
+            .post(
+                this.url + `familyGroup/join/${uuid}`,
+                null,
+                {
+                    headers: this.getHeaders(),
+                    withCredentials: true,
+                }
+            )
+            .then(() => {
+                onSuccess();
+            })
+            .catch(() => {
+                onFailure();
+            });
     }
 }

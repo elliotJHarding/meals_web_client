@@ -68,7 +68,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
             <Stack>
                 {planMeal.note && <Typography  sx={{color: 'text.secondary', mb: 0, mt: 0.5, fontWeight: 'bold'}}>{planMeal.note}</Typography>}
 
-                <Card onClick={() => setMealChooserOpen(true)} sx={{backgroundColor: 'beige', my: 0.3}}>
+                <Card onClick={() => setMealChooserOpen(true)} sx={{backgroundColor: 'secondaryContainer', my: 0.3}}>
                     <Stack direction="row" gap={1} sx={{padding: 1}}>
                         <CardMedia
                             sx={{

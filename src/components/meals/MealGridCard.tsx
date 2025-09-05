@@ -4,6 +4,7 @@ import EffortChip from "./chip/EffortChip.tsx";
 import Box from "@mui/material/Box";
 import PrepTimeChip from "./chip/PrepTimeChip.tsx";
 import ServesChip from "./chip/ServesChip.tsx";
+import IngredientsStatusChip from "./chip/IngredientsStatusChip.tsx";
 
 const constant = {
     padding: 1.5,
@@ -75,6 +76,7 @@ export default function MealGridCard({meal, index, onClick} : {meal : Meal, inde
                             <ServesChip serves={meal.serves} size={'small'}/>
                             <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'small'}/>
                             <EffortChip effort={meal.effort} size={'small'}/>
+                            <IngredientsStatusChip meal={meal} size={'small'}/>
                         </Box>
                     </Stack>
                 </CardActionArea>

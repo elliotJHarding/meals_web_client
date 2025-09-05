@@ -17,6 +17,7 @@ import {CheckCircle, RadioButtonUnchecked} from "@mui/icons-material";
 import LandingPage from "./components/home/LandingPage.tsx";
 import Profile from "./components/user/Profile.tsx";
 import Logout from "./components/user/Logout.tsx";
+import JoinGroup from "./components/user/JoinGroup.tsx";
 import LinkCalendar from "./components/calendar/LinkCalendar.tsx";
 import LoginPage from "./components/auth/LoginPage.tsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.tsx";
@@ -34,6 +35,7 @@ export default function App() {
                 { path: "profile", element: <ProtectedRoute><Profile/></ProtectedRoute>},
                 { path: "logout", element: <ProtectedRoute><Logout/></ProtectedRoute>},
                 { path: "calendar/link", element: <ProtectedRoute><LinkCalendar/></ProtectedRoute>},
+                { path: "group/join/:uid", element: <ProtectedRoute><JoinGroup/></ProtectedRoute>},
             ]}
     ])
 
@@ -42,6 +44,7 @@ export default function App() {
             mode: 'light',
             primary: {
                 main: '#50652c',
+                light: '#D2ECA5'
             },
             secondary: {
                 main: '#6b9992',
