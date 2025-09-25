@@ -34,4 +34,20 @@ export default class MealPlan {
     to() {
         return MealPlan.formatDate(this.plans[this.plans.length - 1].date);
     }
+
+    // Helper method to filter out a plan by both date and ID to prevent duplicates
+    static filterOutPlan(plans: Plan[], planToRemove: Plan): Plan[] {
+        return plans.filter(p => {
+            // If both plans have IDs, compare by ID
+            if (p.id && planToRemove.id) {
+                return p.id !== planToRemove.id;
+            }
+            // If either plan lacks an ID, compare by date
+            const pDate = p.date;
+            const removeDate = planToRemove.date;
+            return !(pDate.getUTCFullYear() === removeDate.getUTCFullYear() &&
+                     pDate.getUTCMonth() === removeDate.getUTCMonth() &&
+                     pDate.getUTCDate() === removeDate.getUTCDate());
+        });
+    }
 }

@@ -54,9 +54,11 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
                         height: 60,
                         borderRadius: 1.5,
                         cursor: 'pointer',
-                        flexShrink: 0
+                        flexShrink: 0,
+                        backgroundColor: planMeal.meal?.image?.url ? 'transparent' : 'grey.200',
+                        backgroundSize: 'cover'
                     }}
-                    image={planMeal.meal?.image?.url}
+                    image={planMeal.meal?.image?.url || '/placeholder-meal.png'}
                     onClick={handleMealClick}
                 />
                 

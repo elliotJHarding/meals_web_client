@@ -16,6 +16,7 @@ import CalendarEvents from "./CalendarEvents.tsx";
 import ServesChip from "../../../../meals/chip/ServesChip.tsx";
 import EffortChip from "../../../../meals/chip/EffortChip.tsx";
 import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
+import {Notes, NotesRounded} from "@mui/icons-material";
 
 const constant = {
     imageWidth: 30,
@@ -58,7 +59,24 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
     const onClick = () => navigate(`?from=${mealPlan.from()}&to=${mealPlan.to()}&selected=${MealPlan.formatDate(plan.date)}`)
 
     const onDelete = () => {
-        deletePlan(plan, () => setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.id != plan.id), {date: plan.date, planMeals: [], shoppingListItems: []}])));
+        deletePlan(plan, () => setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, plan), {date: plan.date, planMeals: [], shoppingListItems: []}])));
+    }
+
+    const Note = ({note}: {note: string}) => {
+        return (
+            <Stack direction='row' gap={1}>
+                <NotesRounded/>
+                <Typography
+                    color='text.secondary'
+                    sx={{
+                        fontWeight: 'bold',
+                        px: 0.5,
+                    }}
+                >
+                    {note}
+                </Typography>
+            </Stack>
+        )
     }
 
     const MealComponent = ({planMeal, setMealChooserOpen} : {planMeal: PlanMeal, setMealChooserOpen : (open: boolean) => void}) => {
@@ -75,9 +93,11 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                                 width: constant.imageWidth,
                                 height: constant.imageHeight,
                                 borderRadius: constant.imageBorderRadius,
-                                flexShrink: 0
+                                flexShrink: 0,
+                                backgroundColor: meal?.image?.url ? 'transparent' : 'grey.200',
+                                backgroundSize: 'cover'
                             }}
-                            image={meal?.image?.url}
+                            image={meal?.image?.url || '/placeholder-meal.png'}
                         />
                         <Typography noWrap={true} sx={{cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
                                     onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
@@ -104,7 +124,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
 
 
     return (
-        <motion.tr layout key={index} style={{borderBottom: '1px solid #e0e0e0', borderRadius: 5}}
+        <motion.tr layout key={index} style={{borderBottom: '1px solid #e0e0e0', borderRadius: 5, verticalAlign: 'middle'}}
                    whileHover={{scale: 1.01, opacity: 0.8, cursor: 'pointer'}} onClick={onClick}>
             <MealChooser meals={meals}
                          mealsLoading={mealsLoading}
@@ -116,11 +136,11 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                              const newPlan = {...plan, planMeals: [...(plan.planMeals || []), newPlanMeal]}
                              if (newPlan.id == null) {
                                  createPlan(newPlan, (returnedPlan) =>
-                                     setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.date !== plan.date), returnedPlan]))
+                                     setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, plan), returnedPlan]))
                                  )
                              } else {
                                  updatePlan(newPlan, ()=> console.log("Updated plan"))
-                                 setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.date !== plan.date), newPlan]))
+                                 setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, plan), newPlan]))
                              }
                          }}
             />
@@ -144,6 +164,9 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
             </motion.td>
             <motion.td layout style={{width:'100%'}}>
                 <Box sx={{padding: 0}} component={motion.div} layout>
+                    {plan.note && (
+                        <Note note={plan.note}/>
+                    )}
                     {
                         plan.planMeals?.map((planMeal, i) =>
                             <MealComponent key={i} planMeal={planMeal} setMealChooserOpen={setMealChooserOpen}/>

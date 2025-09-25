@@ -1,4 +1,4 @@
-import {Card, Stack, Alert, CircularProgress, TextField} from "@mui/material";
+import {Card, Stack, Alert, CircularProgress, TextField, useMediaQuery, useTheme, Typography} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import Box from "@mui/material/Box";
 import Meal from "../../../../../domain/Meal.ts";
@@ -13,6 +13,7 @@ import {useLinkCalendar} from "../../../../../hooks/calendar/useLinkCalendar.ts"
 import PlanEditor from "./PlanEditor.tsx";
 import {useAiGeneration} from "../../../../../hooks/plan/useAiGeneration.ts";
 import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, meals, mealsLoading, mealsFailed}: {
     mealPlan: MealPlan,
@@ -25,6 +26,8 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
     mealsFailed: boolean,
 }) {
 
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const {calendarEvents, isAuthorized} = useCalendarEvents(from || '', to || '');
     const {authorizeCalendar} = useLinkCalendar();
     const {generateMealPlan, loading: aiLoading, failed: aiFailed} = useAiGeneration();
@@ -55,8 +58,22 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
     };
 
     const LinkCalendarButton = () =>
-        <Stack direction="column" spacing={2} alignItems="center" justifyContent="center" sx={{width: '40%'}}>
-            <Button variant='outlined' size='large' sx={{borderRadius: 3, padding: 4, width: '100%', height: '100%', margin: 3}} startIcon={<CalendarMonth/>} onClick={authorizeCalendar}>Link Calendar</Button>
+        <Stack direction="column" spacing={2} alignItems="center" justifyContent="center" sx={{width: isMobile ? '100%' : '40%', mt: isMobile ? 2 : 0}}>
+            <Button 
+                variant='outlined' 
+                size={isMobile ? 'medium' : 'large'} 
+                sx={{
+                    borderRadius: 3, 
+                    padding: isMobile ? 2 : 4, 
+                    width: '100%', 
+                    height: isMobile ? 'auto' : '100%', 
+                    margin: isMobile ? 0 : 3
+                }} 
+                startIcon={<CalendarMonth/>} 
+                onClick={authorizeCalendar}
+            >
+                Link Calendar
+            </Button>
         </Stack>
 
     const WholePlan = () =>
@@ -74,8 +91,13 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                 layout
             >
                 <Stack spacing={2}>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                        <Box sx={{ position: 'relative', display: 'inline-block', flexShrink: 0 }}>
+                    <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={isMobile ? "stretch" : "center"}>
+                        <Box sx={{ 
+                            position: 'relative', 
+                            display: 'inline-block', 
+                            flexShrink: 0,
+                            alignSelf: isMobile ? 'center' : 'auto'
+                        }}>
                         {/* Outer pulsing glow */}
                         <motion.div
                             animate={{
@@ -154,15 +176,15 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                             disabled={aiLoading || mealPlan.plans.length === 0}
                             sx={{
                                 borderRadius: 3,
-                                px: 2,
+                                px: isMobile ? 3 : 2,
                                 py: 1.5,
-                                // fontSize: '1.1rem',
                                 fontWeight: 500,
                                 background: 'linear-gradient(135deg, #ff9800 0%, #ff5722 100%)',
                                 color: 'white',
                                 position: 'relative',
                                 zIndex: 1,
                                 boxShadow: '0 4px 20px rgba(255,152,0,0.3)',
+                                width: isMobile ? '100%' : 'auto',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #f57c00 0%, #e64a19 100%)',
                                     boxShadow: '0 6px 25px rgba(255,152,0,0.4)',
@@ -211,19 +233,178 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
             </Card>
 
             {/* Main Plan Section */}
-            <Stack direction="row" spacing={2}>
-                <Box sx={{width: !isAuthorized ? '60%' : '100%'}} component={motion.div} layout>
-                    <LayoutGroup>
-                        <motion.table layout style={{width:'100%', borderCollapse: 'collapse'}}>
-                            <motion.tbody layout>
-                                {dayItems}
-                            </motion.tbody>
-                        </motion.table>
-                    </LayoutGroup>
-                </Box>
-                {!isAuthorized && <LinkCalendarButton/>}
-            </Stack>
+            {isMobile ? (
+                <Stack spacing={2}>
+                    {dayItemsMobile}
+                    {!isAuthorized && <LinkCalendarButton/>}
+                </Stack>
+            ) : (
+                <Stack direction="row" spacing={2}>
+                    <Box sx={{width: !isAuthorized ? '60%' : '100%'}} component={motion.div} layout>
+                        <LayoutGroup>
+                            <motion.table layout style={{width:'100%', borderCollapse: 'collapse'}}>
+                                <motion.tbody layout>
+                                    {dayItems}
+                                </motion.tbody>
+                            </motion.table>
+                        </LayoutGroup>
+                    </Box>
+                    {!isAuthorized && <LinkCalendarButton/>}
+                </Stack>
+            )}
         </Stack>
+
+    const navigate = useNavigate();
+
+    const MobileDayItem = ({ plan, calendarEvents }: {
+        plan: Plan,
+        calendarEvents: CalendarEvent[]
+    }) => {
+        const onClick = () => navigate(`?from=${mealPlan.from()}&to=${mealPlan.to()}&selected=${MealPlan.formatDate(plan.date)}`);
+        
+        const isToday = (plan: Plan): boolean => {
+            const today: Date = new Date();
+            return (
+                today.getFullYear() === plan.date.getFullYear() &&
+                today.getMonth() === plan.date.getMonth() &&
+                today.getDate() === plan.date.getDate()
+            )
+        }
+
+        return (
+            <Card
+                component={motion.div}
+                layout
+                sx={{
+                    p: 2,
+                    cursor: 'pointer',
+                    borderRadius: 3,
+                    border: isToday(plan) ? `2px solid ${theme.palette.primary.main}` : '1px solid rgba(0,0,0,0.12)',
+                    background: isToday(plan) ? 'rgba(25, 118, 210, 0.04)' : 'background.paper',
+                    boxShadow: isToday(plan) ? '0 2px 8px rgba(25, 118, 210, 0.15)' : '0 1px 3px rgba(0,0,0,0.1)'
+                }}
+                onClick={onClick}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+            >
+                <Stack spacing={2}>
+                    {/* Date Header */}
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                            sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: '50%',
+                                backgroundColor: isToday(plan) ? theme.palette.primary.main : 'rgba(0,0,0,0.08)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: isToday(plan) ? 'white' : 'text.secondary',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            {plan.date.getDate()}
+                        </Box>
+                        <Box>
+                            <Typography variant="h6" sx={{ fontWeight: 500, color: isToday(plan) ? 'primary.main' : 'text.primary' }}>
+                                {plan.date.toLocaleDateString('en-gb', { weekday: 'long' })}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {plan.date.toLocaleDateString('en-gb', { month: 'long', day: 'numeric' })}
+                            </Typography>
+                        </Box>
+                    </Stack>
+
+                    {/* Meals */}
+                    {plan.planMeals && plan.planMeals.length > 0 ? (
+                        <Stack spacing={1}>
+                            {plan.planMeals.map((planMeal, index) => (
+                                <Box key={index} sx={{ 
+                                    p: 1.5, 
+                                    backgroundColor: 'rgba(0,0,0,0.04)', 
+                                    borderRadius: 2,
+                                    border: '1px solid rgba(0,0,0,0.08)'
+                                }}>
+                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                        {planMeal.meal?.name}
+                                    </Typography>
+                                    {planMeal.note && (
+                                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mt: 0.5 }}>
+                                            {planMeal.note}
+                                        </Typography>
+                                    )}
+                                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                                        <Typography variant="caption" sx={{ 
+                                            px: 1, 
+                                            py: 0.5, 
+                                            backgroundColor: 'primary.main', 
+                                            color: 'white', 
+                                            borderRadius: 1,
+                                            fontSize: '0.7rem'
+                                        }}>
+                                            {planMeal.requiredServings} servings
+                                        </Typography>
+                                        {planMeal.meal?.effort && (
+                                            <Typography variant="caption" sx={{ 
+                                                px: 1, 
+                                                py: 0.5, 
+                                                backgroundColor: 'secondary.main', 
+                                                color: 'white', 
+                                                borderRadius: 1,
+                                                fontSize: '0.7rem'
+                                            }}>
+                                                {planMeal.meal.effort} effort
+                                            </Typography>
+                                        )}
+                                        {planMeal.meal?.prepTimeMinutes && (
+                                            <Typography variant="caption" sx={{ 
+                                                px: 1, 
+                                                py: 0.5, 
+                                                backgroundColor: 'success.main', 
+                                                color: 'white', 
+                                                borderRadius: 1,
+                                                fontSize: '0.7rem'
+                                            }}>
+                                                {planMeal.meal.prepTimeMinutes}min
+                                            </Typography>
+                                        )}
+                                    </Stack>
+                                </Box>
+                            ))}
+                        </Stack>
+                    ) : (
+                        <Box sx={{ 
+                            p: 2, 
+                            backgroundColor: 'rgba(0,0,0,0.02)', 
+                            borderRadius: 2,
+                            border: '1px dashed rgba(0,0,0,0.12)',
+                            textAlign: 'center'
+                        }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                Tap to add meals
+                            </Typography>
+                        </Box>
+                    )}
+
+                    {/* Calendar Events */}
+                    {calendarEvents.length > 0 && (
+                        <Box sx={{ pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                Calendar Events
+                            </Typography>
+                            <Stack spacing={0.5} sx={{ mt: 0.5 }}>
+                                {calendarEvents.map((event, index) => (
+                                    <Typography key={index} variant="body2" color="text.secondary">
+                                        • {event.summary}
+                                    </Typography>
+                                ))}
+                            </Stack>
+                        </Box>
+                    )}
+                </Stack>
+            </Card>
+        );
+    };
 
     const dayItems = mealPlan.plans.map((plan, i) =>
         <DayItem index={i}
@@ -235,6 +416,14 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                  mealPlan={mealPlan}
                  setMealPlan={setMealPlan}
                  calendarEvents={filterEventsByPlan(calendarEvents, plan)}/>
+    );
+
+    const dayItemsMobile = mealPlan.plans.map((plan, i) =>
+        <MobileDayItem
+            key={i}
+            plan={plan}
+            calendarEvents={filterEventsByPlan(calendarEvents, plan)}
+        />
     );
 
     return (
@@ -252,7 +441,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                     mealsLoading={mealsLoading}
                     mealsFailed={mealsFailed}
                     onPlanUpdate={(updatedPlan) => {
-                        setMealPlan(new MealPlan([...mealPlan.plans.filter(p => p.date !== updatedPlan.date), updatedPlan]));
+                        setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, updatedPlan), updatedPlan]));
                     }}
                     calendarEvents={calendarEvents}
                 />
