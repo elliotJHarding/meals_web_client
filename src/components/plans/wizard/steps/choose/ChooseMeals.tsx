@@ -1,13 +1,17 @@
-import {Card, Stack, Alert, CircularProgress, TextField, useMediaQuery, useTheme, Typography} from "@mui/material";
+import {Card, Stack, Alert, CircularProgress, TextField, useMediaQuery, useTheme, Typography, CardMedia} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import Box from "@mui/material/Box";
 import Meal from "../../../../../domain/Meal.ts";
 import {LayoutGroup, motion} from "framer-motion";
 import DayItem from "./DayItem.tsx";
+import ServesChip from "../../../../meals/chip/ServesChip.tsx";
+import EffortChip from "../../../../meals/chip/EffortChip.tsx";
+import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
 import {useCalendarEvents} from "../../../../../hooks/calendar/useCalendarEvents.ts";
 import Plan from "../../../../../domain/Plan.ts";
 import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
-import {CalendarMonth, AutoAwesome} from "@mui/icons-material";
+import CalendarEvents from "./CalendarEvents.tsx";
+import {CalendarMonth, AutoAwesome, NotesRounded} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import {useLinkCalendar} from "../../../../../hooks/calendar/useLinkCalendar.ts";
 import PlanEditor from "./PlanEditor.tsx";
@@ -279,7 +283,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                     p: 2,
                     cursor: 'pointer',
                     borderRadius: 3,
-                    border: isToday(plan) ? `2px solid ${theme.palette.primary.main}` : '1px solid rgba(0,0,0,0.12)',
+                    border: isToday(plan) ? `2px solid ${theme.sys.color.primary}` : '1px solid rgba(0,0,0,0.12)',
                     background: isToday(plan) ? 'rgba(25, 118, 210, 0.04)' : 'background.paper',
                     boxShadow: isToday(plan) ? '0 2px 8px rgba(25, 118, 210, 0.15)' : '0 1px 3px rgba(0,0,0,0.1)'
                 }}
@@ -290,86 +294,86 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                 <Stack spacing={2}>
                     {/* Date Header */}
                     <Stack direction="row" alignItems="center" spacing={2}>
-                        <Box
-                            sx={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: '50%',
-                                backgroundColor: isToday(plan) ? theme.palette.primary.main : 'rgba(0,0,0,0.08)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: isToday(plan) ? 'white' : 'text.secondary',
-                                fontWeight: 'bold'
+                        <Typography variant='h6' align="center" sx={{
+                            backgroundColor: isToday(plan) ? theme.sys.color.primary : 'transparent',
+                            width: '2rem',
+                            height: '2rem',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: isToday(plan) ? 'white' : 'text.secondary',
+                            fontWeight: 'bold'
+                        }}>
+                            {plan.date.getDate()}
+                        </Typography>
+                        <Typography 
+                            variant="h6" 
+                            sx={{ 
+                                fontFamily: 'Montserrat',
+                                color: isToday(plan) ? theme.sys.color.primary : 'text.secondary',
+                                fontWeight: 500
                             }}
                         >
-                            {plan.date.getDate()}
-                        </Box>
-                        <Box>
-                            <Typography variant="h6" sx={{ fontWeight: 500, color: isToday(plan) ? 'primary.main' : 'text.primary' }}>
-                                {plan.date.toLocaleDateString('en-gb', { weekday: 'long' })}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {plan.date.toLocaleDateString('en-gb', { month: 'long', day: 'numeric' })}
-                            </Typography>
-                        </Box>
+                            {plan.date.toLocaleDateString('en-gb', { weekday: 'long' })}
+                        </Typography>
                     </Stack>
+
+                    {/* Plan Note */}
+                    {plan.note && (
+                        <Stack direction='row' gap={1} sx={{ mt: 1 }}>
+                            <NotesRounded sx={{ color: 'text.secondary', fontSize: '1rem' }}/>
+                            <Typography
+                                variant='body2'
+                                color='text.secondary'
+                                sx={{
+                                    fontWeight: 'bold',
+                                    fontStyle: 'italic'
+                                }}
+                            >
+                                {plan.note}
+                            </Typography>
+                        </Stack>
+                    )}
 
                     {/* Meals */}
                     {plan.planMeals && plan.planMeals.length > 0 ? (
                         <Stack spacing={1}>
                             {plan.planMeals.map((planMeal, index) => (
-                                <Box key={index} sx={{ 
-                                    p: 1.5, 
-                                    backgroundColor: 'rgba(0,0,0,0.04)', 
-                                    borderRadius: 2,
-                                    border: '1px solid rgba(0,0,0,0.08)'
+                                <Card key={index} sx={{ 
+                                    backgroundColor: 'secondaryContainer',
+                                    border: 'none',
+                                    boxShadow: 'none'
                                 }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                        {planMeal.meal?.name}
-                                    </Typography>
-                                    {planMeal.note && (
-                                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mt: 0.5 }}>
-                                            {planMeal.note}
-                                        </Typography>
-                                    )}
-                                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                                        <Typography variant="caption" sx={{ 
-                                            px: 1, 
-                                            py: 0.5, 
-                                            backgroundColor: 'primary.main', 
-                                            color: 'white', 
-                                            borderRadius: 1,
-                                            fontSize: '0.7rem'
-                                        }}>
-                                            {planMeal.requiredServings} servings
-                                        </Typography>
-                                        {planMeal.meal?.effort && (
-                                            <Typography variant="caption" sx={{ 
-                                                px: 1, 
-                                                py: 0.5, 
-                                                backgroundColor: 'secondary.main', 
-                                                color: 'white', 
-                                                borderRadius: 1,
-                                                fontSize: '0.7rem'
-                                            }}>
-                                                {planMeal.meal.effort} effort
+                                    <Stack direction="row" gap={1.5} sx={{ p: 1.5 }} alignItems="center">
+                                        <CardMedia
+                                            sx={{
+                                                width: 50,
+                                                height: 40,
+                                                borderRadius: 1.5,
+                                                flexShrink: 0,
+                                                backgroundColor: planMeal.meal?.image?.url ? 'transparent' : 'grey.200',
+                                                backgroundSize: 'cover'
+                                            }}
+                                            image={planMeal.meal?.image?.url || '/placeholder-meal.png'}
+                                        />
+                                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                                            {planMeal.note && (
+                                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                                                    {planMeal.note}
+                                                </Typography>
+                                            )}
+                                            <Typography variant="body1" sx={{ fontWeight: 500 }} noWrap>
+                                                {planMeal.meal?.name || 'Unknown Meal'}
                                             </Typography>
-                                        )}
-                                        {planMeal.meal?.prepTimeMinutes && (
-                                            <Typography variant="caption" sx={{ 
-                                                px: 1, 
-                                                py: 0.5, 
-                                                backgroundColor: 'success.main', 
-                                                color: 'white', 
-                                                borderRadius: 1,
-                                                fontSize: '0.7rem'
-                                            }}>
-                                                {planMeal.meal.prepTimeMinutes}min
-                                            </Typography>
-                                        )}
+                                            <Stack direction="row" gap={0.5} alignItems="center" sx={{ mt: 0.5 }}>
+                                                <EffortChip effort={planMeal.meal?.effort} size="small" />
+                                                <ServesChip serves={planMeal.requiredServings} size="small" />
+                                                <PrepTimeChip prepTimeMinutes={planMeal.meal?.prepTimeMinutes} size="small" />
+                                            </Stack>
+                                        </Box>
                                     </Stack>
-                                </Box>
+                                </Card>
                             ))}
                         </Stack>
                     ) : (
@@ -389,16 +393,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                     {/* Calendar Events */}
                     {calendarEvents.length > 0 && (
                         <Box sx={{ pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                Calendar Events
-                            </Typography>
-                            <Stack spacing={0.5} sx={{ mt: 0.5 }}>
-                                {calendarEvents.map((event, index) => (
-                                    <Typography key={index} variant="body2" color="text.secondary">
-                                        • {event.summary}
-                                    </Typography>
-                                ))}
-                            </Stack>
+                            <CalendarEvents calendarEvents={calendarEvents} />
                         </Box>
                     )}
                 </Stack>

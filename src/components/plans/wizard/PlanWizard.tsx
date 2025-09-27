@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import {Stack, Step, StepLabel, Stepper, Typography} from "@mui/material";
+import {Stack, Step, StepLabel, Stepper, Typography, useMediaQuery, useTheme} from "@mui/material";
 import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import ChooseMeals from "./steps/choose/ChooseMeals.tsx";
 import {useMeals} from "../../../hooks/meal/useMeals.ts";
@@ -25,6 +25,10 @@ export default function PlanWizard() {
     const {mealPlan, setMealPlan} = usePlans(fromDate, toDate);
 
     const navigate = useNavigate();
+
+    const theme = useTheme();
+
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const steps = [
         {
@@ -77,8 +81,8 @@ export default function PlanWizard() {
                 <Typography variant='h6' component={motion.div} layout>
                     {`${fromDate?.toLocaleDateString('en-gb', {
                         day: "numeric",
-                        month: "long"
-                    })} - ${toDate?.toLocaleDateString('en-gb', {day: "numeric", month: "long"})}`}
+                        month: isMobile ? "short": "long"
+                    })} - ${toDate?.toLocaleDateString('en-gb', {day: "numeric", month: isMobile ? "short": "long"})}`}
                 </Typography>
                 <Box flexGrow={1}/>
                 <Stack direction='row' gap={2} component={motion.div} layout="position">

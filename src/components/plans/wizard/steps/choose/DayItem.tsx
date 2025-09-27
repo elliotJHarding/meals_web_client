@@ -1,6 +1,6 @@
 import MealChooser from "../../../../dialog/MealChooser.tsx";
 import MealPlan from "../../../../../domain/MealPlan.ts";
-import {Card, CardMedia, Stack, Typography, useTheme, Tooltip} from "@mui/material";
+import {Card, CardMedia, Stack, Typography, useTheme} from "@mui/material";
 import Box from "@mui/material/Box";
 import Plan from "../../../../../domain/Plan.ts";
 import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
@@ -16,7 +16,7 @@ import CalendarEvents from "./CalendarEvents.tsx";
 import ServesChip from "../../../../meals/chip/ServesChip.tsx";
 import EffortChip from "../../../../meals/chip/EffortChip.tsx";
 import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
-import {Notes, NotesRounded} from "@mui/icons-material";
+import {NotesRounded} from "@mui/icons-material";
 
 const constant = {
     imageWidth: 30,
@@ -67,6 +67,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
             <Stack direction='row' gap={1}>
                 <NotesRounded/>
                 <Typography
+                    variant='body1'
                     color='text.secondary'
                     sx={{
                         fontWeight: 'bold',

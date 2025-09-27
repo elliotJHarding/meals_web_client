@@ -12,7 +12,10 @@ export default function Root() {
     return (
         <Box>
             <NavBar/>
-            <Container sx={{my: {sm: 0, md: 4}, pb: {sm: 9, md: 0}}}>
+            <Container sx={{
+                my: {sm: 0, md: 4}, 
+                pb: {xs: 10, md: 0} // Bottom padding for mobile navbar (0-899px), none for desktop
+            }}>
                 <Outlet/>
             </Container>
         </Box>

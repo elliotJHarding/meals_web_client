@@ -1,12 +1,10 @@
 import Plan from "../../../../../domain/Plan.ts";
 import {Box, InputAdornment, Stack, TextField, Typography, Divider} from "@mui/material";
 import {motion} from "framer-motion";
-import MealPlan from "../../../../../domain/MealPlan.ts";
 import {useNavigate} from "react-router-dom";
 import {ArrowBackIos, EditNoteRounded, Add} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import Grid from "@mui/material/Unstable_Grid2";
-import {useCalendarEvents} from "../../../../../hooks/calendar/useCalendarEvents.ts";
 import CalendarEvents from "./CalendarEvents.tsx";
 import {useState, useCallback} from "react";
 import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
@@ -139,18 +137,18 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
         <Box component={motion.div} layout width={'100%'}>
             {/* Header */}
             <Stack direction="row" spacing={2} alignItems={'center'} sx={{ p: 2, pb: 1 }}>
-                <Button 
-                    variant={'text'} 
-                    size={'medium'} 
-                    sx={{borderRadius: 2, paddingX: 1, paddingY: 1, minWidth: 'auto'}} 
+                <Button
+                    variant={'text'}
+                    size={'medium'}
+                    sx={{borderRadius: 2, paddingX: 1, paddingY: 1, minWidth: 'auto'}}
                     startIcon={<ArrowBackIos/>}
-                    onClick={() => navigate(-1)} 
-                    component={motion.div} 
+                    onClick={() => navigate(-1)}
+                    component={motion.div}
                     layout
                 >
                     <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <Typography 
-                            variant='h6' 
+                        <Typography
+                            variant='h6'
                             sx={{
                                 width: '2rem',
                                 height: '2rem',
@@ -163,15 +161,15 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
                             {plan.date.toLocaleDateString('en-gb', {day: 'numeric'})}
                         </Typography>
                         <Typography
-                            sx={{fontFamily: 'Montserrat', fontSize: '1rem', fontWeight: 500}} 
+                            sx={{fontFamily: 'Montserrat', fontSize: '1rem', fontWeight: 500}}
                         >
                             {plan.date.toLocaleDateString('en-gb', {weekday: 'long'})}
                         </Typography>
                     </Stack>
                 </Button>
-                
-                <TextField 
-                    size={'small'} 
+
+                <TextField
+                    size={'small'}
                     fullWidth
                     value={currentPlan.note || ''}
                     onChange={(e) => handleNoteChange(e.target.value)}
@@ -194,7 +192,7 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
                         <Stack spacing={2}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
                                 <Typography variant="h6" fontWeight="600">
-                                    Meals ({(currentPlan.planMeals || []).length})
+                                    Meals
                                 </Typography>
                                 <Button
                                     variant="outlined"
@@ -206,14 +204,14 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
                                     Add Meal
                                 </Button>
                             </Stack>
-                            
+
                             <Divider />
 
                             {(currentPlan.planMeals || []).length === 0 ? (
-                                <Box 
-                                    sx={{ 
-                                        textAlign: 'center', 
-                                        py: 3, 
+                                <Box
+                                    sx={{
+                                        textAlign: 'center',
+                                        py: 3,
                                         color: 'text.secondary',
                                         backgroundColor: 'grey.50',
                                         borderRadius: 2,
@@ -250,15 +248,9 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
 
                     {/* Calendar Events Section */}
                     <Grid xs={12} md={4}>
-                        <Stack spacing={2}>
-                            <Typography variant="h6" fontWeight="600">
-                                Calendar Events
-                            </Typography>
-                            <Divider />
-                            <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
-                                <CalendarEvents calendarEvents={filteredCalendarEvents} />
-                            </Box>
-                        </Stack>
+                        <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+                            <CalendarEvents calendarEvents={filteredCalendarEvents} />
+                        </Box>
                     </Grid>
                 </Grid>
             </Box>
