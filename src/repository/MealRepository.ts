@@ -55,4 +55,11 @@ export default class MealRepository extends ResourceRepository {
 
         this.update(`meals/${meal.id}`, meal,() => onSuccess());
     }
+
+    deleteMeal(mealId: bigint, onSuccess : () => void) : void {
+        console.info('Deleting meal with id:');
+        console.info(mealId)
+
+        this.delete(`meals/${mealId}`, () => onSuccess());
+    }
 }

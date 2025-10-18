@@ -63,7 +63,7 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
     const {createMeal} = useMealCreate((createdMeal) => {
         setEdit(false);
         setMeal({...newMeal});
-        navigate(`/meals/${createdMeal?.id}`)
+        navigate(`/meals/${createdMeal?.id}`, { replace: true })
     });
 
 

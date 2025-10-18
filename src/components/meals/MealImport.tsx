@@ -39,8 +39,7 @@ export default function MealImport() {
                         image: {url: metadata.image ?? ''},
                         recipe: {
                             title: metadata.title ?? '',
-                            url: url,
-                            image: {url: metadata.image ?? ''},
+                            url: url
                         }
                     });
                 });

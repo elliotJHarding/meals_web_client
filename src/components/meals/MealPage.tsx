@@ -10,12 +10,15 @@ import {LayoutGroup} from "framer-motion";
 import DeleteDialog from "../dialog/DeleteDialog.tsx";
 import {useState} from "react";
 import Error from "../error/Error.tsx";
+import {useMealDelete} from "../../hooks/meal/useMealDelete.ts";
 
 export default function MealPage() {
 
     const { mealId } = useParams();
 
     const {meal, setMeal, newMeal, setNewMeal, loading, failed} = useMeal(mealId);
+
+    const {deleteMeal, loading: deleting} = useMealDelete();
 
     const navigate = useNavigate();
 
@@ -24,6 +27,15 @@ export default function MealPage() {
     const handleBackOnClick = () => navigate(-1);
 
     const handleDeleteOnClick = () => setDeleteDialogOpen(true);
+
+    const handleDelete = () => {
+        if (meal?.id) {
+            deleteMeal(meal.id, () => {
+                setDeleteDialogOpen(false);
+                navigate('/meals');
+            });
+        }
+    };
 
     const mealElement = meal == null || newMeal == null ? null :
         <Fade in timeout={500}>
@@ -37,11 +49,17 @@ export default function MealPage() {
 
     return (
         <>
-            <DeleteDialog open={deleteDialogOpen} setOpen={setDeleteDialogOpen} onDelete={() => {}}/>
+            <DeleteDialog open={deleteDialogOpen} setOpen={setDeleteDialogOpen} onDelete={handleDelete}/>
             <Stack direction='row' sx={{pb: 1}}>
                 <Button startIcon={<ArrowBackIos/>} onClick={handleBackOnClick}>Back</Button>
                 <Box sx={{flexGrow: 1}}/>
-                <Button startIcon={<Delete/>} onClick={handleDeleteOnClick}>Delete</Button>
+                <Button
+                    startIcon={<Delete/>}
+                    onClick={handleDeleteOnClick}
+                    disabled={mealId === 'new' || deleting}
+                >
+                    Delete
+                </Button>
             </Stack>
             {failed ? <Error message={"Error loading meal"} icon={<WarningRounded fontSize="large"/>}/> : mealElement}
         </>

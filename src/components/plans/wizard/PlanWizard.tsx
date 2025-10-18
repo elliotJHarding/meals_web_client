@@ -85,10 +85,10 @@ export default function PlanWizard() {
                     })} - ${toDate?.toLocaleDateString('en-gb', {day: "numeric", month: isMobile ? "short": "long"})}`}
                 </Typography>
                 <Box flexGrow={1}/>
-                <Stack direction='row' gap={2} component={motion.div} layout="position">
-                    {back != null && <Button component={motion.div} startIcon={<ArrowBackIos/>} onClick={() => navigate(`/plans/create/${back}?from=${from}&to=${to}`)}>Back</Button>}
-                    {next != null && <Button component={motion.div} endIcon={<ArrowForwardIos/>} variant='filled' onClick={() => navigate(`/plans/create/${next}?from=${from}&to=${to}`)}>Next</Button>}
-                    {next == null && <Button component={motion.div} endIcon={<Check/>} variant='filled' onClick={() => navigate(`/plans`)}>Done</Button>}
+                <Stack direction='row' gap={isMobile ? 0.5 : 2} component={motion.div} layout="position">
+                    {back != null && <Button component={motion.div} startIcon={<ArrowBackIos sx={isMobile ? {fontSize: 16} : {}}/>} onClick={() => navigate(`/plans/create/${back}?from=${from}&to=${to}`)} sx={isMobile ? {px: 1, py: 0.5, minWidth: 'auto', fontSize: '0.813rem'} : {}}>Back</Button>}
+                    {next != null && <Button component={motion.div} endIcon={<ArrowForwardIos sx={isMobile ? {fontSize: 16} : {}}/>} variant='filled' onClick={() => navigate(`/plans/create/${next}?from=${from}&to=${to}`)} sx={isMobile ? {px: 1, py: 0.5, minWidth: 'auto', fontSize: '0.813rem'} : {}}>Next</Button>}
+                {next == null && <Button component={motion.div} endIcon={<Check sx={isMobile ? {fontSize: 16} : {}}/>} variant='filled' onClick={() => navigate(`/plans`)} sx={isMobile ? {px: 1, py: 0.5, minWidth: 'auto', fontSize: '0.813rem'} : {}}>Done</Button>}
                 </Stack>
             </Stack>
             <Box id='wizard-step-holder' component={motion.div} layout>

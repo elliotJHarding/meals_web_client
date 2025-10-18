@@ -2,7 +2,7 @@ import MealChooser from "../../../../dialog/MealChooser.tsx";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import {Card, CardMedia, Stack, Typography, useTheme} from "@mui/material";
 import Box from "@mui/material/Box";
-import {RestaurantMenu} from "@mui/icons-material";
+import {RestaurantMenu, WarningAmber} from "@mui/icons-material";
 import Plan from "../../../../../domain/Plan.ts";
 import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
 import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
@@ -90,7 +90,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
 
                 <Card onClick={() => setMealChooserOpen(true)} sx={{backgroundColor: 'secondaryContainer', my: 0.3}}>
                     <Stack direction="row" gap={1} sx={{padding: 1}}>
-                        {meal?.image?.url ? (
+                        {meal?.image?.url && (
                             <CardMedia
                                 sx={{
                                     width: constant.imageWidth,
@@ -101,28 +101,37 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                                 }}
                                 image={meal.image.url}
                             />
-                        ) : (
-                            <Box
-                                sx={{
-                                    width: constant.imageWidth,
-                                    height: constant.imageHeight,
-                                    borderRadius: constant.imageBorderRadius,
-                                    flexShrink: 0,
-                                    backgroundColor: 'grey.100',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
-                            >
-                                <RestaurantMenu sx={{ fontSize: 16, color: 'grey.400' }} />
-                            </Box>
                         )}
-                        <Typography noWrap={true} sx={{cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
-                                    onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
-                            {meal?.name}
-                        </Typography>
+                        <Stack direction="row" alignItems="center" gap={0.5} sx={{ flex: 1, minWidth: 0 }}>
+                            <Typography noWrap={true} sx={{cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
+                                        onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
+                                {meal?.name}
+                            </Typography>
+                            {meal?.ingredients?.length === 0 && (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.3,
+                                        backgroundColor: 'warning.light',
+                                        color: 'warning.dark',
+                                        px: 0.75,
+                                        py: 0.25,
+                                        borderRadius: 1,
+                                        fontSize: '0.75rem',
+                                        fontWeight: 500,
+                                        flexShrink: 0
+                                    }}
+                                >
+                                    <WarningAmber sx={{ fontSize: '0.875rem' }} />
+                                    <Typography variant="caption" sx={{ fontSize: '0.75rem', fontWeight: 500 }}>
+                                        No ingredients
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Stack>
 
-                        <Box flexGrow={1} />
+                        <Box flexGrow={0} />
 
                         <Stack direction="row" gap={0.5} alignItems="center" sx={{ mt: 0.2 }}>
                             {/* Effort */}

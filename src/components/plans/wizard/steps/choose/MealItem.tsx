@@ -1,5 +1,5 @@
 import { Card, CardMedia, IconButton, Stack, TextField, Typography, InputAdornment, useMediaQuery, useTheme, Box } from "@mui/material";
-import {Add, Remove, Delete, NotesRounded, Person, RestaurantMenu} from "@mui/icons-material";
+import {Add, Remove, Delete, NotesRounded, Person, RestaurantMenu, WarningAmber} from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import PlanMeal from "../../../../../domain/PlanMeal.ts";
@@ -85,14 +85,38 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
                     )}
                     
                     <Stack sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography
-                            variant="subtitle1"
-                            noWrap
-                            sx={{ cursor: 'pointer', fontWeight: 500 }}
-                            onClick={handleMealClick}
-                        >
-                            {planMeal.meal?.name}
-                        </Typography>
+                        <Stack direction="row" alignItems="center" gap={0.5}>
+                            <Typography
+                                variant="subtitle1"
+                                noWrap
+                                sx={{ cursor: 'pointer', fontWeight: 500 }}
+                                onClick={handleMealClick}
+                            >
+                                {planMeal.meal?.name}
+                            </Typography>
+                            {planMeal.meal?.ingredients?.length === 0 && (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.3,
+                                        backgroundColor: 'warning.light',
+                                        color: 'warning.dark',
+                                        px: 0.75,
+                                        py: 0.25,
+                                        borderRadius: 1,
+                                        fontSize: '0.75rem',
+                                        fontWeight: 500,
+                                        flexShrink: 0
+                                    }}
+                                >
+                                    <WarningAmber sx={{ fontSize: '0.875rem' }} />
+                                    <Typography variant="caption" sx={{ fontSize: '0.75rem', fontWeight: 500 }}>
+                                        No ingredients
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Stack>
 
                         <TextField
                             size="small"

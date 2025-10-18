@@ -32,7 +32,7 @@ export default function MealListRow({meal, index, onClick} : {meal : Meal, index
                         ) : (
                             <Box
                                 sx={{
-                                    width: constant.imageWidth,
+                                    width: 100,
                                     borderRadius: constant.imageBorderRadius,
                                     backgroundColor: 'grey.100',
                                     display: 'flex',
