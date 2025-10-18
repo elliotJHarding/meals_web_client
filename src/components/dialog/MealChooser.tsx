@@ -1,14 +1,22 @@
 import Meal from "../../domain/Meal.ts";
-import {Dialog, Stack, useMediaQuery, useTheme, Typography} from "@mui/material";
+import {Dialog, Stack, useMediaQuery, useTheme, Typography, TextField, Select, FormControl, InputLabel, MenuItem, CircularProgress, Card, CardActionArea, CardMedia, Collapse} from "@mui/material";
 import SearchBar from "../common/SearchBar.tsx";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import MealList from "../meals/MealList.tsx";
 import MealGrid from "../meals/MealGrid.tsx";
 import {Box} from "@mui/material";
 import Button from "@mui/material-next/Button";
-import {Tab, Tabs} from "@mui/material-next"
-import {RestaurantMenu, Kitchen, Add, ArrowBack} from "@mui/icons-material";
+import {Tab, Tabs, Slider, Chip} from "@mui/material-next"
+import {RestaurantMenu, Kitchen, Add, ArrowBack, Remove, Person, Timer} from "@mui/icons-material";
 import Grid from "@mui/material/Unstable_Grid2";
+import IconButton from "@mui/material-next/IconButton";
+import {useMealCreate} from "../../hooks/meal/useMealCreate.ts";
+import {useTags} from "../../hooks/tags/useTags.ts";
+import {formatPrepTime} from "../common/Utils.ts";
+import Effort from "../../domain/Effort.ts";
+import {AnimatePresence, motion} from "framer-motion";
+import PrepTimeChip from "../meals/chip/PrepTimeChip.tsx";
+import EffortChip from "../meals/chip/EffortChip.tsx";
 
 export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoading, mealsFailed}: {
     open: boolean,
@@ -25,6 +33,47 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
     const theme = useTheme();
     const isXsScreen = useMediaQuery(theme.breakpoints.only('xs'));
     const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+    // New meal form state
+    const [newMeal, setNewMeal] = useState<Meal>({
+        name: '',
+        description: '',
+        serves: 2,
+        prepTimeMinutes: 30,
+        ingredients: [],
+        tags: []
+    });
+
+    // Debounced search for similar meals
+    const [debouncedMealName, setDebouncedMealName] = useState('');
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedMealName(newMeal.name);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [newMeal.name]);
+
+    const {tags, findTag} = useTags();
+    const {createMeal, loading: creatingMeal} = useMealCreate((createdMeal: Meal) => {
+        // Reset form
+        setNewMeal({
+            name: '',
+            description: '',
+            serves: 2,
+            prepTimeMinutes: 30,
+            ingredients: [],
+            tags: []
+        });
+        setDebouncedMealName('');
+        // Close dialog and notify parent
+        setOpen(false);
+        onConfirm(createdMeal);
+        setSearchValue('');
+        setTabValue(0);
+        setMobileView('menu');
+    });
 
     const handleMealOnClick = (meal: Meal) => {
         setOpen(false);
@@ -48,6 +97,194 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
         setMobileView('menu');
         setSearchValue('');
     };
+
+    // New meal form handlers
+    const handleNameChange = (newName: string) => setNewMeal({...newMeal, name: newName});
+    const handleDescriptionChange = (newDesc: string) => setNewMeal({...newMeal, description: newDesc});
+    const handlePrepTimeChange = (newPrepTime: number) => setNewMeal({...newMeal, prepTimeMinutes: newPrepTime});
+    const handleServesIncrease = () => newMeal.serves < 100 && setNewMeal({...newMeal, serves: newMeal.serves + 1});
+    const handleServesDecrease = () => newMeal.serves > 1 && setNewMeal({...newMeal, serves: newMeal.serves - 1});
+    const handleEffortChange = (newEffort: Effort | undefined) => setNewMeal({...newMeal, effort: newEffort});
+    const handleTagsChange = (tagIds: number[]) => {
+        setNewMeal({...newMeal, tags: tagIds.map(id => findTag(id)).filter(tag => tag !== undefined) as typeof newMeal.tags})
+    };
+
+    // Find similar meals based on debounced name
+    const similarMeals = debouncedMealName.trim().length >= 2
+        ? meals.filter(meal =>
+            meal.name.toLowerCase().includes(debouncedMealName.toLowerCase().trim())
+          ).slice(0, 3) // Show max 3 suggestions
+        : [];
+
+    const handleCreateMeal = () => {
+        if (newMeal.name.trim().length === 0) {
+            return; // Don't create if name is empty
+        }
+        createMeal(newMeal);
+    };
+
+    const handleCancelNewMeal = () => {
+        // Reset form
+        setNewMeal({
+            name: '',
+            description: '',
+            serves: 2,
+            prepTimeMinutes: 30,
+            ingredients: [],
+            tags: []
+        });
+        setDebouncedMealName('');
+        // Go back to menu in mobile or switch to first tab in desktop
+        if (isMobileScreen) {
+            setMobileView('menu');
+        } else {
+            setTabValue(0);
+        }
+    };
+
+    const renderNewMealForm = () => (
+        <Stack gap={2} sx={{ flex: 1 }}>
+            <TextField
+                label='Name'
+                value={newMeal.name}
+                autoComplete='off'
+                onChange={(event) => handleNameChange(event.target.value)}
+                required
+                disabled={creatingMeal}
+                autoFocus
+            />
+            <Collapse in={similarMeals.length > 0} timeout={300}>
+                <Box sx={{ mb: 2 }}>
+                    <Stack gap={1}>
+                        <AnimatePresence mode="sync">
+                            {similarMeals.map((meal, index) => (
+                                <motion.div
+                                    key={meal.id?.toString() || meal.name}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.2, delay: index * 0.05 }}
+                                >
+                                    <CardActionArea onClick={() => handleMealOnClick(meal)}>
+                                        <Card
+                                            sx={{
+                                                borderRadius: 3,
+                                                p: 1,
+                                                display: 'flex',
+                                                gap: 1,
+                                                border: '1px solid',
+                                                borderColor: 'divider'
+                                            }}
+                                        >
+                                            {meal.image?.url && (
+                                                <CardMedia
+                                                    sx={{ width: 80, height: 60, borderRadius: 2, flexShrink: 0 }}
+                                                    image={meal.image.url}
+                                                />
+                                            )}
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, py: 0.5, flex: 1, minWidth: 0 }}>
+                                                <Typography variant='body2' fontWeight="medium" noWrap>
+                                                    {meal.name}
+                                                </Typography>
+                                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                                                    <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'small'}/>
+                                                    {meal.effort && <EffortChip effort={meal.effort} size={'small'}/>}
+                                                </Box>
+                                            </Box>
+                                        </Card>
+                                    </CardActionArea>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </Stack>
+                </Box>
+            </Collapse>
+            <TextField
+                multiline
+                rows={3}
+                label="Description"
+                value={newMeal.description}
+                onChange={(event) => handleDescriptionChange(event.target.value)}
+                disabled={creatingMeal}
+            />
+            <Stack spacing={1} direction='row' alignItems='center'>
+                <Timer/>
+                <Typography sx={{ minWidth: 60 }}>{formatPrepTime(newMeal.prepTimeMinutes)}</Typography>
+                <Slider
+                    step={5}
+                    min={5}
+                    marks
+                    max={120}
+                    value={newMeal.prepTimeMinutes}
+                    onChange={(_event: Event, value: number | number[]) => handlePrepTimeChange(Array.isArray(value) ? value[0] : value)}
+                    disabled={creatingMeal}
+                    sx={{ flex: 1 }}
+                />
+            </Stack>
+            <Stack spacing={1} direction='row' alignItems='center'>
+                <IconButton size='small' onClick={handleServesDecrease} disabled={creatingMeal}>
+                    <Remove/>
+                </IconButton>
+                <Person/>
+                <Typography sx={{ minWidth: 20 }}>{newMeal.serves}</Typography>
+                <IconButton size='small' onClick={handleServesIncrease} disabled={creatingMeal}>
+                    <Add/>
+                </IconButton>
+                <FormControl fullWidth>
+                    <InputLabel id="effort-label">Effort</InputLabel>
+                    <Select
+                        labelId="effort-label"
+                        label="Effort"
+                        value={newMeal.effort || ''}
+                        onChange={(event) => handleEffortChange(event.target.value === '' ? undefined : event.target.value as Effort)}
+                        disabled={creatingMeal}
+                    >
+                        <MenuItem value="">None</MenuItem>
+                        <MenuItem value="LOW">Low</MenuItem>
+                        <MenuItem value="MEDIUM">Medium</MenuItem>
+                        <MenuItem value="HIGH">High</MenuItem>
+                    </Select>
+                </FormControl>
+            </Stack>
+            <FormControl fullWidth>
+                <InputLabel id="tags-label">Tags</InputLabel>
+                <Select
+                    labelId="tags-label"
+                    label="Tags"
+                    multiple
+                    renderValue={(selected) => (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                            {selected.map((value: number) => (
+                                <Chip key={value} label={findTag(value)?.name}/>
+                            ))}
+                        </Box>
+                    )}
+                    value={newMeal.tags.map(tag => tag.id)}
+                    onChange={(event) => handleTagsChange(event.target.value as number[])}
+                    disabled={creatingMeal}
+                >
+                    {tags.map(tag => <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>)}
+                </Select>
+            </FormControl>
+            <Stack direction='row' gap={2} justifyContent='flex-end' sx={{ mt: 2 }}>
+                <Button
+                    variant='text'
+                    onClick={handleCancelNewMeal}
+                    disabled={creatingMeal}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    variant='filled'
+                    onClick={handleCreateMeal}
+                    disabled={creatingMeal || newMeal.name.trim().length === 0}
+                    startIcon={creatingMeal ? <CircularProgress size={16} /> : undefined}
+                >
+                    {creatingMeal ? 'Creating...' : similarMeals.length > 0 ? 'Create New Anyway' : 'Create Meal'}
+                </Button>
+            </Stack>
+        </Stack>
+    );
 
     const renderMobileButtons = () => (
         <Grid container spacing={2}>
@@ -168,11 +405,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                                 Create New Meal
                             </Typography>
                         </Stack>
-                        <Box sx={{ p: 4, textAlign: 'center' }}>
-                            <Typography color="text.secondary">
-                                New meal creation coming soon...
-                            </Typography>
-                        </Box>
+                        {renderNewMealForm()}
                     </Stack>
                 );
             default:
@@ -203,14 +436,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                     </Stack>
                 );
             case 2:
-                return (
-                    <Stack gap={2} sx={{ flex: 1, p: 4, textAlign: 'center' }}>
-                        <Typography variant="h6">Create New Meal</Typography>
-                        <Typography color="text.secondary">
-                            New meal creation coming soon...
-                        </Typography>
-                    </Stack>
-                );
+                return renderNewMealForm();
             default:
                 return null;
         }
@@ -218,13 +444,22 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
 
 
     return (
-        <Dialog 
-            open={open} 
+        <Dialog
+            open={open}
             onClose={() => {
                 setOpen(false)
                 setSearchValue('')
                 setTabValue(0)
                 setMobileView('menu')
+                setNewMeal({
+                    name: '',
+                    description: '',
+                    serves: 2,
+                    prepTimeMinutes: 30,
+                    ingredients: [],
+                    tags: []
+                })
+                setDebouncedMealName('')
             }}
             PaperProps={{
                 sx: {

@@ -56,6 +56,9 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
             console.log("Updating existing plan in backend:", updatedPlan);
             updatePlan(updatedPlan, () => {
                 console.log("Plan updated successfully");
+                // Notify parent AFTER backend confirms the update
+                // Use the updatedPlan we sent (with full meal objects), not what backend returns
+                onPlanUpdate(updatedPlan);
             });
         } else {
             console.log("Creating new plan in backend:", updatedPlan);
@@ -116,6 +119,10 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
     };
 
     const handleAddMeal = (meal: Meal) => {
+        console.group('handleAddMeal called');
+        console.log('Meal object:', meal);
+        console.log('Current plan:', currentPlan);
+
         const newPlanMeal: PlanMeal = {
             meal,
             requiredServings: meal.serves
@@ -124,14 +131,22 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
             ...currentPlan,
             planMeals: [...(currentPlan.planMeals || []), newPlanMeal]
         };
+
+        console.log('Updated plan with new meal:', updatedPlan);
+        console.log('Updated plan meals count:', updatedPlan.planMeals.length);
+        console.log('Last meal in plan:', updatedPlan.planMeals[updatedPlan.planMeals.length - 1]);
+        console.groupEnd();
+
+        // Set local state immediately for optimistic update
         setCurrentPlan(updatedPlan);
-        onPlanUpdate(updatedPlan);
-        
-        // Immediate sync for meal addition
-        syncPlanToBackend(updatedPlan);
-        
+
+        // Close dialog
         setMealChooserOpen(false);
-    };
+
+        // Sync to backend - DO NOT call onPlanUpdate until we're sure the state has updated
+        // The parent will eventually get the updated data when needed (e.g., on navigation)
+        syncPlanToBackend(updatedPlan);
+};
 
     return (
         <Box component={motion.div} layout width={'100%'}>

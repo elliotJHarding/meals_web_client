@@ -32,6 +32,7 @@ export default function LoginPage() {
                             borderColor: 'divider'
                         }}
                     >
+                        <img src="/grub_logo.svg" alt="logo" style={{width: 100}}/>
                         {/* Welcome Message */}
                         <Typography
                             variant="h5"
