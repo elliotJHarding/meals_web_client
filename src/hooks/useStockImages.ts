@@ -1,11 +1,11 @@
-import StockImagesRepository, {PexelsSearchResponse} from "../repository/StockImagesRepository.ts";
+import StockImagesRepository, {ImageSearchResponse} from "../repository/StockImagesRepository.ts";
 
-export const useStockImages = () : {getStockPhotos: (query: string, page: number, onSuccess: (response: PexelsSearchResponse) => void) => void} => {
+export const useStockImages = () : {getStockPhotos: (query: string, onSuccess: (response: ImageSearchResponse) => void) => void} => {
 
-    const repository = new StockImagesRepository(import.meta.env.VITE_PEXELS_API_KEY);
+    const repository = new StockImagesRepository();
 
-    const getStockPhotos = (query: string, page: number, onSuccess: (response: PexelsSearchResponse) => void) => {
-        query.length > 0 && repository.searchImages(query, page, onSuccess);
+    const getStockPhotos = (query: string, onSuccess: (response: ImageSearchResponse) => void) => {
+        query.length > 0 && repository.searchImages(query, onSuccess);
     }
 
     return {getStockPhotos} ;

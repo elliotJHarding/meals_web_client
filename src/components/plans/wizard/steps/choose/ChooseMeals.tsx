@@ -84,9 +84,10 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
         <Stack spacing={2} sx={{padding: 2}} component={motion.div} layout>
             {/* AI Generation Section */}
             <Card 
-                variant="outlined" 
-                sx={{ 
+                variant="outlined"
+                sx={{
                     p: 1,
+                    display: 'none',
                     borderRadius: 3,
                     background: 'linear-gradient(135deg, rgba(255,152,0,0.05) 0%, rgba(255,193,7,0.08) 100%)',
                     border: '1px solid rgba(255,152,0,0.2)'
