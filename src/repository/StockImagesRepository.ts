@@ -1,51 +1,15 @@
-import Repository from "./Repository.ts";
+import ResourceRepository from "./ResourceRepository.ts";
 
-export interface PexelsPhoto {
-    id: number,
-    width: number,
-    height: number,
-    url: string,
-    photographer: string,
-    photographer_url: string,
-    src: {
-        original: string,
-        large2x?: string,
-        large: string,
-        medium: string,
-        small: string,
-        portrait: string,
-        landscape: string,
-        tiny: string,
-    }
+export interface ImageSearchResponse {
+    imageUrls: string[]
 }
 
-export interface PexelsSearchResponse {
-    total_results: number,
-    page: number,
-    per_page: number,
-    photos: PexelsPhoto[]
-}
+export default class StockImagesRepository extends ResourceRepository {
 
-
-export default class StockImagesRepository extends Repository {
-
-    perPage: number = 16;
-    orientation: string = 'landscape'
-    key : string;
-
-    override getHeaders() {
-        return {Authorization: `${this.key}`}
-    }
-
-    constructor(key: string) {
-        super("https://api.pexels.com/v1");
-        this.key = key;
-    }
-
-    searchImages(searchTerm: string, page: number, onSuccess: (response: PexelsSearchResponse) => void) {
+    searchImages(searchTerm: string, onSuccess: (response: ImageSearchResponse) => void) {
         console.info("Fetching images for query: ", searchTerm);
         this.get(
-            `/search?query=${searchTerm}&per_page=${this.perPage}&orientation=${this.orientation}&page=${page}`,
+            `images/search?query=${searchTerm}`,
             (response) => {
                 console.info(`Successfully fetched images:`);
                 console.info(response.data);

@@ -18,7 +18,7 @@ import Button from "@mui/material-next/Button";
 import {Camera, Cancel, Check, ImageOutlined, Link, Upload, Close} from "@mui/icons-material";
 import {useStockImages} from "../../hooks/useStockImages.ts";
 import {useEffect, useState} from "react";
-import {PexelsPhoto, PexelsSearchResponse} from "../../repository/StockImagesRepository.ts";
+import {Photo, ImageSearchResponse} from "../../repository/StockImagesRepository.ts";
 import Box from "@mui/material/Box";
 import {TabContext, TabList, TabPanel} from "@mui/lab";
 import {Tab} from "@mui/material";
@@ -36,8 +36,8 @@ export default function SelectImageDialog({query, open, setOpen, onConfirm} : {q
 
     const {getStockPhotos} = useStockImages();
 
-    const [images, setImages]: [images: PexelsPhoto[], setImages: any] = useState([]);
-    const [selected, setSelected]: [selected: string, setSelected: any] = useState('')
+    const [images, setImages] = useState<string[]>([]);
+    const [selected, setSelected] = useState<string>('')
     const [tabValue, setTabValue] = useState<string>('stock');
     const [loading, setLoading] = useState(false);
     const [imageLoading, setImageLoading] = useState(true);
@@ -45,22 +45,22 @@ export default function SelectImageDialog({query, open, setOpen, onConfirm} : {q
     useEffect(() => {
         if (query && tabValue === 'stock') {
             setLoading(true);
-            getStockPhotos(query, 1, (response: PexelsSearchResponse) => {
-                setImages(response.photos);
+            getStockPhotos(query, (response: ImageSearchResponse) => {
+                setImages(response.imageUrls);
                 setLoading(false);
             });
         }
     }, [query, tabValue]);
 
-    const imageItems = images.map(image =>
+    const imageItems = images.map((image, i) =>
         <ImageListItem 
-            key={image.id} 
-            onClick={() => handleItemOnClick(image.src.original)}
+            key={i}
+            onClick={() => handleItemOnClick(image)}
             sx={{
                 cursor: 'pointer',
                 borderRadius: 1,
                 overflow: 'hidden',
-                border: selected === image.src.original ? '3px solid primary.main' : '3px solid transparent',
+                border: selected === image ? '3px solid primary.main' : '3px solid transparent',
                 transition: 'all 0.2s ease-in-out',
                 '&:hover': {
                     transform: 'scale(1.02)',
@@ -69,9 +69,8 @@ export default function SelectImageDialog({query, open, setOpen, onConfirm} : {q
             }}
         >
             <img
-                src={image.src.large}
+                src={image}
                 loading='lazy'
-                alt={image.alt}
                 style={{
                     width: '100%',
                     height: '100%',
@@ -79,7 +78,7 @@ export default function SelectImageDialog({query, open, setOpen, onConfirm} : {q
                     borderRadius: 4
                 }}
             />
-            {selected === image.src.original && (
+            {selected === image && (
                 <Chip 
                     icon={<Check />} 
                     label="Selected" 
