@@ -2,6 +2,7 @@ import Plan from "../../domain/Plan.ts";
 import {Card, CardMedia, Stack, Typography} from "@mui/material";
 import Box from "@mui/material/Box";
 import Meal from "../../domain/Meal.ts";
+import {RestaurantMenu} from "@mui/icons-material";
 
 export default function DayPlan({plan} : {plan: Plan}) {
 
@@ -9,16 +10,31 @@ export default function DayPlan({plan} : {plan: Plan}) {
         <Card key={meal?.id || Math.random()}>
             <Box sx={{padding: 1}}>
                 <Stack direction='row' gap={1}>
-                    <CardMedia 
-                        image={meal?.image?.url || '/placeholder-meal.png'} 
-                        sx={{
-                            borderRadius: 2, 
-                            width: 50, 
-                            height: 50,
-                            backgroundColor: meal?.image?.url ? 'transparent' : 'grey.200',
-                            backgroundSize: 'cover'
-                        }}
-                    />
+                    {meal?.image?.url ? (
+                        <CardMedia
+                            image={meal.image.url}
+                            sx={{
+                                borderRadius: 2,
+                                width: 50,
+                                height: 50,
+                                backgroundSize: 'cover'
+                            }}
+                        />
+                    ) : (
+                        <Box
+                            sx={{
+                                borderRadius: 2,
+                                width: 50,
+                                height: 50,
+                                backgroundColor: 'grey.100',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <RestaurantMenu sx={{ fontSize: 24, color: 'grey.400' }} />
+                        </Box>
+                    )}
                     <Typography variant='h6'>
                         {meal?.name || 'Unknown Meal'}
                     </Typography>

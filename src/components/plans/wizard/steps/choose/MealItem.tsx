@@ -1,5 +1,5 @@
-import { Card, CardMedia, IconButton, Stack, TextField, Typography, InputAdornment, useMediaQuery, useTheme } from "@mui/material";
-import {Add, Remove, Delete, NotesRounded, Person} from "@mui/icons-material";
+import { Card, CardMedia, IconButton, Stack, TextField, Typography, InputAdornment, useMediaQuery, useTheme, Box } from "@mui/material";
+import {Add, Remove, Delete, NotesRounded, Person, RestaurantMenu} from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import PlanMeal from "../../../../../domain/PlanMeal.ts";
@@ -52,19 +52,37 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
                 {/* Top Row: Image and Info */}
                 <Stack direction="row" gap={2} alignItems="center">
                     {/* Meal Image and Info */}
-                    <CardMedia
-                        sx={{
-                            width: 70,
-                            height: 60,
-                            borderRadius: 1.5,
-                            cursor: 'pointer',
-                            flexShrink: 0,
-                            backgroundColor: planMeal.meal?.image?.url ? 'transparent' : 'grey.200',
-                            backgroundSize: 'cover'
-                        }}
-                        image={planMeal.meal?.image?.url || '/placeholder-meal.png'}
-                        onClick={handleMealClick}
-                    />
+                    {planMeal.meal?.image?.url ? (
+                        <CardMedia
+                            sx={{
+                                width: 70,
+                                height: 60,
+                                borderRadius: 1.5,
+                                cursor: 'pointer',
+                                flexShrink: 0,
+                                backgroundSize: 'cover'
+                            }}
+                            image={planMeal.meal.image.url}
+                            onClick={handleMealClick}
+                        />
+                    ) : (
+                        <Box
+                            sx={{
+                                width: 70,
+                                height: 60,
+                                borderRadius: 1.5,
+                                cursor: 'pointer',
+                                flexShrink: 0,
+                                backgroundColor: 'grey.100',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                            onClick={handleMealClick}
+                        >
+                            <RestaurantMenu sx={{ fontSize: 32, color: 'grey.400' }} />
+                        </Box>
+                    )}
                     
                     <Stack sx={{ flex: 1, minWidth: 0 }}>
                         <Typography

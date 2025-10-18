@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import PrepTimeChip from "./chip/PrepTimeChip.tsx";
 import ServesChip from "./chip/ServesChip.tsx";
 import IngredientsStatusChip from "./chip/IngredientsStatusChip.tsx";
+import {RestaurantMenu} from "@mui/icons-material";
 
 const constant = {
     padding: 1.5,
@@ -31,23 +32,39 @@ export default function MealGridCard({meal, index, onClick} : {meal : Meal, inde
                     transition: 'all 0.2s ease-in-out'
                 }
             }}>
-                <CardActionArea 
+                <CardActionArea
                     onClick={handleClick}
-                    sx={{ 
+                    sx={{
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'stretch'
                     }}
                 >
-                    <CardMedia
-                        sx={{
-                            height: constant.imageHeight, 
-                            borderRadius: `${constant.imageBorderRadius}px ${constant.imageBorderRadius}px 0 0`,
-                            flexShrink: 0
-                        }}
-                        image={meal.image?.url}
-                    />
+                    {meal.image?.url ? (
+                        <CardMedia
+                            sx={{
+                                height: constant.imageHeight,
+                                borderRadius: `${constant.imageBorderRadius}px ${constant.imageBorderRadius}px 0 0`,
+                                flexShrink: 0
+                            }}
+                            image={meal.image.url}
+                        />
+                    ) : (
+                        <Box
+                            sx={{
+                                height: constant.imageHeight,
+                                borderRadius: `${constant.imageBorderRadius}px ${constant.imageBorderRadius}px 0 0`,
+                                flexShrink: 0,
+                                backgroundColor: 'grey.100',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <RestaurantMenu sx={{ fontSize: 56, color: 'grey.300' }} />
+                        </Box>
+                    )}
                     <Stack 
                         sx={{ 
                             padding: constant.padding, 

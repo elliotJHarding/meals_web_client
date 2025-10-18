@@ -2,6 +2,7 @@ import MealChooser from "../../../../dialog/MealChooser.tsx";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import {Card, CardMedia, Stack, Typography, useTheme} from "@mui/material";
 import Box from "@mui/material/Box";
+import {RestaurantMenu} from "@mui/icons-material";
 import Plan from "../../../../../domain/Plan.ts";
 import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
 import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
@@ -89,17 +90,33 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
 
                 <Card onClick={() => setMealChooserOpen(true)} sx={{backgroundColor: 'secondaryContainer', my: 0.3}}>
                     <Stack direction="row" gap={1} sx={{padding: 1}}>
-                        <CardMedia
-                            sx={{
-                                width: constant.imageWidth,
-                                height: constant.imageHeight,
-                                borderRadius: constant.imageBorderRadius,
-                                flexShrink: 0,
-                                backgroundColor: meal?.image?.url ? 'transparent' : 'grey.200',
-                                backgroundSize: 'cover'
-                            }}
-                            image={meal?.image?.url || '/placeholder-meal.png'}
-                        />
+                        {meal?.image?.url ? (
+                            <CardMedia
+                                sx={{
+                                    width: constant.imageWidth,
+                                    height: constant.imageHeight,
+                                    borderRadius: constant.imageBorderRadius,
+                                    flexShrink: 0,
+                                    backgroundSize: 'cover'
+                                }}
+                                image={meal.image.url}
+                            />
+                        ) : (
+                            <Box
+                                sx={{
+                                    width: constant.imageWidth,
+                                    height: constant.imageHeight,
+                                    borderRadius: constant.imageBorderRadius,
+                                    flexShrink: 0,
+                                    backgroundColor: 'grey.100',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <RestaurantMenu sx={{ fontSize: 16, color: 'grey.400' }} />
+                            </Box>
+                        )}
                         <Typography noWrap={true} sx={{cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
                                     onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
                             {meal?.name}

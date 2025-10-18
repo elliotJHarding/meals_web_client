@@ -151,10 +151,12 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}>
-            <Grid xs={12} md={4} component={motion.div} layout>
-                {image}
-            </Grid>
-            <Grid xs={12} md={6} component={motion.div} layout>
+            {meal.image?.url && (
+                <Grid xs={12} md={4} component={motion.div} layout>
+                    {image}
+                </Grid>
+            )}
+            <Grid xs={12} md={meal.image?.url ? 6 : 8} component={motion.div} layout>
                     <Stack gap={2} sx={{py: 2, width: '100%', height: '100%'}} component={motion.div} layout='position'>
                         <Typography variant='h4' component={motion.div} layout='position'>
                             {meal.name}

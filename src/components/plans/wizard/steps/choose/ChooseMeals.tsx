@@ -11,7 +11,7 @@ import {useCalendarEvents} from "../../../../../hooks/calendar/useCalendarEvents
 import Plan from "../../../../../domain/Plan.ts";
 import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 import CalendarEvents from "./CalendarEvents.tsx";
-import {CalendarMonth, AutoAwesome, NotesRounded} from "@mui/icons-material";
+import {CalendarMonth, AutoAwesome, NotesRounded, RestaurantMenu} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import {useLinkCalendar} from "../../../../../hooks/calendar/useLinkCalendar.ts";
 import PlanEditor from "./PlanEditor.tsx";
@@ -340,23 +340,39 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                     {plan.planMeals && plan.planMeals.length > 0 ? (
                         <Stack spacing={1}>
                             {plan.planMeals.map((planMeal, index) => (
-                                <Card key={index} sx={{ 
+                                <Card key={index} sx={{
                                     backgroundColor: 'secondaryContainer',
                                     border: 'none',
                                     boxShadow: 'none'
                                 }}>
                                     <Stack direction="row" gap={1.5} sx={{ p: 1.5 }} alignItems="center">
-                                        <CardMedia
-                                            sx={{
-                                                width: 50,
-                                                height: 40,
-                                                borderRadius: 1.5,
-                                                flexShrink: 0,
-                                                backgroundColor: planMeal.meal?.image?.url ? 'transparent' : 'grey.200',
-                                                backgroundSize: 'cover'
-                                            }}
-                                            image={planMeal.meal?.image?.url || '/placeholder-meal.png'}
-                                        />
+                                        {planMeal.meal?.image?.url ? (
+                                            <CardMedia
+                                                sx={{
+                                                    width: 50,
+                                                    height: 40,
+                                                    borderRadius: 1.5,
+                                                    flexShrink: 0,
+                                                    backgroundSize: 'cover'
+                                                }}
+                                                image={planMeal.meal.image.url}
+                                            />
+                                        ) : (
+                                            <Box
+                                                sx={{
+                                                    width: 50,
+                                                    height: 40,
+                                                    borderRadius: 1.5,
+                                                    flexShrink: 0,
+                                                    backgroundColor: 'grey.100',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                            >
+                                                <RestaurantMenu sx={{ fontSize: 20, color: 'grey.400' }} />
+                                            </Box>
+                                        )}
                                         <Box sx={{ flex: 1, minWidth: 0 }}>
                                             {planMeal.note && (
                                                 <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mb: 0.5 }}>
