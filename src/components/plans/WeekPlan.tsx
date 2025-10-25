@@ -5,6 +5,7 @@ import DayPlan from "./Plan.tsx";
 import Button from "@mui/material-next/Button";
 import {NoteAdd} from "@mui/icons-material";
 import {useNavigate} from "react-router-dom";
+import {useCalendarEvents} from "../../hooks/calendar/useCalendarEvents.ts";
 
 export default function WeekPlan({mealPlan} : {mealPlan: MealPlan}) {
 
@@ -17,6 +18,8 @@ export default function WeekPlan({mealPlan} : {mealPlan: MealPlan}) {
         );
 
     const onClick = () => navigate(`create/choose?from=${mealPlan.from()}&to=${mealPlan.to()}`)
+
+    useCalendarEvents(mealPlan.from(), mealPlan.to())
 
     const createPlan =
         <Button variant="text"
