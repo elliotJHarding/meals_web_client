@@ -1,9 +1,13 @@
 import { Card, CardMedia, IconButton, Stack, TextField, Typography, InputAdornment, useMediaQuery, useTheme, Box } from "@mui/material";
-import {Add, Remove, Delete, NotesRounded, Person, RestaurantMenu, WarningAmber} from "@mui/icons-material";
+import {Add, Remove, Delete, NotesRounded, Person, RestaurantMenu} from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import PlanMeal from "../../../../../domain/PlanMeal.ts";
 import { useNavigate } from "react-router-dom";
+import IngredientsWarningChip from "../../../../meals/chip/IngredientsWarningChip.tsx";
+import EffortChip from "../../../../meals/chip/EffortChip.tsx";
+import ServesChip from "../../../../meals/chip/ServesChip.tsx";
+import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
 
 interface MealItemProps {
     planMeal: PlanMeal;
@@ -18,6 +22,9 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [servings, setServings] = useState(planMeal.requiredServings);
     const [note, setNote] = useState(planMeal.note || "");
+
+    const meal = planMeal.meal;
+    const hasIngredients = !meal || meal.ingredients?.length > 0;
 
     const handleServingsChange = (newServings: number) => {
         if (newServings < 1) return;
@@ -35,11 +42,11 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
     };
 
     return (
-        <Card 
+        <Card
             component={motion.div}
             layout
-            sx={{ 
-                backgroundColor: 'background.paper',
+            sx={{
+                backgroundColor: hasIngredients ? 'secondaryContainer' : 'warningContainer',
                 border: '1px solid',
                 borderColor: 'divider',
                 borderRadius: 2,
@@ -85,38 +92,14 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
                     )}
                     
                     <Stack sx={{ flex: 1, minWidth: 0 }}>
-                        <Stack direction="row" alignItems="center" gap={0.5}>
-                            <Typography
-                                variant="subtitle1"
-                                noWrap
-                                sx={{ cursor: 'pointer', fontWeight: 500 }}
-                                onClick={handleMealClick}
-                            >
-                                {planMeal.meal?.name}
-                            </Typography>
-                            {planMeal.meal?.ingredients?.length === 0 && (
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 0.3,
-                                        backgroundColor: 'warning.light',
-                                        color: 'warning.dark',
-                                        px: 0.75,
-                                        py: 0.25,
-                                        borderRadius: 1,
-                                        fontSize: '0.75rem',
-                                        fontWeight: 500,
-                                        flexShrink: 0
-                                    }}
-                                >
-                                    <WarningAmber sx={{ fontSize: '0.875rem' }} />
-                                    <Typography variant="caption" sx={{ fontSize: '0.75rem', fontWeight: 500 }}>
-                                        No ingredients
-                                    </Typography>
-                                </Box>
-                            )}
-                        </Stack>
+                        <Typography
+                            variant="subtitle1"
+                            noWrap
+                            sx={{ cursor: 'pointer', fontWeight: 500 }}
+                            onClick={handleMealClick}
+                        >
+                            {planMeal.meal?.name}
+                        </Typography>
 
                         <TextField
                             size="small"
@@ -148,6 +131,7 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
                                 },
                             }}
                         />
+
                     </Stack>
 
                     {/* Desktop-only controls */}

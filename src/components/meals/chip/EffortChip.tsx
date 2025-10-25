@@ -18,6 +18,6 @@ export default function EffortChip({effort, size} : {effort : Effort | undefined
     ])
 
     return effort == null ? null : (
-        <Chip variant="filled" size={size} color={colorMap.get(effort)} label={stringMap.get(effort)}/>
+        <Chip variant={'elevated'} size={size} color={colorMap.get(effort)} label={stringMap.get(effort)}/>
     );
 }

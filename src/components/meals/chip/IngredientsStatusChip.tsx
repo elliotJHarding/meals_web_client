@@ -18,11 +18,11 @@ export default function IngredientsStatusChip({meal, size}: {meal: Meal, size?: 
     
     return (
         <Chip 
-            variant={"outlined"}
+            variant={"filled"}
             size={size}
-            color={hasIngredients ? 'none' : "warning"}
-            label={hasIngredients ? undefined : "Ingredients"}
+            color={'color'}
             icon={hasIngredients ? <PlaylistAddCheck/> : <PlaylistRemove/>}
         />
     );
 }
+

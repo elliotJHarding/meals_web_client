@@ -65,8 +65,9 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
             createPlan(updatedPlan, (createdPlan: Plan) => {
                 console.log("Plan created successfully:", createdPlan);
                 // Update local state with the newly created plan (now has ID)
-                setCurrentPlan(createdPlan);
-                onPlanUpdate(createdPlan);
+                const planWithId : Plan = {...updatedPlan, id: createdPlan.id};
+                setCurrentPlan(planWithId);
+                onPlanUpdate(planWithId);
             });
         }
     }, [updatePlan, createPlan, onPlanUpdate]);

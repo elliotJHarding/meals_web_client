@@ -7,11 +7,12 @@ import DayItem from "./DayItem.tsx";
 import ServesChip from "../../../../meals/chip/ServesChip.tsx";
 import EffortChip from "../../../../meals/chip/EffortChip.tsx";
 import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
+import IngredientsWarningChip from "../../../../meals/chip/IngredientsWarningChip.tsx";
 import {useCalendarEvents} from "../../../../../hooks/calendar/useCalendarEvents.ts";
 import Plan from "../../../../../domain/Plan.ts";
 import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 import CalendarEvents from "./CalendarEvents.tsx";
-import {CalendarMonth, AutoAwesome, NotesRounded, RestaurantMenu, WarningAmber} from "@mui/icons-material";
+import {CalendarMonth, NotesRounded, RestaurantMenu} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import {useLinkCalendar} from "../../../../../hooks/calendar/useLinkCalendar.ts";
 import PlanEditor from "./PlanEditor.tsx";
@@ -82,161 +83,6 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
 
     const WholePlan = () =>
         <Stack id="WholePlan" spacing={2} sx={{padding: 2}} component={motion.div} layout>
-            {/* AI Generation Section */}
-            {/*<Card */}
-            {/*    variant="outlined"*/}
-            {/*    sx={{*/}
-            {/*        p: 1,*/}
-            {/*        display: 'none',*/}
-            {/*        borderRadius: 3,*/}
-            {/*        background: 'linear-gradient(135deg, rgba(255,152,0,0.05) 0%, rgba(255,193,7,0.08) 100%)',*/}
-            {/*        border: '1px solid rgba(255,152,0,0.2)'*/}
-            {/*    }}*/}
-            {/*    component={motion.div}*/}
-            {/*    layout*/}
-            {/*>*/}
-            {/*    <Stack spacing={2}>*/}
-            {/*        <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={isMobile ? "stretch" : "center"}>*/}
-            {/*            <Box sx={{ */}
-            {/*                position: 'relative', */}
-            {/*                display: 'inline-block', */}
-            {/*                flexShrink: 0,*/}
-            {/*                alignSelf: isMobile ? 'center' : 'auto'*/}
-            {/*            }}>*/}
-            {/*            /!* Outer pulsing glow *!/*/}
-            {/*            <motion.div*/}
-            {/*                animate={{*/}
-            {/*                    scale: [1, 1.1, 1],*/}
-            {/*                    opacity: [0.2, 0.5, 0.2],*/}
-            {/*                }}*/}
-            {/*                transition={{*/}
-            {/*                    duration: 4,*/}
-            {/*                    ease: "easeInOut",*/}
-            {/*                    repeat: Infinity,*/}
-            {/*                }}*/}
-            {/*                style={{*/}
-            {/*                    position: 'absolute',*/}
-            {/*                    top: -8,*/}
-            {/*                    left: -8,*/}
-            {/*                    right: -8,*/}
-            {/*                    bottom: -8,*/}
-            {/*                    borderRadius: 5,*/}
-            {/*                    background: 'radial-gradient(ellipse, rgba(255,193,7,0.4) 0%, rgba(255,152,0,0.3) 40%, rgba(255,87,34,0.2) 70%, transparent 100%)',*/}
-            {/*                    filter: 'blur(6px)',*/}
-            {/*                }}*/}
-            {/*            />*/}
-            {/*            */}
-            {/*            /!* Inner shimmer *!/*/}
-            {/*            <motion.div*/}
-            {/*                animate={{*/}
-            {/*                    opacity: [0.3, 0.8, 0.3],*/}
-            {/*                    scale: [1, 1.02, 1],*/}
-            {/*                }}*/}
-            {/*                transition={{*/}
-            {/*                    duration: 2.5,*/}
-            {/*                    ease: "easeInOut",*/}
-            {/*                    repeat: Infinity,*/}
-            {/*                    delay: 0.5,*/}
-            {/*                }}*/}
-            {/*                style={{*/}
-            {/*                    position: 'absolute',*/}
-            {/*                    top: -4,*/}
-            {/*                    left: -4,*/}
-            {/*                    right: -4,*/}
-            {/*                    bottom: -4,*/}
-            {/*                    borderRadius: 5,*/}
-            {/*                    background: 'linear-gradient(135deg, rgba(255,193,7,0.3), rgba(255,152,0,0.5), rgba(255,87,34,0.3))',*/}
-            {/*                    filter: 'blur(3px)',*/}
-            {/*                }}*/}
-            {/*            />*/}
-            {/*            */}
-            {/*            /!* Central glow *!/*/}
-            {/*            <motion.div*/}
-            {/*                animate={{*/}
-            {/*                    scale: [1, 1.03, 1],*/}
-            {/*                    opacity: [0.4, 0.7, 0.4],*/}
-            {/*                }}*/}
-            {/*                transition={{*/}
-            {/*                    duration: 2,*/}
-            {/*                    ease: "easeInOut",*/}
-            {/*                    repeat: Infinity,*/}
-            {/*                    delay: 1,*/}
-            {/*                }}*/}
-            {/*                style={{*/}
-            {/*                    position: 'absolute',*/}
-            {/*                    top: -2,*/}
-            {/*                    left: -2,*/}
-            {/*                    right: -2,*/}
-            {/*                    bottom: -2,*/}
-            {/*                    borderRadius: 5,*/}
-            {/*                    backgroundColor: 'rgba(255,193,7,0.2)',*/}
-            {/*                    filter: 'blur(1px)',*/}
-            {/*                }}*/}
-            {/*            />*/}
-
-            {/*            <Button*/}
-            {/*                variant="filled"*/}
-            {/*                startIcon={aiLoading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <AutoAwesome />}*/}
-            {/*                onClick={handleAiGenerate}*/}
-            {/*                disabled={aiLoading || mealPlan.plans.length === 0}*/}
-            {/*                sx={{*/}
-            {/*                    borderRadius: 3,*/}
-            {/*                    px: isMobile ? 3 : 2,*/}
-            {/*                    py: 1.5,*/}
-            {/*                    fontWeight: 500,*/}
-            {/*                    background: 'linear-gradient(135deg, #ff9800 0%, #ff5722 100%)',*/}
-            {/*                    color: 'white',*/}
-            {/*                    position: 'relative',*/}
-            {/*                    zIndex: 1,*/}
-            {/*                    boxShadow: '0 4px 20px rgba(255,152,0,0.3)',*/}
-            {/*                    width: isMobile ? '100%' : 'auto',*/}
-            {/*                    '&:hover': {*/}
-            {/*                        background: 'linear-gradient(135deg, #f57c00 0%, #e64a19 100%)',*/}
-            {/*                        boxShadow: '0 6px 25px rgba(255,152,0,0.4)',*/}
-            {/*                        transform: 'translateY(-2px)',*/}
-            {/*                    },*/}
-            {/*                    '&.Mui-disabled': {*/}
-            {/*                        background: 'rgba(0, 0, 0, 0.12)',*/}
-            {/*                        color: 'rgba(0, 0, 0, 0.26)',*/}
-            {/*                        boxShadow: 'none',*/}
-            {/*                    },*/}
-            {/*                    transition: 'all 0.3s ease-in-out',*/}
-            {/*                }}*/}
-            {/*            >*/}
-            {/*                {aiLoading ? 'Generating AI Meal Plan...' : 'Generate Meal Plan'}*/}
-            {/*            </Button>*/}
-            {/*            </Box>*/}
-            {/*            <TextField*/}
-            {/*                fullWidth*/}
-            {/*                label="Prompt (optional)"*/}
-            {/*                placeholder="e.g., focus on healthy meals, include vegetarian options, avoid spicy food..."*/}
-            {/*                value={promptText}*/}
-            {/*                onChange={(e) => setPromptText(e.target.value)}*/}
-            {/*                variant="outlined"*/}
-            {/*                size="small"*/}
-            {/*                sx={{*/}
-            {/*                    '& .MuiOutlinedInput-root': {*/}
-            {/*                        borderRadius: 2,*/}
-            {/*                        backgroundColor: 'rgba(255,255,255,0.8)',*/}
-            {/*                    }*/}
-            {/*                }}*/}
-            {/*            />*/}
-            {/*        </Stack>*/}
-            {/*        */}
-            {/*        {showSuccessMessage && (*/}
-            {/*            <Alert severity="success" sx={{ borderRadius: 2 }}>*/}
-            {/*                AI meal plan generated successfully!*/}
-            {/*            </Alert>*/}
-            {/*        )}*/}
-            {/*        */}
-            {/*        {aiFailed && (*/}
-            {/*            <Alert severity="error" sx={{ borderRadius: 2 }}>*/}
-            {/*                Failed to generate meal plan. Please try again.*/}
-            {/*            </Alert>*/}
-            {/*        )}*/}
-            {/*    </Stack>*/}
-            {/*</Card>*/}
-
             {/* Main Plan Section */}
             {isMobile ? (
                 <Stack spacing={2}>
@@ -343,7 +189,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                         <Stack spacing={1}>
                             {plan.planMeals.map((planMeal, index) => (
                                 <Card key={index} sx={{
-                                    backgroundColor: 'secondaryContainer',
+                                    backgroundColor: planMeal.meal.ingredients.length > 0 ? 'secondaryContainer' : 'warningContainer',
                                     border: 'none',
                                     boxShadow: 'none'
                                 }}>
@@ -381,37 +227,14 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                                                     {planMeal.note}
                                                 </Typography>
                                             )}
-                                            <Stack direction="row" alignItems="center" gap={0.5} flexWrap="wrap">
-                                                <Typography variant="body1" sx={{ fontWeight: 500 }} noWrap>
-                                                    {planMeal.meal?.name || 'Unknown Meal'}
-                                                </Typography>
-                                                {planMeal.meal?.ingredients?.length === 0 && (
-                                                    <Box
-                                                        sx={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: 0.3,
-                                                            backgroundColor: 'warning.light',
-                                                            color: 'warning.dark',
-                                                            px: 0.75,
-                                                            py: 0.25,
-                                                            borderRadius: 1,
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: 500,
-                                                            flexShrink: 0
-                                                        }}
-                                                    >
-                                                        <WarningAmber sx={{ fontSize: '0.875rem' }} />
-                                                        <Typography variant="caption" sx={{ fontSize: '0.75rem', fontWeight: 500 }}>
-                                                            No ingredients
-                                                        </Typography>
-                                                    </Box>
-                                                )}
-                                            </Stack>
+                                            <Typography variant="body1" sx={{ fontWeight: 500 }} noWrap>
+                                                {planMeal.meal?.name || 'Unknown Meal'}
+                                            </Typography>
                                             <Stack direction="row" gap={0.5} alignItems="center" sx={{ mt: 0.5 }}>
                                                 <EffortChip effort={planMeal.meal?.effort} size="small" />
                                                 <ServesChip serves={planMeal.requiredServings} size="small" />
                                                 <PrepTimeChip prepTimeMinutes={planMeal.meal?.prepTimeMinutes} size="small" />
+                                                <IngredientsWarningChip meal={planMeal.meal} size="small" />
                                             </Stack>
                                         </Box>
                                     </Stack>

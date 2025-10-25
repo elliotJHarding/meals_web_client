@@ -22,11 +22,12 @@ import LinkCalendar from "./components/calendar/LinkCalendar.tsx";
 import LoginPage from "./components/auth/LoginPage.tsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.tsx";
 import ComingSoonPage from "./components/explore/ComingSoonPage.tsx";
+import ErrorBoundary from "./components/error/ErrorBoundary.tsx";
 
 export default function App() {
 
     const router  = createBrowserRouter([
-        { path: "/", element: <Root/>, children: [
+        { path: "/", element: <Root/>, errorElement: <ErrorBoundary/>, children: [
                 { path: "/" , element: <LandingPage/>},
                 { path: "login", element: <LoginPage/>},
                 { path: "meals", element: <ProtectedRoute><MealsPage/></ProtectedRoute>},
@@ -89,6 +90,13 @@ export default function App() {
                 defaultProps: {
                     icon: <RadioButtonUnchecked/>,
                     checkedIcon: <CheckCircle/>,
+                }
+            },
+            MuiSwitch: {
+                defaultProps: {
+                    style: {
+
+                    }
                 }
             }
         },
@@ -179,7 +187,7 @@ export default function App() {
 
     return (
     <>
-        <ThemeProvider theme={md3theme}>
+        <ThemeProvider theme={theme}>
             <CssVarsProvider theme={md3theme}>
                 <GlobalStyles styles={{html: {backgroundColor: theme.palette.background.default}}}/>
                 <AuthProvider>

@@ -6,9 +6,12 @@ import {RestaurantMenu} from "@mui/icons-material";
 
 export default function DayPlan({plan} : {plan: Plan}) {
 
-    const MealItems = ({meals}: {meals: Meal[]}) => meals.map(meal =>
-        <Card key={meal?.id || Math.random()}>
-            <Box sx={{padding: 1}}>
+    const MealItems = ({meals}: {meals: Meal[]}) => meals.map(meal => {
+        const hasIngredients = !meal || meal.ingredients?.length > 0;
+
+        return (
+            <Card key={meal?.id || Math.random()} sx={{backgroundColor: hasIngredients ? 'secondaryContainer' : 'warningContainer'}}>
+                <Box sx={{padding: 1}}>
                 <Stack direction='row' gap={1}>
                     {meal?.image?.url ? (
                         <CardMedia
@@ -41,7 +44,8 @@ export default function DayPlan({plan} : {plan: Plan}) {
                 </Stack>
             </Box>
         </Card>
-    );
+        );
+    });
 
     return (
         <Stack>

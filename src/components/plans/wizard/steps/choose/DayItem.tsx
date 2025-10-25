@@ -2,7 +2,6 @@ import MealChooser from "../../../../dialog/MealChooser.tsx";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import {Card, CardMedia, Stack, Typography, useTheme} from "@mui/material";
 import Box from "@mui/material/Box";
-import {RestaurantMenu, WarningAmber} from "@mui/icons-material";
 import Plan from "../../../../../domain/Plan.ts";
 import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
 import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
@@ -17,6 +16,7 @@ import CalendarEvents from "./CalendarEvents.tsx";
 import ServesChip from "../../../../meals/chip/ServesChip.tsx";
 import EffortChip from "../../../../meals/chip/EffortChip.tsx";
 import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
+import IngredientsWarningChip from "../../../../meals/chip/IngredientsWarningChip.tsx";
 import {NotesRounded} from "@mui/icons-material";
 
 const constant = {
@@ -83,12 +83,13 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
 
     const MealComponent = ({planMeal, setMealChooserOpen} : {planMeal: PlanMeal, setMealChooserOpen : (open: boolean) => void}) => {
         const meal = planMeal.meal;
+        const hasIngredients = !meal || meal.ingredients?.length > 0;
         
         return (
             <Stack>
                 {planMeal.note && <Typography  sx={{color: 'text.secondary', mb: 0, mt: 0.5, fontWeight: 'bold'}}>{planMeal.note}</Typography>}
 
-                <Card onClick={() => setMealChooserOpen(true)} sx={{backgroundColor: 'secondaryContainer', my: 0.3}}>
+                <Card onClick={() => setMealChooserOpen(true)} sx={{backgroundColor: hasIngredients ? 'secondaryContainer' : 'warningContainer', my: 0.3}}>
                     <Stack direction="row" gap={1} sx={{padding: 1}}>
                         {meal?.image?.url && (
                             <CardMedia
@@ -102,45 +103,17 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                                 image={meal.image.url}
                             />
                         )}
-                        <Stack direction="row" alignItems="center" gap={0.5} sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography noWrap={true} sx={{cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
-                                        onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
-                                {meal?.name}
-                            </Typography>
-                            {meal?.ingredients?.length === 0 && (
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 0.3,
-                                        backgroundColor: 'warning.light',
-                                        color: 'warning.dark',
-                                        px: 0.75,
-                                        py: 0.25,
-                                        borderRadius: 1,
-                                        fontSize: '0.75rem',
-                                        fontWeight: 500,
-                                        flexShrink: 0
-                                    }}
-                                >
-                                    <WarningAmber sx={{ fontSize: '0.875rem' }} />
-                                    <Typography variant="caption" sx={{ fontSize: '0.75rem', fontWeight: 500 }}>
-                                        No ingredients
-                                    </Typography>
-                                </Box>
-                            )}
-                        </Stack>
+                        <Typography noWrap={true} sx={{cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
+                            {meal?.name}
+                        </Typography>
 
-                        <Box flexGrow={0} />
+                        <Box flexGrow={1} />
 
-                        <Stack direction="row" gap={0.5} alignItems="center" sx={{ mt: 0.2 }}>
-                            {/* Effort */}
+                        <Stack direction="row" gap={0.5} alignItems="center" sx={{ mt: 0.2 }} >
+                            <IngredientsWarningChip meal={meal} size="small" />
                             <EffortChip effort={meal?.effort} size="small" />
-
-                            {/* Required Servings */}
                             <ServesChip serves={planMeal.requiredServings} size="small" />
-
-                            {/* Prep Time */}
                             <PrepTimeChip prepTimeMinutes={meal?.prepTimeMinutes} size="small" />
                         </Stack>
                     </Stack>
