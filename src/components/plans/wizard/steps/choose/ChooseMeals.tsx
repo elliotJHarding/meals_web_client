@@ -12,7 +12,7 @@ import {useCalendarEvents} from "../../../../../hooks/calendar/useCalendarEvents
 import Plan from "../../../../../domain/Plan.ts";
 import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 import CalendarEvents from "./CalendarEvents.tsx";
-import {CalendarMonth, NotesRounded, RestaurantMenu} from "@mui/icons-material";
+import {CalendarMonth, NotesRounded, RestaurantMenu, Kitchen} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import {useLinkCalendar} from "../../../../../hooks/calendar/useLinkCalendar.ts";
 import PlanEditor from "./PlanEditor.tsx";
@@ -194,7 +194,22 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                                     boxShadow: 'none'
                                 }}>
                                     <Stack direction="row" gap={1.5} sx={{ p: 1.5 }} alignItems="center">
-                                        {planMeal.meal?.image?.url ? (
+                                        {planMeal.leftovers ? (
+                                            <Box
+                                                sx={{
+                                                    width: 50,
+                                                    height: 40,
+                                                    borderRadius: 1.5,
+                                                    flexShrink: 0,
+                                                    backgroundColor: 'primary.light',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                            >
+                                                <Kitchen sx={{ fontSize: 20, color: 'primary.main' }} />
+                                            </Box>
+                                        ) : planMeal.meal?.image?.url ? (
                                             <CardMedia
                                                 sx={{
                                                     width: 50,
@@ -228,7 +243,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                                                 </Typography>
                                             )}
                                             <Typography variant="body1" sx={{ fontWeight: 500 }} noWrap>
-                                                {planMeal.meal?.name || 'Unknown Meal'}
+                                                {planMeal.meal?.name || 'Unknown Meal'}{planMeal.leftovers ? ' Leftovers' : ''}
                                             </Typography>
                                             <Stack direction="row" gap={0.5} alignItems="center" sx={{ mt: 0.5 }}>
                                                 <EffortChip effort={planMeal.meal?.effort} size="small" />
@@ -295,8 +310,10 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
               animate={{x:0, opacity: 1 }}
               exit={{x: 100, opacity: 0 }}>
             {selectedPlan ? (
-                <PlanEditor 
+                <PlanEditor
+                    key={selectedPlan.date.toISOString()}
                     plan={selectedPlan}
+                    mealPlan={mealPlan}
                     meals={meals}
                     mealsLoading={mealsLoading}
                     mealsFailed={mealsFailed}

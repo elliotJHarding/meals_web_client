@@ -1,19 +1,34 @@
 import Plan from "../../domain/Plan.ts";
 import {Card, CardMedia, Stack, Typography} from "@mui/material";
 import Box from "@mui/material/Box";
-import Meal from "../../domain/Meal.ts";
-import {RestaurantMenu} from "@mui/icons-material";
+import {RestaurantMenu, Kitchen} from "@mui/icons-material";
+import PlanMeal from "../../domain/PlanMeal.ts";
 
 export default function DayPlan({plan} : {plan: Plan}) {
 
-    const MealItems = ({meals}: {meals: Meal[]}) => meals.map(meal => {
+    const MealItems = ({planMeals}: {planMeals: PlanMeal[]}) => planMeals.map((planMeal, index) => {
+        const meal = planMeal.meal;
         const hasIngredients = !meal || meal.ingredients?.length > 0;
 
         return (
-            <Card key={meal?.id || Math.random()} sx={{backgroundColor: hasIngredients ? 'secondaryContainer' : 'warningContainer'}}>
+            <Card key={meal?.id || index} sx={{borderRadius: 3, backgroundColor: hasIngredients ? 'secondaryContainer' : 'warningContainer'}}>
                 <Box sx={{padding: 1}}>
                 <Stack direction='row' gap={1}>
-                    {meal?.image?.url ? (
+                    {planMeal.leftovers ? (
+                        <Box
+                            sx={{
+                                borderRadius: 2,
+                                width: 50,
+                                height: 50,
+                                backgroundColor: 'tertiary',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <Kitchen sx={{ fontSize: 24, color: 'onTertiary' }} />
+                        </Box>
+                    ) : meal?.image?.url ? (
                         <CardMedia
                             image={meal.image.url}
                             sx={{
@@ -39,7 +54,7 @@ export default function DayPlan({plan} : {plan: Plan}) {
                         </Box>
                     )}
                     <Typography variant='h6'>
-                        {meal?.name || 'Unknown Meal'}
+                        {meal?.name || 'Unknown Meal'}{planMeal.leftovers ? ' Leftovers' : ''}
                     </Typography>
                 </Stack>
             </Box>
@@ -53,7 +68,7 @@ export default function DayPlan({plan} : {plan: Plan}) {
                 {plan.date.toLocaleDateString('en-gb', {weekday: "long"})}
             </Typography>
             <Stack direction='row' gap={1}>
-                <MealItems meals={plan.planMeals?.map(pm => pm.meal).filter(meal => meal != null) || []}/>
+                <MealItems planMeals={plan.planMeals?.filter(pm => pm.meal != null) || []}/>
             </Stack>
         </Stack>
     )

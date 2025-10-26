@@ -8,6 +8,7 @@ interface BackendPlanMeal {
         id: bigint;
     };
     requiredServings: number;
+    leftovers: boolean;
     note?: string;
 }
 

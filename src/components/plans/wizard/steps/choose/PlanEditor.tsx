@@ -14,6 +14,8 @@ import MealChooser from "../../../../dialog/MealChooser.tsx";
 import Meal from "../../../../../domain/Meal.ts";
 import PlanMeal from "../../../../../domain/PlanMeal.ts";
 import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
+import MealPlan from "../../../../../domain/MealPlan.ts";
+import IconButton from "@mui/material-next/IconButton";
 
 // Simple debounce implementation
 const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => {
@@ -26,6 +28,7 @@ const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => 
 
 interface PlanEditorProps {
     plan: Plan;
+    mealPlan: MealPlan;
     meals: Meal[];
     mealsLoading: boolean;
     mealsFailed: boolean;
@@ -33,7 +36,7 @@ interface PlanEditorProps {
     calendarEvents: CalendarEvent[];
 }
 
-export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPlanUpdate, calendarEvents}: PlanEditorProps) {
+export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFailed, onPlanUpdate, calendarEvents}: PlanEditorProps) {
     const navigate = useNavigate();
     const {updatePlan} = usePlanUpdate();
     const {createPlan} = usePlanCreate();
@@ -119,14 +122,17 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
         syncPlanToBackend(updatedPlan);
     };
 
-    const handleAddMeal = (meal: Meal) => {
+    const handleAddMeal = (meal: Meal, servings: number, leftovers: boolean) => {
         console.group('handleAddMeal called');
         console.log('Meal object:', meal);
+        console.log('Servings:', servings);
+        console.log('Leftovers:', leftovers);
         console.log('Current plan:', currentPlan);
 
         const newPlanMeal: PlanMeal = {
             meal,
-            requiredServings: meal.serves
+            requiredServings: servings,
+            leftovers: leftovers
         };
         const updatedPlan = {
             ...currentPlan,
@@ -149,67 +155,185 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
         syncPlanToBackend(updatedPlan);
 };
 
+    const handleDayClick = (dayPlan: Plan) => {
+        navigate(`?from=${mealPlan.from()}&to=${mealPlan.to()}&selected=${MealPlan.formatDate(dayPlan.date)}`);
+    };
+
+    const getCurrentDayIndex = () => {
+        return mealPlan.plans.findIndex(p => p.date.toDateString() === plan.date.toDateString());
+    };
+
+    const getPreviousDay = () => {
+        const currentIndex = getCurrentDayIndex();
+        if (currentIndex > 0) {
+            return mealPlan.plans[currentIndex - 1];
+        }
+        return null;
+    };
+
+    const getNextDay = () => {
+        const currentIndex = getCurrentDayIndex();
+        if (currentIndex < mealPlan.plans.length - 1) {
+            return mealPlan.plans[currentIndex + 1];
+        }
+        return null;
+    };
+
+    const handlePreviousDay = () => {
+        const prevDay = getPreviousDay();
+        if (prevDay) {
+            handleDayClick(prevDay);
+        }
+    };
+
+    const handleNextDay = () => {
+        const nextDay = getNextDay();
+        if (nextDay) {
+            handleDayClick(nextDay);
+        }
+    };
+
     return (
         <Box component={motion.div} layout width={'100%'}>
-            {/* Header */}
-            <Stack direction="row" spacing={2} alignItems={'center'} sx={{ p: 2, pb: 1 }}>
-                <Button
-                    variant={'text'}
-                    size={'medium'}
-                    sx={{borderRadius: 2, paddingX: 1, paddingY: 1, minWidth: 'auto'}}
-                    startIcon={<ArrowBackIos/>}
-                    onClick={() => navigate(-1)}
-                    component={motion.div}
-                    layout
-                >
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <Typography
-                            variant='h6'
-                            sx={{
-                                width: '2rem',
-                                height: '2rem',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            {plan.date.toLocaleDateString('en-gb', {day: 'numeric'})}
-                        </Typography>
-                        <Typography
-                            sx={{fontFamily: 'Montserrat', fontSize: '1rem', fontWeight: 500}}
-                        >
-                            {plan.date.toLocaleDateString('en-gb', {weekday: 'long'})}
-                        </Typography>
-                    </Stack>
-                </Button>
+            {/* Day Navigation Header */}
+            <Box sx={{
+                p: 2,
+                pb: 1,
+                position: 'relative'
+            }}>
+                <Stack direction="row" alignItems="center" component={motion.div} layout='position'>
+                    {/* Back Button */}
+                    <Button
+                        variant={'text'}
+                        size={'medium'}
+                        sx={{
+                            borderRadius: 2,
+                            paddingX: 1,
+                            paddingY: 1,
+                            minWidth: 'auto',
+                            position: 'absolute',
+                            left: 16,
+                            zIndex: 1
+                        }}
+                        startIcon={<ArrowBackIos/>}
+                        onClick={() => navigate(`/plans/create/choose?from=${mealPlan.from()}&to=${mealPlan.to()}`)}
+                    >Back</Button>
 
-                <TextField
-                    size={'small'}
-                    fullWidth
-                    value={currentPlan.note || ''}
-                    onChange={(e) => handleNoteChange(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position='start'>
-                                <EditNoteRounded sx={{ fontSize: '1rem' }}/>
-                            </InputAdornment>
-                        ),
-                        placeholder: 'Add a note for this day',
-                        sx: { borderRadius: 2 }
-                    }}
-                />
-            </Stack>
+                    {/* Day Navigation - Centered on desktop, flexible on mobile */}
+                    <Box sx={{
+                        flex: 1,
+                        display: 'flex',
+                        justifyContent: { xs: 'flex-end', md: 'center' },
+                        alignItems: 'center',
+                        pl: { xs: 0, md: 0 },
+                        ml: { xs: '60px', md: 0 }
+                    }}>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                            {/* Previous Day Button */}
+                            <IconButton
+                                size="small"
+                                onClick={handlePreviousDay}
+                                disabled={!getPreviousDay()}
+                                sx={{
+                                    color: 'text.secondary',
+                                    '&:hover': {
+                                        color: 'tertiary',
+                                    },
+                                    '&.Mui-disabled': {
+                                        opacity: 0.3
+                                    }
+                                }}
+                            >
+                                <ArrowBackIos fontSize="small" />
+                            </IconButton>
+
+                            {/* Current Day Display */}
+                            <Stack direction="row" alignItems="center" spacing={0.5} component={motion.div} layout='position' sx={{ minWidth: '150px', justifyContent: 'center' }}>
+                                <Typography
+                                    variant='h6'
+                                    sx={{
+                                        width: '2rem',
+                                        height: '2rem',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'tertiary'
+                                    }}
+                                >
+                                    {plan.date.toLocaleDateString('en-gb', {day: 'numeric'})}
+                                </Typography>
+                                <Typography
+                                    sx={{fontFamily: 'Montserrat', fontSize: '1rem', fontWeight: 500, color: 'tertiary'}}
+                                >
+                                    {plan.date.toLocaleDateString('en-gb', {weekday: 'long'})}
+                                </Typography>
+                            </Stack>
+
+                            {/* Next Day Button */}
+                            <IconButton
+                                size="small"
+                                onClick={handleNextDay}
+                                disabled={!getNextDay()}
+                                sx={{
+                                    color: 'text.secondary',
+                                    transform: 'rotate(180deg)',
+                                    '&:hover': {
+                                        color: 'tertiary',
+                                    },
+                                    '&.Mui-disabled': {
+                                        opacity: 0.3
+                                    }
+                                }}
+                            >
+                                <ArrowBackIos fontSize="small" />
+                            </IconButton>
+                        </Stack>
+                    </Box>
+                </Stack>
+            </Box>
 
             <Box sx={{ px: 2, pb: 2 }}>
                 <Grid container spacing={2}>
                     {/* Meals Section */}
                     <Grid xs={12} md={8}>
                         <Stack spacing={2}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                <Typography variant="h6" fontWeight="600">
+                            <Stack direction="row" gap={2} alignItems="center">
+                                <Typography variant="h6" fontWeight="600" sx={{mt: 0.5}}>
                                     Meals
                                 </Typography>
+                                <TextField
+                                    size={'small'}
+                                    value={currentPlan.note || ''}
+                                    onChange={(e) => handleNoteChange(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position='start'>
+                                                <EditNoteRounded sx={{ fontSize: '1rem' }}/>
+                                            </InputAdornment>
+                                        ),
+                                        placeholder: 'Add a note for this day',
+                                        sx: { borderRadius: 2 }
+                                    }}
+                                    sx={{
+                                        mt: 0.5,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': {
+                                                border: 'none',
+                                            },
+                                            '&:hover fieldset': {
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                border: '1px solid',
+                                                borderColor: 'primary.main',
+                                            },
+                                        },
+                                    }}
+
+                                />
+                                <Box flexGrow={1} />
                                 <Button
                                     variant="outlined"
                                     size="small"
@@ -279,6 +403,8 @@ export default function PlanEditor({plan, meals, mealsLoading, mealsFailed, onPl
                 open={mealChooserOpen}
                 setOpen={setMealChooserOpen}
                 onConfirm={handleAddMeal}
+                mealPlan={mealPlan}
+                currentPlan={plan}
             />
         </Box>
     );

@@ -17,19 +17,24 @@ import Effort from "../../domain/Effort.ts";
 import {AnimatePresence, motion} from "framer-motion";
 import PrepTimeChip from "../meals/chip/PrepTimeChip.tsx";
 import EffortChip from "../meals/chip/EffortChip.tsx";
+import MealPlan from "../../domain/MealPlan.ts";
+import Plan from "../../domain/Plan.ts";
 
-export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoading, mealsFailed}: {
+export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoading, mealsFailed, mealPlan, currentPlan}: {
     open: boolean,
     setOpen: (open: boolean) => void,
-    onConfirm: (meal: Meal) => void,
+    onConfirm: (meal: Meal, servings: number, leftovers: boolean) => void,
     meals: Meal[]
     mealsLoading: boolean,
-    mealsFailed: boolean
+    mealsFailed: boolean,
+    mealPlan?: MealPlan,
+    currentPlan?: Plan
 }) {
 
     const [searchValue, setSearchValue] = useState<string>('');
     const [tabValue, setTabValue] = useState(0);
     const [mobileView, setMobileView] = useState<'menu' | 'meals' | 'leftovers' | 'new'>('menu');
+    const [leftoverServings, setLeftoverServings] = useState<Record<string, number>>({});
     const theme = useTheme();
     const isXsScreen = useMediaQuery(theme.breakpoints.only('xs'));
     const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -75,13 +80,54 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
         setMobileView('menu');
     });
 
+    const getPrecedingMeals = (): Meal[] => {
+        if (!mealPlan || !currentPlan) return [];
+
+        const precedingPlans = mealPlan.plans.filter(p =>
+            p.date.getTime() < currentPlan.date.getTime()
+        );
+
+        const mealsMap = new Map<string, Meal>();
+        precedingPlans.forEach(plan => {
+            plan.planMeals?.forEach(planMeal => {
+                if (planMeal.meal && planMeal.meal.id) {
+                    mealsMap.set(planMeal.meal.id.toString(), planMeal.meal);
+                }
+            });
+        });
+
+        return Array.from(mealsMap.values());
+    };
+
     const handleMealOnClick = (meal: Meal) => {
         setOpen(false);
-        onConfirm(meal);
+        onConfirm(meal, meal.serves, false);
         setSearchValue('');
         setTabValue(0);
         setMobileView('menu');
+        setLeftoverServings({});
     }
+
+    const handleLeftoverClick = (meal: Meal) => {
+        const mealId = meal.id?.toString() || meal.name;
+        const servings = leftoverServings[mealId] || 1;
+        setOpen(false);
+        onConfirm(meal, servings, true);
+        setSearchValue('');
+        setTabValue(0);
+        setMobileView('menu');
+        setLeftoverServings({});
+    };
+
+    const getLeftoverServings = (meal: Meal): number => {
+        const mealId = meal.id?.toString() || meal.name;
+        return leftoverServings[mealId] || 1;
+    };
+
+    const setLeftoverServingsForMeal = (meal: Meal, servings: number) => {
+        const mealId = meal.id?.toString() || meal.name;
+        setLeftoverServings(prev => ({ ...prev, [mealId]: servings }));
+    };
 
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
@@ -367,6 +413,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                     </Stack>
                 );
             case 'leftovers':
+                const precedingMealsMobile = getPrecedingMeals();
                 return (
                     <Stack gap={2}>
                         <Stack direction="row" alignItems="center" gap={1}>
@@ -382,11 +429,26 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                                 Add Leftovers
                             </Typography>
                         </Stack>
-                        <Box sx={{ p: 4, textAlign: 'center' }}>
-                            <Typography color="text.secondary">
-                                Leftovers functionality coming soon...
-                            </Typography>
-                        </Box>
+                        {!mealPlan || !currentPlan ? (
+                            <Box sx={{ p: 4, textAlign: 'center' }}>
+                                <Typography variant="h6" color="text.secondary">
+                                    Open from a plan to use leftovers
+                                </Typography>
+                            </Box>
+                        ) : precedingMealsMobile.length === 0 ? (
+                            <Box sx={{ p: 4, textAlign: 'center' }}>
+                                <Typography variant="h6" color="text.secondary">
+                                    No meals from previous days
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                    Plan some meals on earlier dates to add them as leftovers
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Stack gap={1}>
+                                {precedingMealsMobile.map(meal => renderLeftoverItem(meal))}
+                            </Stack>
+                        )}
                     </Stack>
                 );
             case 'new':
@@ -413,6 +475,91 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
         }
     };
 
+    const renderLeftoverItem = (meal: Meal) => {
+        const servings = getLeftoverServings(meal);
+
+        return (
+            <Card
+                key={meal.id?.toString() || meal.name}
+                sx={{
+                    borderRadius: 2,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    '&:hover': {
+                        boxShadow: 2
+                    }
+                }}
+            >
+                <Stack direction="row" gap={2} sx={{ p: 2 }} alignItems="center">
+                    {/* Meal Image */}
+                    {meal?.image?.url ? (
+                        <CardMedia
+                            image={meal.image.url}
+                            sx={{
+                                width: 60,
+                                height: 60,
+                                borderRadius: 2,
+                                backgroundSize: 'cover',
+                                flexShrink: 0
+                            }}
+                        />
+                    ) : (
+                        <Box sx={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: 2,
+                            backgroundColor: 'grey.100',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                        }}>
+                            <RestaurantMenu sx={{ fontSize: 28, color: 'grey.400' }} />
+                        </Box>
+                    )}
+
+                    {/* Meal Info */}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body1" fontWeight={500} noWrap>
+                            {meal.name} Leftovers
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
+                            <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'small'}/>
+                            {meal.effort && <EffortChip effort={meal.effort} size={'small'}/>}
+                        </Box>
+                    </Box>
+
+                    {/* Portions Selector */}
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{ flexShrink: 0 }}>
+                        <Person fontSize="small" />
+                        <IconButton
+                            size="small"
+                            onClick={() => setLeftoverServingsForMeal(meal, Math.max(1, servings - 1))}
+                        >
+                            <Remove fontSize="small" />
+                        </IconButton>
+                        <Typography sx={{ minWidth: '2ch', textAlign: 'center' }}>{servings}</Typography>
+                        <IconButton
+                            size="small"
+                            onClick={() => setLeftoverServingsForMeal(meal, servings + 1)}
+                        >
+                            <Add fontSize="small" />
+                        </IconButton>
+                    </Stack>
+
+                    {/* Add Button */}
+                    <Button
+                        variant="filled"
+                        onClick={() => handleLeftoverClick(meal)}
+                        sx={{ flexShrink: 0 }}
+                    >
+                        Add
+                    </Button>
+                </Stack>
+            </Card>
+        );
+    };
+
     const renderTabContent = () => {
         switch (tabValue) {
             case 0:
@@ -427,12 +574,29 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                     </Stack>
                 );
             case 1:
+                const precedingMeals = getPrecedingMeals();
                 return (
-                    <Stack gap={2} sx={{ flex: 1, p: 4, textAlign: 'center' }}>
-                        <Typography variant="h6">Add Leftovers</Typography>
-                        <Typography color="text.secondary">
-                            Leftovers functionality coming soon...
-                        </Typography>
+                    <Stack gap={2} sx={{ flex: 1 }}>
+                        {!mealPlan || !currentPlan ? (
+                            <Box sx={{ p: 4, textAlign: 'center' }}>
+                                <Typography variant="h6" color="text.secondary">
+                                    Open from a plan to use leftovers
+                                </Typography>
+                            </Box>
+                        ) : precedingMeals.length === 0 ? (
+                            <Box sx={{ p: 4, textAlign: 'center' }}>
+                                <Typography variant="h6" color="text.secondary">
+                                    No meals from previous days
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                    Plan some meals on earlier dates to add them as leftovers
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Stack gap={1}>
+                                {precedingMeals.map(meal => renderLeftoverItem(meal))}
+                            </Stack>
+                        )}
                     </Stack>
                 );
             case 2:

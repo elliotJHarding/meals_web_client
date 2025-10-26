@@ -1,13 +1,9 @@
 import { Card, CardMedia, IconButton, Stack, TextField, Typography, InputAdornment, useMediaQuery, useTheme, Box } from "@mui/material";
-import {Add, Remove, Delete, NotesRounded, Person, RestaurantMenu} from "@mui/icons-material";
+import {Add, Remove, Delete, NotesRounded, Person, RestaurantMenu, Kitchen} from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import PlanMeal from "../../../../../domain/PlanMeal.ts";
 import { useNavigate } from "react-router-dom";
-import IngredientsWarningChip from "../../../../meals/chip/IngredientsWarningChip.tsx";
-import EffortChip from "../../../../meals/chip/EffortChip.tsx";
-import ServesChip from "../../../../meals/chip/ServesChip.tsx";
-import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
 
 interface MealItemProps {
     planMeal: PlanMeal;
@@ -58,8 +54,25 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
             <Stack sx={{ p: 1.5 }}>
                 {/* Top Row: Image and Info */}
                 <Stack direction="row" gap={2} alignItems="center">
-                    {/* Meal Image and Info */}
-                    {planMeal.meal?.image?.url ? (
+                    {/* Meal Image/Icon - Show Fridge for Leftovers */}
+                    {planMeal.leftovers ? (
+                        <Box
+                            sx={{
+                                width: 70,
+                                height: 60,
+                                borderRadius: 1.5,
+                                cursor: 'pointer',
+                                flexShrink: 0,
+                                backgroundColor: 'tertiary',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                            onClick={handleMealClick}
+                        >
+                            <Kitchen sx={{ fontSize: 32, color: 'onPrimary' }} />
+                        </Box>
+                    ) : planMeal.meal?.image?.url ? (
                         <CardMedia
                             sx={{
                                 width: 70,
@@ -90,7 +103,7 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
                             <RestaurantMenu sx={{ fontSize: 32, color: 'grey.400' }} />
                         </Box>
                     )}
-                    
+
                     <Stack sx={{ flex: 1, minWidth: 0 }}>
                         <Typography
                             variant="subtitle1"
@@ -98,7 +111,7 @@ export default function MealItem({ planMeal, onServingsChange, onNoteChange, onR
                             sx={{ cursor: 'pointer', fontWeight: 500 }}
                             onClick={handleMealClick}
                         >
-                            {planMeal.meal?.name}
+                            {planMeal.meal?.name}{planMeal.leftovers ? ' Leftovers' : ''}
                         </Typography>
 
                         <TextField
