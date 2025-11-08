@@ -193,7 +193,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                                     border: 'none',
                                     boxShadow: 'none'
                                 }}>
-                                    <Stack direction="row" gap={1.5} sx={{ p: 1.5 }} alignItems="center">
+                                    <Stack direction="row" gap={1.5} sx={{ p: 1.5 }} alignItems="start">
                                         {planMeal.leftovers ? (
                                             <Box
                                                 sx={{
@@ -201,19 +201,19 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                                                     height: 40,
                                                     borderRadius: 1.5,
                                                     flexShrink: 0,
-                                                    backgroundColor: 'primary.light',
+                                                    backgroundColor: 'tertiary',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center'
                                                 }}
                                             >
-                                                <Kitchen sx={{ fontSize: 20, color: 'primary.main' }} />
+                                                <Kitchen sx={{ fontSize: 20, color: 'onPrimary' }} />
                                             </Box>
                                         ) : planMeal.meal?.image?.url ? (
                                             <CardMedia
                                                 sx={{
-                                                    width: 50,
-                                                    height: 40,
+                                                    width: 60,
+                                                    height: 60,
                                                     borderRadius: 1.5,
                                                     flexShrink: 0,
                                                     backgroundSize: 'cover'
@@ -245,12 +245,12 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                                             <Typography variant="body1" sx={{ fontWeight: 500 }} noWrap>
                                                 {planMeal.meal?.name || 'Unknown Meal'}{planMeal.leftovers ? ' Leftovers' : ''}
                                             </Typography>
-                                            <Stack direction="row" gap={0.5} alignItems="center" sx={{ mt: 0.5 }}>
+                                            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', mt: 0.5, flexWrap: 'wrap' }}>
                                                 <EffortChip effort={planMeal.meal?.effort} size="small" />
                                                 <ServesChip serves={planMeal.requiredServings} size="small" />
                                                 <PrepTimeChip prepTimeMinutes={planMeal.meal?.prepTimeMinutes} size="small" />
                                                 <IngredientsWarningChip meal={planMeal.meal} size="small" />
-                                            </Stack>
+                                            </Box>
                                         </Box>
                                     </Stack>
                                 </Card>

@@ -20,7 +20,8 @@ export default class AuthRepository extends ResourceRepository {
                 } else {
                     console.error(response.statusText);
                 }
-            }
+            },
+            true
         )
     }
 

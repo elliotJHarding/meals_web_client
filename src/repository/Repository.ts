@@ -1,4 +1,5 @@
 import axios, {AxiosResponse} from "axios";
+import {toastService} from "../contexts/ToastContext.tsx";
 
 export default class Repository {
     protected url : string;
@@ -11,9 +12,7 @@ export default class Repository {
         return {}
     }
 
-    get(path : string, onSuccess : (response : AxiosResponse) => void) : void
-    get(path : string, onSuccess : (response : AxiosResponse) => void, onFailure? : (response: AxiosResponse) => void) : void {
-        const logError = (response: AxiosResponse) => console.error(response);
+    get(path : string, onSuccess : (response : AxiosResponse) => void, onFailure? : (response: AxiosResponse) => void, suppressToast?: boolean) : void {
         axios
             .get(
                 this.url + path,
@@ -23,10 +22,18 @@ export default class Repository {
                 }
             )
             .then(onSuccess)
-            .catch(onFailure ?? logError);
+            .catch(error => {
+                console.error(error);
+                if (!suppressToast) {
+                    toastService.showError('Failed to load data');
+                }
+                if (onFailure) {
+                    onFailure(error);
+                }
+            });
     }
 
-    post(path : string, data : any, onSuccess : (response : AxiosResponse) => void) : void {
+    post(path : string, data : any, onSuccess : (response : AxiosResponse) => void, suppressToast?: boolean) : void {
         axios
             .post(
                 this.url + path,
@@ -37,10 +44,15 @@ export default class Repository {
                 }
             )
             .then(onSuccess)
-            .catch(error => console.error(error));
+            .catch(error => {
+                console.error(error);
+                if (!suppressToast) {
+                    toastService.showError('Failed to save data');
+                }
+            });
     }
 
-    update(path : string, data : any, onSuccess : () => void) : void {
+    update(path : string, data : any, onSuccess : () => void, suppressToast?: boolean) : void {
         axios
             .put(
                 this.url + path,
@@ -51,10 +63,15 @@ export default class Repository {
                 }
             )
             .then(onSuccess)
-            .catch(error => console.error(error));
+            .catch(error => {
+                console.error(error);
+                if (!suppressToast) {
+                    toastService.showError('Failed to update data');
+                }
+            });
     }
 
-    delete(path : string, onSuccess : () => void) : void {
+    delete(path : string, onSuccess : () => void, suppressToast?: boolean) : void {
         axios
             .delete(
                 this.url + path,
@@ -64,7 +81,12 @@ export default class Repository {
                 }
             )
             .then(onSuccess)
-            .catch(error => console.error(error));
+            .catch(error => {
+                console.error(error);
+                if (!suppressToast) {
+                    toastService.showError('Failed to delete data');
+                }
+            });
     }
 
 }

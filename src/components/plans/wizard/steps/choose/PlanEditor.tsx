@@ -1,5 +1,5 @@
 import Plan from "../../../../../domain/Plan.ts";
-import {Box, InputAdornment, Stack, TextField, Typography, Divider} from "@mui/material";
+import {Box, InputAdornment, Stack, TextField, Typography, Divider, useTheme} from "@mui/material";
 import {motion} from "framer-motion";
 import {useNavigate} from "react-router-dom";
 import {ArrowBackIos, EditNoteRounded, Add} from "@mui/icons-material";
@@ -16,6 +16,7 @@ import PlanMeal from "../../../../../domain/PlanMeal.ts";
 import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import IconButton from "@mui/material-next/IconButton";
+import AiMealSuggestions from "./AiMealSuggestions.tsx";
 
 // Simple debounce implementation
 const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => {
@@ -228,7 +229,8 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
                         pl: { xs: 0, md: 0 },
                         ml: { xs: '60px', md: 0 }
                     }}>
-                        <Stack direction="row" spacing={2} alignItems="center">
+                        <Stack direction="row" spacing={2} alignItems="center" sx={{backgroundColor: '#f5f5f5', borderRadius: 999, px: 1}}>
+
                             {/* Previous Day Button */}
                             <IconButton
                                 size="small"
@@ -295,6 +297,16 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
 
             <Box sx={{ px: 2, pb: 2 }}>
                 <Grid container spacing={2}>
+                    {/* AI Chat Section */}
+                    {/*<Grid xs={12} md={3}>*/}
+                    {/*    <AiMealSuggestions*/}
+                    {/*        plan={plan}*/}
+                    {/*        mealPlan={mealPlan}*/}
+                    {/*        meals={meals}*/}
+                    {/*        calendarEvents={calendarEvents}*/}
+                    {/*        onAddMeal={handleAddMeal}*/}
+                    {/*    />*/}
+                    {/*</Grid>*/}
                     {/* Meals Section */}
                     <Grid xs={12} md={8}>
                         <Stack spacing={2}>

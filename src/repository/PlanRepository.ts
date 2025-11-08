@@ -33,6 +33,7 @@ const transformPlanForBackend = (plan: Plan): BackendPlan => {
                 id: planMeal.meal.id!
             },
             requiredServings: planMeal.requiredServings,
+            leftovers: planMeal.leftovers,
             note: planMeal.note
         })),
         shoppingListItems: plan.shoppingListItems,

@@ -10,7 +10,7 @@ export default class CalendarRepository extends ResourceRepository {
             onSuccess(response.data);
             console.info('Successfully fetched calendar events');
             console.info(response.data);
-        });
+        }, () => null, true);
     }
     public getEvents(from: string, to: string, onSuccess : (events : CalendarEvent[]) => void) : void {
         console.info(`Fetching calendar events`)
@@ -18,7 +18,7 @@ export default class CalendarRepository extends ResourceRepository {
             onSuccess(response.data);
             console.info('Successfully fetched calendar events');
             console.info(response.data);
-        });
+        }, () => null, true);
     }
     public isAuthorized(onSuccess : (isAuthorized : boolean) => void) : void {
         console.info(`Checking if calendar is authorized`)

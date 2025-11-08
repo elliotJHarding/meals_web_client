@@ -13,7 +13,7 @@ export default function DayPlan({plan} : {plan: Plan}) {
         return (
             <Card key={meal?.id || index} sx={{borderRadius: 3, backgroundColor: hasIngredients ? 'secondaryContainer' : 'warningContainer'}}>
                 <Box sx={{padding: 1}}>
-                <Stack direction='row' gap={1}>
+                <Stack direction='row' gap={1} alignItems='center'>
                     {planMeal.leftovers ? (
                         <Box
                             sx={{
@@ -34,7 +34,7 @@ export default function DayPlan({plan} : {plan: Plan}) {
                             sx={{
                                 borderRadius: 2,
                                 width: 50,
-                                height: 50,
+                                height: 35,
                                 backgroundSize: 'cover'
                             }}
                         />
@@ -67,7 +67,7 @@ export default function DayPlan({plan} : {plan: Plan}) {
             <Typography fontWeight='bolder' textAlign='left'>
                 {plan.date.toLocaleDateString('en-gb', {weekday: "long"})}
             </Typography>
-            <Stack direction='row' gap={1}>
+            <Stack direction='column' gap={1}>
                 <MealItems planMeals={plan.planMeals?.filter(pm => pm.meal != null) || []}/>
             </Stack>
         </Stack>

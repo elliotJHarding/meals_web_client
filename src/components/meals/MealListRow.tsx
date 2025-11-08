@@ -20,7 +20,7 @@ export default function MealListRow({meal, index, onClick} : {meal : Meal, index
     const handleClick = () => onClick(meal);
 
     return (
-        <Fade in unmountOnExit timeout={200 * index}>
+        <Fade in unmountOnExit timeout={index < 15 ? 200 * index : 0}>
             <Grid xs={12} onClick={handleClick}>
                 <CardActionArea>
                     <Card sx={{borderRadius: constant.cardBorderRadius, padding: constant.padding, display: 'flex', gap: constant.gap}}>

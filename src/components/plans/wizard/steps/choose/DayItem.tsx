@@ -17,7 +17,7 @@ import ServesChip from "../../../../meals/chip/ServesChip.tsx";
 import EffortChip from "../../../../meals/chip/EffortChip.tsx";
 import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
 import IngredientsWarningChip from "../../../../meals/chip/IngredientsWarningChip.tsx";
-import {NotesRounded} from "@mui/icons-material";
+import {NotesRounded, Kitchen} from "@mui/icons-material";
 
 const constant = {
     imageWidth: 30,
@@ -84,14 +84,29 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
     const MealComponent = ({planMeal, setMealChooserOpen} : {planMeal: PlanMeal, setMealChooserOpen : (open: boolean) => void}) => {
         const meal = planMeal.meal;
         const hasIngredients = !meal || meal.ingredients?.length > 0;
-        
+
         return (
             <Stack>
                 {planMeal.note && <Typography  sx={{color: 'text.secondary', mb: 0, mt: 0.5, fontWeight: 'bold'}}>{planMeal.note}</Typography>}
 
                 <Card onClick={() => setMealChooserOpen(true)} sx={{backgroundColor: hasIngredients ? 'secondaryContainer' : 'warningContainer', my: 0.3}}>
                     <Stack direction="row" gap={1} sx={{padding: 1}}>
-                        {meal?.image?.url && (
+                        {planMeal.leftovers ? (
+                            <Box
+                                sx={{
+                                    width: constant.imageWidth,
+                                    height: constant.imageHeight,
+                                    borderRadius: constant.imageBorderRadius,
+                                    flexShrink: 0,
+                                    backgroundColor: 'tertiary',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <Kitchen sx={{ fontSize: 20, color: 'onPrimary' }} />
+                            </Box>
+                        ) : meal?.image?.url ? (
                             <CardMedia
                                 sx={{
                                     width: constant.imageWidth,
@@ -102,20 +117,26 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                                 }}
                                 image={meal.image.url}
                             />
-                        )}
+                        ) : null}
                         <Typography noWrap={true} sx={{cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
                                     onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
-                            {meal?.name}
+                            {meal?.name}{planMeal.leftovers ? ' Leftovers' : ''}
                         </Typography>
 
                         <Box flexGrow={1} />
 
-                        <Stack direction="row" gap={0.5} alignItems="center" sx={{ mt: 0.2 }} >
+                        <Box sx={{
+                            display: 'flex',
+                            gap: 0.5,
+                            alignItems: 'center',
+                            mt: 0.2,
+                            flexWrap: 'wrap'
+                        }}>
                             <IngredientsWarningChip meal={meal} size="small" />
                             <EffortChip effort={meal?.effort} size="small" />
                             <ServesChip serves={planMeal.requiredServings} size="small" />
                             <PrepTimeChip prepTimeMinutes={meal?.prepTimeMinutes} size="small" />
-                        </Stack>
+                        </Box>
                     </Stack>
                 </Card>
             </Stack>
