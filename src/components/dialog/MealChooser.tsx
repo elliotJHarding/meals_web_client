@@ -188,6 +188,22 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
         }
     };
 
+    const handleCreateNewFromSearch = () => {
+        // Pre-populate new meal with search term
+        setNewMeal({
+            ...newMeal,
+            name: searchValue
+        });
+        // Navigate to new meal tab
+        if (isMobileScreen) {
+            setMobileView('new');
+        } else {
+            setTabValue(2);
+        }
+        // Clear search
+        setSearchValue('');
+    };
+
     const renderNewMealForm = () => (
         <Stack gap={2} sx={{ flex: 1 }}>
             <TextField
@@ -392,7 +408,10 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
         switch (mobileView) {
             case 'menu':
                 return renderMobileButtons();
-            case 'meals':
+            case 'meals': {
+                const filteredMealsMobile = meals.filter(meal => meal.name.toLowerCase().includes(searchValue.toLowerCase()));
+                const hasNoResultsMobile = !mealsLoading && !mealsFailed && filteredMealsMobile.length === 0 && searchValue.trim().length > 0;
+
                 return (
                     <Stack gap={2}>
                         <Stack direction="row" alignItems="center" gap={1}>
@@ -409,10 +428,36 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                             </Typography>
                         </Stack>
                         <SearchBar searchValue={searchValue} onChange={setSearchValue}/>
-                        <MealList meals={meals.filter(meal => meal.name.toLowerCase().includes(searchValue.toLowerCase()))} loading={mealsLoading} failed={mealsFailed} mealOnClick={handleMealOnClick}/>
+                        {hasNoResultsMobile ? (
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                p: 4,
+                                textAlign: 'center'
+                            }}>
+                                <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                                    No meals found for "{searchValue}"
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                                    Create a new meal with this name?
+                                </Typography>
+                                <Button
+                                    variant="filled"
+                                    startIcon={<Add />}
+                                    onClick={handleCreateNewFromSearch}
+                                >
+                                    Create New Meal
+                                </Button>
+                            </Box>
+                        ) : (
+                            <MealList meals={filteredMealsMobile} loading={mealsLoading} failed={mealsFailed} mealOnClick={handleMealOnClick}/>
+                        )}
                     </Stack>
                 );
-            case 'leftovers':
+            }
+            case 'leftovers': {
                 const precedingMealsMobile = getPrecedingMeals();
                 return (
                     <Stack gap={2}>
@@ -451,6 +496,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                         )}
                     </Stack>
                 );
+            }
             case 'new':
                 return (
                     <Stack gap={2}>
@@ -562,18 +608,46 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
 
     const renderTabContent = () => {
         switch (tabValue) {
-            case 0:
+            case 0: {
+                const filteredMeals = meals.filter(meal => meal.name.toLowerCase().includes(searchValue.toLowerCase()));
+                const hasNoResults = !mealsLoading && !mealsFailed && filteredMeals.length === 0 && searchValue.trim().length > 0;
+
                 return (
                     <Stack gap={2} sx={{ flex: 1 }}>
                         <SearchBar searchValue={searchValue} onChange={setSearchValue}/>
-                        {isXsScreen ? (
-                            <MealList meals={meals.filter(meal => meal.name.toLowerCase().includes(searchValue.toLowerCase()))} loading={mealsLoading} failed={mealsFailed} mealOnClick={handleMealOnClick}/>
+                        {hasNoResults ? (
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                p: 4,
+                                textAlign: 'center',
+                                flex: 1
+                            }}>
+                                <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                                    No meals found for "{searchValue}"
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                                    Create a new meal with this name?
+                                </Typography>
+                                <Button
+                                    variant="filled"
+                                    startIcon={<Add />}
+                                    onClick={handleCreateNewFromSearch}
+                                >
+                                    Create New Meal
+                                </Button>
+                            </Box>
+                        ) : isXsScreen ? (
+                            <MealList meals={filteredMeals} loading={mealsLoading} failed={mealsFailed} mealOnClick={handleMealOnClick}/>
                         ) : (
-                            <MealGrid meals={meals.filter(meal => meal.name.toLowerCase().includes(searchValue.toLowerCase()))} loading={mealsLoading} failed={mealsFailed} mealOnClick={handleMealOnClick}/>
+                            <MealGrid meals={filteredMeals} loading={mealsLoading} failed={mealsFailed} mealOnClick={handleMealOnClick}/>
                         )}
                     </Stack>
                 );
-            case 1:
+            }
+            case 1: {
                 const precedingMeals = getPrecedingMeals();
                 return (
                     <Stack gap={2} sx={{ flex: 1 }}>
@@ -599,6 +673,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                         )}
                     </Stack>
                 );
+            }
             case 2:
                 return renderNewMealForm();
             default:
