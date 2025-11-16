@@ -33,6 +33,7 @@ export default function PlanWizard() {
     const steps = [
         {
             label: "Choose Meals",
+            shortLabel: "Meals",
             url: "choose",
             next: "ingredients",
             back: null,
@@ -45,6 +46,7 @@ export default function PlanWizard() {
         },
         {
             label: "Check Ingredients",
+            shortLabel: "Ingredients",
             url: "ingredients",
             next: "shopping",
             back: "choose",
@@ -53,6 +55,7 @@ export default function PlanWizard() {
         },
         {
             label: "Shopping List",
+            shortLabel: "Shopping",
             url: "shopping",
             next: null,
             back: "ingredients",
@@ -68,13 +71,21 @@ export default function PlanWizard() {
 
     const stepItems = steps.map(step =>
         <Step key={step.label} component={motion.div} layout>
-            <StepLabel>{step.label}</StepLabel>
+            <StepLabel>{isMobile ? step.shortLabel : step.label}</StepLabel>
         </Step>
     )
 
     return (
         <Box id='container-wizard' sx={{width: '100%'}} component={motion.div} layout>
-            <Stepper id='wizard-stepper' activeStep={activeStep} alternativeLabel sx={{mt: 6, mb: 4}}>
+            <Stepper
+                id='wizard-stepper'
+                activeStep={activeStep}
+                alternativeLabel
+                sx={{
+                    mt: isMobile ? 2 : 6,
+                    mb: isMobile ? 1 : 4
+                }}
+            >
                 {stepItems}
             </Stepper>
             <Stack id='wizard-plan-dates' spacing={2} sx={{paddingLeft: 2, marginBottom: 1}} direction='row' alignItems='end' component={motion.div} layout>

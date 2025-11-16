@@ -1,4 +1,4 @@
-import { Card, CardMedia, Stack, Typography, Box, Chip } from "@mui/material";
+import {Card, CardMedia, Stack, Typography, Box, Chip, useTheme} from "@mui/material";
 import { RestaurantMenu, Add } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import SuggestedMeal from "../../../../../domain/ai/SuggestedMeal.ts";
@@ -10,126 +10,79 @@ interface SuggestedMealCardProps {
 }
 
 export default function SuggestedMealCard({ suggestedMeal, onAddMeal }: SuggestedMealCardProps) {
-    const { meal, rank, suitability_score } = suggestedMeal;
+    const { meal } = suggestedMeal;
 
-    // Format suitability score as percentage
-    const scorePercent = Math.round(suitability_score * 100);
+    const theme = useTheme();
 
     return (
         <Card
             component={motion.div}
             layout
             sx={{
-                backgroundColor: 'secondaryContainer',
-                border: '1px solid',
-                borderColor: 'divider',
+                backgroundColor: 'transparent',
+                border: '2px dashed',
+                borderColor: 'grey.300',
                 borderRadius: 2,
-                cursor: 'pointer',
                 transition: 'all 0.2s',
                 '&:hover': {
-                    boxShadow: 2,
-                    borderColor: 'primary.main'
+                    borderColor: theme.sys.color.tertiary,
+                    backgroundColor: 'grey.50'
                 }
             }}
+            onClick={(e) => {
+                e.stopPropagation();
+                onAddMeal(suggestedMeal);
+            }}
         >
-            <Stack sx={{ p: 1.5 }} spacing={1}>
-                {/* Top Row: Image and Info */}
-                <Stack direction="row" gap={1.5} alignItems="center">
-                    {/* Meal Image/Icon */}
-                    {meal?.image?.url ? (
-                        <CardMedia
-                            sx={{
-                                width: 50,
-                                height: 50,
-                                borderRadius: 1,
-                                flexShrink: 0,
-                                backgroundSize: 'cover'
-                            }}
-                            image={meal.image.url}
-                        />
-                    ) : (
-                        <Box
-                            sx={{
-                                width: 50,
-                                height: 50,
-                                borderRadius: 1,
-                                flexShrink: 0,
-                                backgroundColor: 'grey.100',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <RestaurantMenu sx={{ fontSize: 24, color: 'grey.400' }} />
-                        </Box>
-                    )}
-
-                    <Stack sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography
-                            variant="body2"
-                            noWrap
-                            sx={{ fontWeight: 500 }}
-                        >
-                            {meal?.name}
-                        </Typography>
-                        <Stack direction="row" spacing={0.5} sx={{ mt: 0.5 }}>
-                            <Chip
-                                label={`#${rank}`}
-                                size="small"
-                                sx={{
-                                    height: 20,
-                                    fontSize: '0.7rem',
-                                    fontWeight: 600,
-                                    backgroundColor: 'primary.main',
-                                    color: 'white'
-                                }}
-                            />
-                            <Chip
-                                label={`${scorePercent}%`}
-                                size="small"
-                                sx={{
-                                    height: 20,
-                                    fontSize: '0.7rem',
-                                    backgroundColor: scorePercent >= 80 ? 'success.light' : scorePercent >= 60 ? 'warning.light' : 'grey.300'
-                                }}
-                            />
-                        </Stack>
-                    </Stack>
-
-                    {/* Add Button */}
-                    <IconButton
-                        size="small"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onAddMeal(suggestedMeal);
-                        }}
+            <Stack direction="row" gap={1} alignItems="center" sx={{ p: 1 }}>
+                {/* Meal Image/Icon */}
+                {meal?.image?.url ? (
+                    <CardMedia
                         sx={{
-                            backgroundColor: 'primary.main',
-                            color: 'white',
-                            '&:hover': {
-                                backgroundColor: 'primary.dark'
-                            }
+                            width: 40,
+                            height: 40,
+                            borderRadius: 1,
+                            flexShrink: 0,
+                            backgroundSize: 'cover'
+                        }}
+                        image={meal.image.url}
+                    />
+                ) : (
+                    <Box
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 1,
+                            flexShrink: 0,
+                            backgroundColor: 'grey.100',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}
                     >
-                        <Add fontSize="small" />
-                    </IconButton>
-                </Stack>
-
-                {/* Meal Description (if short enough) */}
-                {meal?.description && meal.description.length < 60 && (
-                    <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden'
-                        }}
-                    >
-                        {meal.description}
-                    </Typography>
+                        <RestaurantMenu sx={{ fontSize: 20, color: 'grey.400' }} />
+                    </Box>
                 )}
+
+                <Typography
+                    noWrap
+                    sx={{ fontWeight: 500 }}
+                >
+                    {meal?.name}
+                </Typography>
+
+                <Box flexGrow={1} />
+
+                {/* Add Button */}
+                <IconButton
+                    size="small"
+                    sx={{
+                        backgroundColor: theme.sys.color.tertiary,
+                        color: theme.sys.color.onPrimary,
+                    }}
+                >
+                    <Add fontSize="small" />
+                </IconButton>
             </Stack>
         </Card>
     );

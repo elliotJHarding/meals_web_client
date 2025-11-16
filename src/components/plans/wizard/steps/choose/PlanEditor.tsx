@@ -16,7 +16,10 @@ import PlanMeal from "../../../../../domain/PlanMeal.ts";
 import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import IconButton from "@mui/material-next/IconButton";
-import AiMealSuggestions from "./AiMealSuggestions.tsx";
+import AiChatInput from "./AiChatInput.tsx";
+import SuggestedMealCard from "./SuggestedMealCard.tsx";
+import SuggestedMeal from "../../../../../domain/ai/SuggestedMeal.ts";
+import { useAiMealChat } from "../../../../../hooks/ai/useAiMealChat.ts";
 
 // Simple debounce implementation
 const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => {
@@ -46,6 +49,17 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
         planMeals: plan.planMeals || []
     });
     const [mealChooserOpen, setMealChooserOpen] = useState(false);
+
+    // AI Chat Hook
+    const {
+        conversationHistory,
+        currentSuggestions,
+        inputMessage,
+        isLoading: aiLoading,
+        setInputMessage,
+        sendMessage,
+        removeSuggestion
+    } = useAiMealChat(plan, mealPlan, meals, calendarEvents);
 
     // Filter calendar events to only show events on the plan date
     const filteredCalendarEvents = calendarEvents.filter(event => {
@@ -154,7 +168,18 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
         // Sync to backend - DO NOT call onPlanUpdate until we're sure the state has updated
         // The parent will eventually get the updated data when needed (e.g., on navigation)
         syncPlanToBackend(updatedPlan);
-};
+    };
+
+    const handleSendAiMessage = () => {
+        sendMessage(inputMessage);
+    };
+
+    const handleAddSuggestedMeal = (suggestedMeal: SuggestedMeal) => {
+        // Remove from suggestions first
+        removeSuggestion(suggestedMeal.meal.id);
+        // Then add to plan
+        handleAddMeal(suggestedMeal.meal, suggestedMeal.meal.serves, false);
+    };
 
     const handleDayClick = (dayPlan: Plan) => {
         navigate(`?from=${mealPlan.from()}&to=${mealPlan.to()}&selected=${MealPlan.formatDate(dayPlan.date)}`);
@@ -297,16 +322,6 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
 
             <Box sx={{ px: 2, pb: 2 }}>
                 <Grid container spacing={2}>
-                    {/* AI Chat Section */}
-                    {/*<Grid xs={12} md={3}>*/}
-                    {/*    <AiMealSuggestions*/}
-                    {/*        plan={plan}*/}
-                    {/*        mealPlan={mealPlan}*/}
-                    {/*        meals={meals}*/}
-                    {/*        calendarEvents={calendarEvents}*/}
-                    {/*        onAddMeal={handleAddMeal}*/}
-                    {/*    />*/}
-                    {/*</Grid>*/}
                     {/* Meals Section */}
                     <Grid xs={12} md={8}>
                         <Stack spacing={2}>
@@ -324,7 +339,7 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
                                                 <EditNoteRounded sx={{ fontSize: '1rem' }}/>
                                             </InputAdornment>
                                         ),
-                                        placeholder: 'Add a note for this day',
+                                        placeholder: 'Note for ' + plan.date.toLocaleDateString('en-gb', {weekday: 'short'}),
                                         sx: { borderRadius: 2 }
                                     }}
                                     sx={{
@@ -353,48 +368,95 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
                                     onClick={() => setMealChooserOpen(true)}
                                     sx={{ borderRadius: 2 }}
                                 >
-                                    Add Meal
+                                    Meal
                                 </Button>
                             </Stack>
 
                             <Divider />
 
-                            {(currentPlan.planMeals || []).length === 0 ? (
-                                <Box
-                                    sx={{
-                                        textAlign: 'center',
-                                        py: 3,
-                                        color: 'text.secondary',
-                                        backgroundColor: 'grey.50',
-                                        borderRadius: 2,
-                                        border: '2px dashed',
-                                        borderColor: 'grey.300'
-                                    }}
-                                >
-                                    <Typography variant="body1" sx={{ mb: 1 }}>
-                                        No meals planned for this day
-                                    </Typography>
-                                    <Button
-                                        variant="text"
-                                        onClick={() => setMealChooserOpen(true)}
-                                        sx={{ textTransform: 'none' }}
-                                    >
-                                        Add your first meal
-                                    </Button>
-                                </Box>
-                            ) : (
-                                <Stack spacing={1}>
-                                    {(currentPlan.planMeals || []).map((planMeal, index) => (
-                                        <MealItem
-                                            key={index}
-                                            planMeal={planMeal}
-                                            onServingsChange={(newServings) => handleServingsChange(index, newServings)}
-                                            onNoteChange={(newNote) => handleMealNoteChange(index, newNote)}
-                                            onRemove={() => handleRemoveMeal(index)}
-                                        />
-                                    ))}
+
+                            <Stack
+                                sx={{
+                                    textAlign: 'center',
+                                    p: 1,
+                                    color: 'text.secondary',
+                                    backgroundColor: 'grey.50',
+                                    borderRadius: 2,
+                                    border: '2px solid',
+                                    borderColor: 'grey.300'
+                                }}
+                                direction='column'
+                                gap={1}
+                            >
+                                {/* AI Chat Input */}
+                                <AiChatInput
+                                    value={inputMessage}
+                                    onChange={setInputMessage}
+                                    onSend={handleSendAiMessage}
+                                    isLoading={aiLoading}
+                                />
+                                <Stack alignItems='start' padding={1}>
+                                    {/* Display latest AI response */}
+                                    {conversationHistory.length > 0 && (() => {
+                                        // Find the last assistant message
+                                        const lastAssistantMessage = [...conversationHistory]
+                                            .reverse()
+                                            .find(msg => msg.role === 'assistant');
+
+                                        return lastAssistantMessage ? (
+                                            <Typography
+                                                variant="body2"
+                                                color="text.primary"
+                                                sx={{
+                                                    mt: 1,
+                                                    textAlign: 'left',
+                                                    whiteSpace: 'pre-wrap'
+                                                }}
+                                            >
+                                                {lastAssistantMessage.content}
+                                            </Typography>
+                                        ) : null;
+                                    })()}
                                 </Stack>
-                            )}
+                                {/* AI Suggested Meals */}
+                                {currentSuggestions.length > 0 && (
+                                    <>
+                                        {currentSuggestions.map((suggestion, index) => (
+                                            <Box key={`ai-${index}`} sx={{ position: 'relative' }}>
+                                                <SuggestedMealCard
+                                                    suggestedMeal={suggestion}
+                                                    onAddMeal={handleAddSuggestedMeal}
+                                                />
+                                            </Box>
+                                        ))}
+                                        {(currentPlan.planMeals || []).length > 0 && (
+                                            <Divider sx={{ my: 1 }} />
+                                        )}
+                                    </>
+                                )}
+                            </Stack>
+
+                            <Stack spacing={1}>
+                                {/* Planned Meals */}
+                                {(currentPlan.planMeals || []).length > 0 && (
+                                    <>
+                                        {currentSuggestions.length > 0 && (
+                                            <Typography variant="caption" fontWeight="600" color="text.secondary" sx={{ mt: 1, ml: 0.5 }}>
+                                                Planned Meals
+                                            </Typography>
+                                        )}
+                                        {(currentPlan.planMeals || []).map((planMeal, index) => (
+                                            <MealItem
+                                                key={`planned-${index}`}
+                                                planMeal={planMeal}
+                                                onServingsChange={(newServings) => handleServingsChange(index, newServings)}
+                                                onNoteChange={(newNote) => handleMealNoteChange(index, newNote)}
+                                                onRemove={() => handleRemoveMeal(index)}
+                                            />
+                                        ))}
+                                    </>
+                                )}
+                            </Stack>
                         </Stack>
                     </Grid>
 
