@@ -1,28 +1,28 @@
 import MealChooser from "../../../../dialog/MealChooser.tsx";
 import MealPlan from "../../../../../domain/MealPlan.ts";
-import {Card, CardMedia, Stack, Typography, useTheme} from "@mui/material";
+import { Card, CardMedia, Stack, Typography, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import Plan from "../../../../../domain/Plan.ts";
-import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
-import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
+import { usePlanCreate } from "../../../../../hooks/plan/usePlanCreate.ts";
+import { usePlanUpdate } from "../../../../../hooks/plan/usePlanUpdate.ts";
 import Meal from "../../../../../domain/Meal.ts";
 import PlanMeal from "../../../../../domain/PlanMeal.ts";
-import {useState} from "react";
-import {usePlanDelete} from "../../../../../hooks/plan/usePlanDelete.ts";
-import {useNavigate} from "react-router-dom";
-import {motion} from "framer-motion";
+import { useState } from "react";
+import { usePlanDelete } from "../../../../../hooks/plan/usePlanDelete.ts";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 import CalendarEvents from "./CalendarEvents.tsx";
 import ServesChip from "../../../../meals/chip/ServesChip.tsx";
 import EffortChip from "../../../../meals/chip/EffortChip.tsx";
 import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
 import IngredientsWarningChip from "../../../../meals/chip/IngredientsWarningChip.tsx";
-import {NotesRounded, Kitchen} from "@mui/icons-material";
+import { NotesRounded, Kitchen } from "@mui/icons-material";
 
 const constant = {
-    imageWidth: 30,
-    imageHeight: 25,
-    imageBorderRadius: 2,
+    imageWidth: 24,
+    imageHeight: 24,
+    imageBorderRadius: 99999,
 }
 
 interface DayItemProps {
@@ -36,11 +36,11 @@ interface DayItemProps {
     calendarEvents: CalendarEvent[],
 }
 
-export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, mealPlan, setMealPlan, calendarEvents}: DayItemProps) {
+export default function DayItem({ index, plan, meals, mealsLoading, mealsFailed, mealPlan, setMealPlan, calendarEvents }: DayItemProps) {
     const [mealChooserOpen, setMealChooserOpen] = useState<boolean>(false);
-    const {createPlan} = usePlanCreate();
-    const {updatePlan} = usePlanUpdate();
-    const {deletePlan} = usePlanDelete();
+    const { createPlan } = usePlanCreate();
+    const { updatePlan } = usePlanUpdate();
+    const { deletePlan } = usePlanDelete();
 
     const navigate = useNavigate();
 
@@ -48,7 +48,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
     // @ts-ignore
     const primary = theme.sys.color.primary;
 
-    const isToday = (plan: Plan) : boolean => {
+    const isToday = (plan: Plan): boolean => {
         const today: Date = new Date();
         return (
             today.getFullYear() === plan.date.getFullYear() &&
@@ -60,13 +60,13 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
     const onClick = () => navigate(`?from=${mealPlan.from()}&to=${mealPlan.to()}&selected=${MealPlan.formatDate(plan.date)}`)
 
     const onDelete = () => {
-        deletePlan(plan, () => setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, plan), {date: plan.date, planMeals: [], shoppingListItems: []}])));
+        deletePlan(plan, () => setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, plan), { date: plan.date, planMeals: [], shoppingListItems: [] }])));
     }
 
-    const Note = ({note}: {note: string}) => {
+    const Note = ({ note }: { note: string }) => {
         return (
             <Stack direction='row' gap={1}>
-                <NotesRounded/>
+                <NotesRounded />
                 <Typography
                     variant='body1'
                     color='text.secondary'
@@ -81,16 +81,16 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
         )
     }
 
-    const MealComponent = ({planMeal, setMealChooserOpen} : {planMeal: PlanMeal, setMealChooserOpen : (open: boolean) => void}) => {
+    const MealComponent = ({ planMeal, setMealChooserOpen }: { planMeal: PlanMeal, setMealChooserOpen: (open: boolean) => void }) => {
         const meal = planMeal.meal;
         const hasIngredients = !meal || meal.ingredients?.length > 0;
 
         return (
             <Stack>
-                {planMeal.note && <Typography  sx={{color: 'text.secondary', mb: 0, mt: 0.5, fontWeight: 'bold'}}>{planMeal.note}</Typography>}
+                {planMeal.note && <Typography sx={{ color: 'text.secondary', mb: 0, mt: 0.5, fontWeight: 'bold' }}>{planMeal.note}</Typography>}
 
-                <Card onClick={() => setMealChooserOpen(true)} sx={{backgroundColor: hasIngredients ? 'secondaryContainer' : 'warningContainer', my: 0.3}}>
-                    <Stack direction="row" gap={1} sx={{padding: 1}}>
+                <Box onClick={() => setMealChooserOpen(true)}>
+                    <Stack direction="row" gap={1} sx={{ padding: 1 }}>
                         {planMeal.leftovers ? (
                             <Box
                                 sx={{
@@ -104,7 +104,7 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                                     justifyContent: 'center'
                                 }}
                             >
-                                <Kitchen sx={{ fontSize: 20, color: 'onPrimary' }} />
+                                <Kitchen sx={{ fontSize: 14, color: 'onPrimary' }} />
                             </Box>
                         ) : meal?.image?.url ? (
                             <CardMedia
@@ -118,8 +118,8 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                                 image={meal.image.url}
                             />
                         ) : null}
-                        <Typography noWrap={true} sx={{cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
-                                    onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
+                        <Typography noWrap={true} sx={{ cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
+                            onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
                             {meal?.name}{planMeal.leftovers ? ' Leftovers' : ''}
                         </Typography>
 
@@ -138,34 +138,34 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                             <PrepTimeChip prepTimeMinutes={meal?.prepTimeMinutes} size="small" />
                         </Box>
                     </Stack>
-                </Card>
+                </Box>
             </Stack>
         );
     }
 
 
     return (
-        <motion.tr layout key={index} style={{borderBottom: '1px solid #e0e0e0', borderRadius: 5, verticalAlign: 'middle'}}
-                   whileHover={{scale: 1.01, opacity: 0.8, cursor: 'pointer'}} onClick={onClick}>
+        <motion.tr layout key={index} style={{ borderBottom: '1px solid #e0e0e0', borderRadius: 5, verticalAlign: 'middle' }}
+            whileHover={{ scale: 1.01, opacity: 0.8, cursor: 'pointer' }} onClick={onClick}>
             <MealChooser meals={meals}
-                         mealsLoading={mealsLoading}
-                         mealsFailed={mealsFailed}
-                         open={mealChooserOpen}
-                         setOpen={setMealChooserOpen}
-                         onConfirm={(meal) => {
-                             const newPlanMeal: PlanMeal = { meal, requiredServings: meal.serves };
-                             const newPlan = {...plan, planMeals: [...(plan.planMeals || []), newPlanMeal]}
-                             if (newPlan.id == null) {
-                                 createPlan(newPlan, (returnedPlan) =>
-                                     setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, plan), returnedPlan]))
-                                 )
-                             } else {
-                                 updatePlan(newPlan, ()=> console.log("Updated plan"))
-                                 setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, plan), newPlan]))
-                             }
-                         }}
+                mealsLoading={mealsLoading}
+                mealsFailed={mealsFailed}
+                open={mealChooserOpen}
+                setOpen={setMealChooserOpen}
+                onConfirm={(meal) => {
+                    const newPlanMeal: PlanMeal = { meal, requiredServings: meal.serves };
+                    const newPlan = { ...plan, planMeals: [...(plan.planMeals || []), newPlanMeal] }
+                    if (newPlan.id == null) {
+                        createPlan(newPlan, (returnedPlan) =>
+                            setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, plan), returnedPlan]))
+                        )
+                    } else {
+                        updatePlan(newPlan, () => console.log("Updated plan"))
+                        setMealPlan(new MealPlan([...MealPlan.filterOutPlan(mealPlan.plans, plan), newPlan]))
+                    }
+                }}
             />
-            <motion.td layout style={{paddingRight: '0.3rem'}}>
+            <motion.td layout style={{ paddingRight: '0.3rem' }}>
                 <Typography component={motion.div} layout variant='h6' align="center" sx={{
                     backgroundColor: isToday(plan) ? primary : 'transparent',
                     width: '2rem',
@@ -174,23 +174,23 @@ export default function DayItem({index, plan, meals, mealsLoading, mealsFailed, 
                     my: 0.5,
                     color: isToday(plan) ? 'white' : 'textSecondary',
                 }}>
-                    {plan.date.toLocaleDateString('en-gb', {day: 'numeric'})}
+                    {plan.date.toLocaleDateString('en-gb', { day: 'numeric' })}
                 </Typography>
             </motion.td>
-            <motion.td layout style={{paddingRight: '0.6rem'}}>
+            <motion.td layout style={{ paddingRight: '0.6rem' }}>
                 <Typography color={isToday(plan) ? primary : 'textSecondary'}
-                            sx={{fontFamily: 'Montserrat'}} component={motion.div} layout>
-                    {plan.date.toLocaleDateString('en-gb', {weekday: 'short'})}
+                    sx={{ fontFamily: 'Montserrat' }} component={motion.div} layout>
+                    {plan.date.toLocaleDateString('en-gb', { weekday: 'short' })}
                 </Typography>
             </motion.td>
-            <motion.td layout style={{width:'100%'}}>
-                <Box sx={{padding: 0}} component={motion.div} layout>
+            <motion.td layout style={{ width: '100%' }}>
+                <Box sx={{ padding: 0 }} component={motion.div} layout>
                     {plan.note && (
-                        <Note note={plan.note}/>
+                        <Note note={plan.note} />
                     )}
                     {
                         plan.planMeals?.map((planMeal, i) =>
-                            <MealComponent key={i} planMeal={planMeal} setMealChooserOpen={setMealChooserOpen}/>
+                            <MealComponent key={i} planMeal={planMeal} setMealChooserOpen={setMealChooserOpen} />
                         ) || []
                     }
                 </Box>
