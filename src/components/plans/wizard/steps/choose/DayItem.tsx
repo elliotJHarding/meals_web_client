@@ -89,7 +89,7 @@ export default function DayItem({ index, plan, meals, mealsLoading, mealsFailed,
             <Stack>
                 {planMeal.note && <Typography sx={{ color: 'text.secondary', mb: 0, mt: 0.5, fontWeight: 'bold' }}>{planMeal.note}</Typography>}
 
-                <Box onClick={() => setMealChooserOpen(true)}>
+                <Box>
                     <Stack direction="row" gap={1} sx={{ padding: 1 }}>
                         {planMeal.leftovers ? (
                             <Box
@@ -118,7 +118,7 @@ export default function DayItem({ index, plan, meals, mealsLoading, mealsFailed,
                                 image={meal.image.url}
                             />
                         ) : null}
-                        <Typography noWrap={true} sx={{ cursor: 'pointer', fontWeight: 500, alignContent: 'center' }}
+                        <Typography noWrap={true} sx={{ cursor: 'pointer', fontWeight: 'bold', alignContent: 'center' }}
                             onClick={(e) => { e.stopPropagation(); navigate(`/meals/${meal.id}`); }}>
                             {meal?.name}{planMeal.leftovers ? ' Leftovers' : ''}
                         </Typography>
@@ -132,10 +132,10 @@ export default function DayItem({ index, plan, meals, mealsLoading, mealsFailed,
                             mt: 0.2,
                             flexWrap: 'wrap'
                         }}>
-                            <IngredientsWarningChip meal={meal} size="small" />
-                            <EffortChip effort={meal?.effort} size="small" />
+                            {/* <IngredientsWarningChip meal={meal} size="small" />
+                            <EffortChip effort={meal?.effort} size="small" /> */}
                             <ServesChip serves={planMeal.requiredServings} size="small" />
-                            <PrepTimeChip prepTimeMinutes={meal?.prepTimeMinutes} size="small" />
+                            {/* <PrepTimeChip prepTimeMinutes={meal?.prepTimeMinutes} size="small" /> */}
                         </Box>
                     </Stack>
                 </Box>

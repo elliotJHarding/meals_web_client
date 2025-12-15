@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import {Stack, Step, StepLabel, Stepper, Typography, useMediaQuery, useTheme} from "@mui/material";
 import {useNavigate, useParams, useSearchParams} from "react-router-dom";
-import ChooseMeals from "./steps/choose/ChooseMeals.tsx";
+import ChooseMealsV2 from "./steps/choose/ChooseMealsV2.tsx";
 import {useMeals} from "../../../hooks/meal/useMeals.ts";
 import Button from "@mui/material-next/Button";
 import {ArrowBackIos, ArrowForwardIos, Check} from "@mui/icons-material";
@@ -37,12 +37,13 @@ export default function PlanWizard() {
             url: "choose",
             next: "ingredients",
             back: null,
-            component: <ChooseMeals mealPlan={mealPlan}
-                                    from={from} to={to} selected={selected}
-                                    setMealPlan={setMealPlan}
-                                    meals={meals}
-                                    mealsLoading={loading}
-                                    mealsFailed={failed}/>,
+            component: <ChooseMealsV2 mealPlan={mealPlan}
+                                      from={from} to={to}
+                                      selected={selected}
+                                      setMealPlan={setMealPlan}
+                                      meals={meals}
+                                      mealsLoading={loading}
+                                      mealsFailed={failed}/>,
         },
         {
             label: "Check Ingredients",

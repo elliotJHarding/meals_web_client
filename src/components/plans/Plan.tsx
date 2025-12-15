@@ -53,7 +53,7 @@ export default function DayPlan({ plan }: { plan: Plan }) {
                                 <RestaurantMenu sx={{ fontSize: 24, color: 'grey.400' }} />
                             </Box>
                         )}
-                        <Typography variant='h6'>
+                        <Typography variant='h5' fontWeight={'bolder'}>
                             {meal?.name || 'Unknown Meal'}{planMeal.leftovers ? ' Leftovers' : ''}
                         </Typography>
                     </Stack>

@@ -67,7 +67,7 @@ export default function AiChatInput({ value, onChange, onSend, isLoading, disabl
                             borderColor: 'transparent',
                         },
                         '&.Mui-focused fieldset': {
-                            borderColor: theme.sys.color.secondaryContainer,
+                            borderColor: theme.sys.color.tertiary,
                         },
                     },
                 }}
