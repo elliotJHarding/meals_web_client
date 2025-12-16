@@ -93,6 +93,11 @@ export default function App() {
                     checkedIcon: <CheckCircle/>,
                 }
             },
+            MuiButton: {
+              defaultProps: {
+                  
+              }
+            },
             MuiSwitch: {
                 defaultProps: {
                     style: {

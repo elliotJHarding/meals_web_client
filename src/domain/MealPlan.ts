@@ -35,6 +35,19 @@ export default class MealPlan {
         return MealPlan.formatDate(this.plans[this.plans.length - 1].date);
     }
 
+    getAdjacentDates(date: Date): { next: Date | null, prev: Date | null } {
+        const index = this.plans.findIndex(p =>
+            p.date.getTime() === date.getTime()
+        );
+
+        if (index === -1) return { next: null, prev: null };
+
+        return {
+            next: this.plans[index + 1]?.date || null,
+            prev: this.plans[index - 1]?.date || null
+        };
+    }
+
     // Helper method to filter out a plan by both date and ID to prevent duplicates
     static filterOutPlan(plans: Plan[], planToRemove: Plan): Plan[] {
         return plans.filter(p => {

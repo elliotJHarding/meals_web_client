@@ -57,7 +57,7 @@ export default function WeekProgressStrip({
         const mealCount = planMeals.length;
         return {
             date: plan.date,
-            dayName: plan.date.toLocaleDateString('en-gb', { weekday: isMobile ? 'short' : 'long' }),
+            dayName: plan.date.toLocaleDateString('en-gb', { weekday: isMobile ? 'short' : 'short' }),
             dayNumber: plan.date.getDate(),
             mealCount,
             planMeals,
@@ -67,8 +67,21 @@ export default function WeekProgressStrip({
         };
     });
 
-    const renderMealIndicator = (planMeals: PlanMeal[], isSelected: boolean) => {
+    const renderMealIndicator = (planMeals: PlanMeal[], isSelected: boolean, hasNote: boolean) => {
         if (planMeals.length === 0) {
+            // Show a dot if there's a note, otherwise show a dash
+            if (hasNote) {
+                return (
+                    <Box
+                        sx={{
+                            width: 5,
+                            height: 5,
+                            borderRadius: '50%',
+                            bgcolor: isSelected ? theme.sys.color.onPrimary : theme.sys.color.secondary
+                        }}
+                    />
+                );
+            }
             return (
                 <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
                     -
@@ -159,10 +172,10 @@ export default function WeekProgressStrip({
                         component={motion.div} layout
                         sx={{
                             cursor: 'pointer',
-                            minWidth: { xs: 50, md: 80 },
+                            minWidth: { xs: 50, md: 50 },
                             px: { xs: 0.5, md: 1.5 },
                             py: { xs: 1, md: 1.5 },
-                            borderRadius: 2,
+                            borderRadius: 5,
                             bgcolor: item.isSelected ? theme.sys.color.primary : 'transparent',
                             border: item.isToday && !item.isSelected ? `2px solid ${theme.sys.color.tertiary}` : '2px solid transparent',
                             transition: 'background-color 0.2s ease, border-color 0.2s ease',
@@ -171,7 +184,7 @@ export default function WeekProgressStrip({
                             }
                         }}
                     >
-                        <Stack spacing={0.3} alignItems="center">
+                        <Stack alignItems="center">
                             {/* Day Name */}
                             <Typography
                                 variant="caption"
@@ -179,7 +192,8 @@ export default function WeekProgressStrip({
                                     fontSize: { xs: '0.6rem', md: '0.7rem' },
                                     fontWeight: 600,
                                     color: item.isSelected ? theme.sys.color.onPrimary : 'text.secondary',
-                                    textTransform: 'uppercase'
+                                    textTransform: 'uppercase',
+                                    mb: 0.3
                                 }}
                             >
                                 {item.dayName}
@@ -194,6 +208,7 @@ export default function WeekProgressStrip({
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
+                                    mb: 0.7,
                                     bgcolor: item.isSelected ? theme.sys.color.onPrimary : (item.isToday ? theme.sys.color.tertiaryContainer : 'transparent')
                                 }}
                             >
@@ -219,20 +234,8 @@ export default function WeekProgressStrip({
                                         justifyContent: 'center'
                                     }}
                                 >
-                                    {renderMealIndicator(item.planMeals, item.isSelected)}
+                                    {renderMealIndicator(item.planMeals, item.isSelected, item.hasNote)}
                                 </Box>
-                            )}
-
-                            {/* Note Indicator */}
-                            {item.hasNote && (
-                                <Box
-                                    sx={{
-                                        width: 4,
-                                        height: 4,
-                                        borderRadius: '50%',
-                                        bgcolor: item.isSelected ? theme.sys.color.onPrimary : theme.sys.color.secondary
-                                    }}
-                                />
                             )}
                         </Stack>
                     </Box>
@@ -240,12 +243,13 @@ export default function WeekProgressStrip({
                 {/* Week Overview Button */}
                 <Box
                     onClick={() => onDaySelect(null)}
+                    component={motion.div} layout
                     sx={{
                         cursor: 'pointer',
                         minWidth: { xs: 50, md: 80 },
                         px: { xs: 0.5, md: 1.5 },
                         py: { xs: 1, md: 1.5 },
-                        borderRadius: 2,
+                        borderRadius: 5,
                         bgcolor: isWeekOverviewSelected ? theme.sys.color.primary : 'transparent',
                         border: '2px solid transparent',
                         transition: 'background-color 0.2s ease, border-color 0.2s ease',
@@ -254,9 +258,10 @@ export default function WeekProgressStrip({
                         }
                     }}
                 >
-                    <Stack spacing={0.3} alignItems="center">
+                    <Stack  spacing={0.3} alignItems="center">
                         <Typography
                             variant="caption"
+
                             sx={{
                                 fontSize: { xs: '0.6rem', md: '0.7rem' },
                                 fontWeight: 600,

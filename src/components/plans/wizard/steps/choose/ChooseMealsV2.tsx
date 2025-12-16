@@ -1,7 +1,7 @@
 import {Card} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import Meal from "../../../../../domain/Meal.ts";
-import {motion} from "framer-motion";
+import {motion, AnimatePresence, PanInfo} from "framer-motion";
 import {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import WeekProgressStrip from "./WeekProgressStrip.tsx";
@@ -34,6 +34,7 @@ export default function ChooseMealsV2({
 
     // Default to week overview (null)
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [swipeDirection, setSwipeDirection] = useState<number>(0);
 
     // Sync URL parameter with local state
     useEffect(() => {
@@ -70,6 +71,32 @@ export default function ChooseMealsV2({
         }
     };
 
+    const handleSwipe = (info: PanInfo) => {
+        if (!selectedDate) return;
+
+        const swipeThreshold = 50;
+        const velocityThreshold = 500;
+        const { offset, velocity } = info;
+
+        if (Math.abs(offset.x) > swipeThreshold || Math.abs(velocity.x) > velocityThreshold) {
+            const adjacentDates = mealPlan.getAdjacentDates(selectedDate);
+
+            if (offset.x > 0) {
+                // Swiped right → previous day
+                if (adjacentDates.prev) {
+                    setSwipeDirection(1); // Exit right, enter from left
+                    handleDaySelect(adjacentDates.prev);
+                }
+            } else {
+                // Swiped left → next day
+                if (adjacentDates.next) {
+                    setSwipeDirection(-1); // Exit left, enter from right
+                    handleDaySelect(adjacentDates.next);
+                }
+            }
+        }
+    };
+
     return (
         <Card
             component={motion.div}
@@ -86,31 +113,66 @@ export default function ChooseMealsV2({
                 onDaySelect={handleDaySelect}
             />
 
-            {/* Conditional Rendering: Week Overview or Day View - With layout animation */}
-            <motion.div layout>
+            {/* Conditional Rendering: Week Overview or Day View - With scale/fade transition */}
+            <AnimatePresence mode="wait">
                 {selectedDate === null ? (
-                    <WeekOverview
-                        mealPlan={mealPlan}
-                        onDayClick={handleDaySelect}
-                        calendarEvents={calendarEvents}
-                        meals={meals}
-                        mealsLoading={mealsLoading}
-                        mealsFailed={mealsFailed}
-                        setMealPlan={setMealPlan}
-                    />
+                    <motion.div
+                        key="week-overview"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{
+                            duration: 0.2,
+                            ease: "easeInOut"
+                        }}
+                    >
+                        <WeekOverview
+                            mealPlan={mealPlan}
+                            onDayClick={handleDaySelect}
+                            calendarEvents={calendarEvents}
+                            meals={meals}
+                            mealsLoading={mealsLoading}
+                            mealsFailed={mealsFailed}
+                            setMealPlan={setMealPlan}
+                        />
+                    </motion.div>
                 ) : selectedPlan && (
-                    <DayView
+                    <motion.div
                         key={selectedPlan.date.toISOString()}
-                        plan={selectedPlan}
-                        mealPlan={mealPlan}
-                        meals={meals}
-                        mealsLoading={mealsLoading}
-                        mealsFailed={mealsFailed}
-                        onPlanUpdate={handlePlanUpdate}
-                        calendarEvents={calendarEvents}
-                    />
+                        initial={{
+                            opacity: 0,
+                            scale: 0.95,
+                            x: swipeDirection === -1 ? 100 : swipeDirection === 1 ? -100 : 0
+                        }}
+                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                        exit={{
+                            opacity: 0,
+                            scale: 0.95,
+                            x: swipeDirection === -1 ? -100 : swipeDirection === 1 ? 100 : 0
+                        }}
+                        transition={{
+                            duration: 0.2,
+                            ease: "easeInOut"
+                        }}
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.2}
+                        onDragEnd={(event, info) => handleSwipe(info)}
+                        whileDrag={{ cursor: "grabbing" }}
+                        onAnimationComplete={() => setSwipeDirection(0)}
+                    >
+                        <DayView
+                            plan={selectedPlan}
+                            mealPlan={mealPlan}
+                            meals={meals}
+                            mealsLoading={mealsLoading}
+                            mealsFailed={mealsFailed}
+                            onPlanUpdate={handlePlanUpdate}
+                            calendarEvents={calendarEvents}
+                        />
+                    </motion.div>
                 )}
-            </motion.div>
+            </AnimatePresence>
         </Card>
     );
 }
