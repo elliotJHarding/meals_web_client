@@ -209,14 +209,14 @@ export default function WeekProgressStrip({
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     mb: 0.7,
-                                    bgcolor: item.isSelected ? theme.sys.color.onPrimary : (item.isToday ? theme.sys.color.tertiaryContainer : 'transparent')
+                                    bgcolor: item.isSelected ? theme.sys.color.onPrimary : (item.isToday ? theme.sys.color.primary : 'transparent')
                                 }}
                             >
                                 <Typography
                                     variant="body1"
                                     sx={{
                                         fontWeight: 'bold',
-                                        color: item.isSelected ? theme.sys.color.primary : (item.isToday ? theme.sys.color.onTertiaryContainer : 'text.primary'),
+                                        color: item.isSelected ? theme.sys.color.primary : (item.isToday ? theme.sys.color.onPrimary : 'text.primary'),
                                         fontSize: { xs: '0.85rem', md: '0.95rem' }
                                     }}
                                 >
