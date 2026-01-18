@@ -1,16 +1,18 @@
 import {Card, CardMedia, Stack, Typography, Box, Chip, useTheme} from "@mui/material";
 import { RestaurantMenu, Add } from "@mui/icons-material";
 import { motion } from "framer-motion";
-import SuggestedMeal from "../../../../../domain/ai/SuggestedMeal.ts";
+import {SuggestedMeal, MealDto} from "@harding/meals-api";
 import IconButton from "@mui/material-next/IconButton";
 
 interface SuggestedMealCardProps {
     suggestedMeal: SuggestedMeal;
+    meals: MealDto[];
     onAddMeal: (suggestedMeal: SuggestedMeal) => void;
 }
 
-export default function SuggestedMealCard({ suggestedMeal, onAddMeal }: SuggestedMealCardProps) {
-    const { meal } = suggestedMeal;
+export default function SuggestedMealCard({ suggestedMeal, meals, onAddMeal }: SuggestedMealCardProps) {
+    // Look up the full meal object using mealId
+    const meal = meals.find(m => m.id === suggestedMeal.mealId);
 
     const theme = useTheme();
 
@@ -20,10 +22,11 @@ export default function SuggestedMealCard({ suggestedMeal, onAddMeal }: Suggeste
             layout
             sx={{
                 backgroundColor: 'transparent',
-                border: '2px dashed',
+                border: '1px dashed',
                 borderColor: 'grey.300',
-                borderRadius: 2,
+                borderRadius: 1.5,
                 transition: 'all 0.2s',
+                cursor: 'pointer',
                 '&:hover': {
                     borderColor: theme.sys.color.tertiary,
                     backgroundColor: 'grey.50'
@@ -34,14 +37,14 @@ export default function SuggestedMealCard({ suggestedMeal, onAddMeal }: Suggeste
                 onAddMeal(suggestedMeal);
             }}
         >
-            <Stack direction="row" gap={1} alignItems="center" sx={{ p: 1 }}>
+            <Stack direction="row" gap={0.75} alignItems="center" sx={{ px: 0.75, py: 0.5 }}>
                 {/* Meal Image/Icon */}
                 {meal?.image?.url ? (
                     <CardMedia
                         sx={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: 1,
+                            width: 28,
+                            height: 28,
+                            borderRadius: 0.75,
                             flexShrink: 0,
                             backgroundSize: 'cover'
                         }}
@@ -50,9 +53,9 @@ export default function SuggestedMealCard({ suggestedMeal, onAddMeal }: Suggeste
                 ) : (
                     <Box
                         sx={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: 1,
+                            width: 28,
+                            height: 28,
+                            borderRadius: 0.75,
                             flexShrink: 0,
                             backgroundColor: 'grey.100',
                             display: 'flex',
@@ -60,15 +63,16 @@ export default function SuggestedMealCard({ suggestedMeal, onAddMeal }: Suggeste
                             justifyContent: 'center'
                         }}
                     >
-                        <RestaurantMenu sx={{ fontSize: 20, color: 'grey.400' }} />
+                        <RestaurantMenu sx={{ fontSize: 16, color: 'grey.400' }} />
                     </Box>
                 )}
 
                 <Typography
+                    variant="body2"
                     noWrap
                     sx={{ fontWeight: 500 }}
                 >
-                    {meal?.name}
+                    {suggestedMeal.mealName || meal?.name}
                 </Typography>
 
                 <Box flexGrow={1} />
@@ -77,11 +81,13 @@ export default function SuggestedMealCard({ suggestedMeal, onAddMeal }: Suggeste
                 <IconButton
                     size="small"
                     sx={{
+                        width: 24,
+                        height: 24,
                         backgroundColor: theme.sys.color.tertiary,
                         color: theme.sys.color.onPrimary,
                     }}
                 >
-                    <Add fontSize="small" />
+                    <Add sx={{ fontSize: 16 }} />
                 </IconButton>
             </Stack>
         </Card>

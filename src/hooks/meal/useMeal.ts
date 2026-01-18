@@ -1,12 +1,12 @@
-import Meal from "../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import {useEffect, useState} from "react";
 import MealRepository from "../../repository/MealRepository.ts";
 import {useLocation} from "react-router-dom";
 
 export const useMeal = (mealIdParam: string | undefined): {
-    meal: Meal | null,
+    meal: MealDto | null,
     setMeal: any,
-    newMeal: Meal | null,
+    newMeal: MealDto | null,
     setNewMeal: any,
     loading: boolean,
     failed: boolean
@@ -17,7 +17,7 @@ export const useMeal = (mealIdParam: string | undefined): {
     const [loading, setLoading] = useState<boolean>(true);
     const [failed, setFailed] = useState<boolean>(false);
 
-    const [meal, setMeal]: [meal: Meal | null, any] = useState({
+    const [meal, setMeal]: [meal: MealDto | null, any] = useState({
         name: "",
         description: "",
         serves: 2,
@@ -26,7 +26,7 @@ export const useMeal = (mealIdParam: string | undefined): {
         tags: []
     });
 
-    const [newMeal, setNewMeal]: [meal: Meal | null, any] = useState({
+    const [newMeal, setNewMeal]: [meal: MealDto | null, any] = useState({
         name: "",
         description: "",
         serves: 2,
@@ -42,7 +42,7 @@ export const useMeal = (mealIdParam: string | undefined): {
         } else {
             return param;
         }
-    }
+    };
 
     const safeParam: string = parseParam(mealIdParam);
 
@@ -62,21 +62,21 @@ export const useMeal = (mealIdParam: string | undefined): {
 
             setLoading(false);
         } else {
-            const mealId = BigInt(safeParam);
+            const mealId = Number(safeParam);
 
             repository.getMeal(
                 mealId,
                 (fetchedMeal) => {
-                    setMeal(fetchedMeal)
-                    setNewMeal(fetchedMeal)
-                    setLoading(false)
+                    setMeal(fetchedMeal);
+                    setNewMeal(fetchedMeal);
+                    setLoading(false);
                 },
                 () => {
                     setFailed(true);
                 }
             );
         }
-    }, [])
+    }, []);
 
     return {meal, setMeal, newMeal, setNewMeal, loading, failed};
 }

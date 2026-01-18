@@ -10,7 +10,7 @@ import Box from "@mui/material/Box";
 import PrepTimeChip from "./chip/PrepTimeChip.tsx";
 import ServesChip from "./chip/ServesChip.tsx";
 import EffortChip from "./chip/EffortChip.tsx";
-import Meal from "../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import {useState} from "react";
 import IconButton from "@mui/material-next/IconButton";
 import {Add, Edit, ImageOutlined, Person, Remove, Timer} from "@mui/icons-material";
@@ -18,7 +18,7 @@ import {FormControl, InputLabel} from "@mui/material";
 import {Chip, Slider} from "@mui/material-next";
 import {formatPrepTime} from "../common/Utils.ts";
 import MenuItem from "@mui/material/MenuItem";
-import Effort from "../../domain/Effort.ts";
+import {Effort} from "@harding/meals-api";
 import Grid from "@mui/material/Unstable_Grid2";
 import Button from "@mui/material-next/Button";
 import ButtonGroup from "@mui/material-next/ButtonGroup";
@@ -39,9 +39,9 @@ const constant = {
 }
 
 export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initialEdit, mealId, loading}: {
-    meal: Meal,
+    meal: MealDto,
     setMeal: any,
-    newMeal: Meal,
+    newMeal: MealDto,
     setNewMeal: any,
     initialEdit: boolean | undefined,
     mealId: string | undefined,
@@ -87,8 +87,8 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
 
     const handleNameOnChange = (newName : string) => setNewMeal({...newMeal, name: newName});
     const handlePrepTimeOnChange = (newPrepTime : number) => setNewMeal({...newMeal, prepTimeMinutes: newPrepTime});
-    const handleServesIncrease = () => newMeal.serves < 100 && setNewMeal({...newMeal, serves: newMeal.serves + 1});
-    const handleServesDecrease = () => newMeal.serves > 1 && setNewMeal({...newMeal, serves: newMeal.serves - 1});
+    const handleServesIncrease = () => (newMeal.serves ?? 2) < 100 && setNewMeal({...newMeal, serves: (newMeal.serves ?? 2) + 1});
+    const handleServesDecrease = () => (newMeal.serves ?? 2) > 1 && setNewMeal({...newMeal, serves: (newMeal.serves ?? 2) - 1});
     const handleEffortOnChange = (newEffort : Effort) => setNewMeal({...newMeal, effort: newEffort});
     const handleDescOnChange = (newDesc: string) => setNewMeal({...newMeal, description: newDesc});
     const handleTagsOnChange = (tagIds: number[]) => {
@@ -162,8 +162,8 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
                             {meal.name}
                         </Typography>
                         <Box sx={{display: 'flex', gap: 1}} component={motion.div} layout='position'>
-                            <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'medium'}/>
-                            <ServesChip serves={meal.serves} size={'medium'}/>
+                            <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes ?? 30} size={'medium'}/>
+                            <ServesChip serves={meal.serves ?? 2} size={'medium'}/>
                             {meal.effort != undefined && <EffortChip effort={meal.effort} size={'medium'}/>}
                         </Box>
                         {meal.description != '' && <Typography component={motion.div} layout='position'>{meal.description}</Typography>}
@@ -215,13 +215,13 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
                     />
                     <Stack spacing={1} direction='row' alignItems='center'>
                         <Timer/>
-                        <Typography>{formatPrepTime(newMeal.prepTimeMinutes)}</Typography>
+                        <Typography>{formatPrepTime(newMeal.prepTimeMinutes ?? 30)}</Typography>
                         <Slider
                             step={5}
                             min={5}
                             marks
                             max={120}
-                            value={newMeal.prepTimeMinutes}
+                            value={newMeal.prepTimeMinutes ?? 30}
                             defaultValue={30}
                             onChange={(_event: any, value: number) => handlePrepTimeOnChange(value)}
                         />
@@ -229,7 +229,7 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
                     <Stack spacing={1} direction='row' alignItems='center'>
                         <IconButton size='small' onClick={handleServesDecrease}><Remove/></IconButton>
                         <Person/>
-                        <Typography>{newMeal.serves}</Typography>
+                        <Typography>{newMeal.serves ?? 2}</Typography>
                         <IconButton size='small' onClick={handleServesIncrease}><Add/></IconButton>
                         <FormControl fullWidth>
                             <InputLabel id="effort-label">Effort</InputLabel>
@@ -254,12 +254,12 @@ export default function MealDetails({meal, setMeal, newMeal, setNewMeal, initial
                                 multiple
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {selected.map((value: number) => (
+                                        {(selected ?? []).map((value: number | undefined) => value !== undefined && (
                                             <Chip key={value} label={findTag(value)?.name}/>
                                         ))}
                                     </Box>
                                 )}
-                                value={newMeal.tags.map(tag => tag.id)}
+                                value={(newMeal.tags ?? []).map(tag => tag.id)}
                                 onChange={(event) => handleTagsOnChange(event.target.value as number[])}
                             >
                                 {tags.map(tag => <MenuItem value={tag.id}>{tag.name}</MenuItem>)}

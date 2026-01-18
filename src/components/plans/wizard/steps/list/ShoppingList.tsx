@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import {ContentCopy} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
-import {shortFormat} from "../../../../../domain/Ingredient.ts";
+import {shortFormat} from "../../../../../utils/IngredientUtils.ts";
 import {useState} from "react";
 import Switch from "@mui/material-next/Switch";
 

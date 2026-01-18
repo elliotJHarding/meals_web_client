@@ -4,22 +4,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import Button from "@mui/material-next/Button";
 import IconButton from "@mui/material-next/IconButton";
-import Plan from "../../../../../domain/Plan.ts";
-import Meal from "../../../../../domain/Meal.ts";
-import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
+import {PlanDto} from "@harding/meals-api";
+import {MealDto} from "@harding/meals-api";
+import {CalendarEventDto} from "@harding/meals-api";
 import MealPlan from "../../../../../domain/MealPlan.ts";
-import ChatMessage from "../../../../../domain/ai/ChatMessage.ts";
-import SuggestedMeal from "../../../../../domain/ai/SuggestedMeal.ts";
-import MealPlanChatRequest from "../../../../../domain/ai/MealPlanChatRequest.ts";
+import {ChatMessage} from "@harding/meals-api";
+import {SuggestedMeal} from "@harding/meals-api";
+import {DayMealPlanChatRequest} from "@harding/meals-api";
 import AiRepository from "../../../../../repository/AiRepository.ts";
 import SuggestedMealCard from "./SuggestedMealCard.tsx";
 
 interface AiMealSuggestionsProps {
-    plan: Plan;
+    plan: PlanDto;
     mealPlan: MealPlan;
-    meals: Meal[];
-    calendarEvents: CalendarEvent[];
-    onAddMeal: (meal: Meal, servings: number, leftovers: boolean) => void;
+    meals: MealDto[];
+    calendarEvents: CalendarEventDto[];
+    onAddMeal: (meal: MealDto, servings: number, leftovers: boolean) => void;
 }
 
 export default function AiMealSuggestions({
@@ -61,17 +61,11 @@ export default function AiMealSuggestions({
         setInputMessage("");
         setIsLoading(true);
 
-        // Prepare request - serialize dates to avoid backend parsing issues
-        const request: MealPlanChatRequest = {
-            dayOfWeek: plan.date.toISOString().split('T')[0],
-            calendarEvents: filteredCalendarEvents.map(event => ({
-                ...event,
-                time: event.time.toISOString()
-            })) as any,
-            currentWeekPlan: mealPlan.plans.map(p => ({
-                ...p,
-                date: p.date.toISOString()
-            })) as any,
+        // Prepare request - dates are already strings in DTOs
+        const request: DayMealPlanChatRequest = {
+            dayOfWeek: plan.date!,
+            calendarEvents: filteredCalendarEvents,
+            currentWeekPlan: mealPlan.plans,
             recentMealPlans: [], // Could be enhanced to fetch recent plans
             availableMeals: meals,
             conversationHistory: updatedHistory,
@@ -108,7 +102,11 @@ export default function AiMealSuggestions({
     };
 
     const handleAddSuggestedMeal = (suggestedMeal: SuggestedMeal) => {
-        onAddMeal(suggestedMeal.meal, suggestedMeal.meal.serves, false);
+        // Find the meal from the meals array using mealId
+        const meal = meals.find(m => m.id === suggestedMeal.mealId);
+        if (meal) {
+            onAddMeal(meal, meal.serves ?? 2, false);
+        }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -213,6 +211,7 @@ export default function AiMealSuggestions({
                                         <SuggestedMealCard
                                             key={index}
                                             suggestedMeal={suggestion}
+                                            meals={meals}
                                             onAddMeal={handleAddSuggestedMeal}
                                         />
                                     ))}

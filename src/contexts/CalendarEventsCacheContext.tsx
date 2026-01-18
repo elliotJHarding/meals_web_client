@@ -1,8 +1,8 @@
 import React, { createContext, useState, useContext } from "react";
-import CalendarEvent from "../domain/CalendarEvent.ts";
+import {CalendarEventDto} from "@harding/meals-api";
 
 interface CachedCalendarEvents {
-    events: CalendarEvent[];
+    events: CalendarEventDto[];
     cachedAt: number;
     from: string;
     to: string;
@@ -10,8 +10,8 @@ interface CachedCalendarEvents {
 }
 
 export interface CalendarEventsCacheContextType {
-    getCachedEvents: (from: string, to: string) => CalendarEvent[] | null;
-    setCachedEvents: (from: string, to: string, events: CalendarEvent[], isAuthorized: boolean) => void;
+    getCachedEvents: (from: string, to: string) => CalendarEventDto[] | null;
+    setCachedEvents: (from: string, to: string, events: CalendarEventDto[], isAuthorized: boolean) => void;
     hasCachedEvents: (from: string, to: string, ttlMs?: number) => boolean;
     getCachedAuthStatus: (from: string, to: string) => boolean | null;
     invalidateCache: () => void;
@@ -25,10 +25,10 @@ const CalendarEventsCacheContext = createContext<CalendarEventsCacheContextType>
     invalidateCache: () => {}
 });
 
-export function CalendarEventsCacheProvider({ 
+export function CalendarEventsCacheProvider({
     children,
     defaultTtlMs = 5 * 60 * 1000 // 5 minutes default TTL
-}: { 
+}: {
     children: React.ReactNode;
     defaultTtlMs?: number;
 }) {
@@ -38,13 +38,13 @@ export function CalendarEventsCacheProvider({
         return `${from}_${to}`;
     };
 
-    const getCachedEvents = (from: string, to: string): CalendarEvent[] | null => {
+    const getCachedEvents = (from: string, to: string): CalendarEventDto[] | null => {
         const key = getCacheKey(from, to);
         const cached = cache.get(key);
         return cached ? cached.events : null;
     };
 
-    const setCachedEvents = (from: string, to: string, events: CalendarEvent[], isAuthorized: boolean): void => {
+    const setCachedEvents = (from: string, to: string, events: CalendarEventDto[], isAuthorized: boolean): void => {
         const key = getCacheKey(from, to);
         const newCache = new Map(cache);
         newCache.set(key, {

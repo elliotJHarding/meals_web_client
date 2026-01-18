@@ -1,7 +1,7 @@
 import {Box, Stack, Typography, useMediaQuery, useTheme, Avatar} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import {CalendarViewWeek, RestaurantMenu, Kitchen} from "@mui/icons-material";
-import PlanMeal from "../../../../../domain/PlanMeal.ts";
+import {PlanMealDto} from "@harding/meals-api";
 import {motion} from "framer-motion";
 
 interface WeekProgressStripProps {
@@ -17,7 +17,7 @@ interface DayStripItem {
     dayName: string;
     dayNumber: number;
     mealCount: number;
-    planMeals: PlanMeal[];
+    planMeals: PlanMealDto[];
     isSelected: boolean;
     isToday: boolean;
     hasNote: boolean;
@@ -67,7 +67,7 @@ export default function WeekProgressStrip({
         };
     });
 
-    const renderMealIndicator = (planMeals: PlanMeal[], isSelected: boolean, hasNote: boolean) => {
+    const renderMealIndicator = (planMeals: PlanMealDto[], isSelected: boolean, hasNote: boolean) => {
         if (planMeals.length === 0) {
             // Show a dot if there's a note, otherwise show a dash
             if (hasNote) {
@@ -83,7 +83,7 @@ export default function WeekProgressStrip({
                 );
             }
             return (
-                <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+                <Typography variant="caption" color={isSelected ? theme.sys.color.onPrimary : theme.sys.color.secondary} sx={{ fontSize: '1.0rem' }}>
                     -
                 </Typography>
             );
@@ -98,19 +98,21 @@ export default function WeekProgressStrip({
                 {visibleMeals.map((planMeal, i) => {
                     const meal = planMeal.meal;
                     const hasImage = meal?.image?.url;
+                    // Leftovers always show Kitchen icon, never the image (matching overview behavior)
+                    const showImage = hasImage && !planMeal.leftovers;
 
                     return (
                         <Avatar
                             key={i}
-                            src={hasImage ? meal.image.url : undefined}
+                            src={showImage ? meal.image.url : undefined}
                             sx={{
                                 width: { xs: 16, md: 18 },
                                 height: { xs: 16, md: 18 },
-                                bgcolor: planMeal.leftovers ? theme.sys.color.tertiary : (hasImage ? 'transparent' : 'grey.300'),
+                                bgcolor: planMeal.leftovers ? theme.sys.color.tertiary : (showImage ? 'transparent' : 'grey.300'),
                                 border: isSelected ? `1px solid ${theme.sys.color.onPrimary}` : 'none'
                             }}
                         >
-                            {!hasImage && (
+                            {!showImage && (
                                 planMeal.leftovers ? (
                                     <Kitchen sx={{ fontSize: { xs: 10, md: 12 }, color: theme.sys.color.onTertiary }} />
                                 ) : (

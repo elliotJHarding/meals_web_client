@@ -1,17 +1,16 @@
 import {useEffect, useState} from "react";
-import {Recipe} from "../../../domain/Recipe.ts";
 import Button from "@mui/material-next/Button";
 import {Cancel, Check, Language, Link} from "@mui/icons-material";
 import {InputAdornment, Skeleton, Stack, TextField, Typography} from "@mui/material";
-import Meal from "../../../domain/Meal.ts";
+import {MealDto, RecipeDto} from "@harding/meals-api";
 import IconButton from "@mui/material-next/IconButton";
 import {MetaData} from "../../../repository/MetaDataRepository.ts";
 import {useMetadataLookup} from "../../../hooks/useMetadataLookup.ts";
 
-export default function RecipeLink({recipe, newMeal, setNewMeal, onConfirm} : {recipe: Recipe | undefined, newMeal: Meal | undefined, setNewMeal : any, onConfirm: () => void}) {
+export default function RecipeLink({recipe, newMeal, setNewMeal, onConfirm} : {recipe: RecipeDto | undefined, newMeal: MealDto | undefined, setNewMeal : any, onConfirm: () => void}) {
     const {lookupMetadata, loading} = useMetadataLookup();
     useEffect(() => {
-            newMeal?.recipe != null && lookupMetadata(newMeal.recipe.url, (metaData) => setRecipeMetadata(metaData))
+            newMeal?.recipe?.url != null && lookupMetadata(newMeal.recipe.url, (metaData) => setRecipeMetadata(metaData))
         }
     , [newMeal]);
 
@@ -28,7 +27,7 @@ export default function RecipeLink({recipe, newMeal, setNewMeal, onConfirm} : {r
     const handleConfirm = () => {
         setEdit(false);
         onConfirm();
-        newMeal?.recipe != null && lookupMetadata(newMeal.recipe.url, (metaData) => setRecipeMetadata(metaData));
+        newMeal?.recipe?.url != null && lookupMetadata(newMeal.recipe.url, (metaData) => setRecipeMetadata(metaData));
     }
 
     const skeleton =

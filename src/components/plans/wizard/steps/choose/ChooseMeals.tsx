@@ -1,7 +1,7 @@
-import {Card, Stack, Alert, CircularProgress, TextField, useMediaQuery, useTheme, Typography, CardMedia} from "@mui/material";
+import {Card, Stack, useMediaQuery, useTheme, Typography, CardMedia} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import Box from "@mui/material/Box";
-import Meal from "../../../../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import {LayoutGroup, motion} from "framer-motion";
 import DayItem from "./DayItem.tsx";
 import ServesChip from "../../../../meals/chip/ServesChip.tsx";
@@ -9,15 +9,13 @@ import EffortChip from "../../../../meals/chip/EffortChip.tsx";
 import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
 import IngredientsWarningChip from "../../../../meals/chip/IngredientsWarningChip.tsx";
 import {useCalendarEvents} from "../../../../../hooks/calendar/useCalendarEvents.ts";
-import Plan from "../../../../../domain/Plan.ts";
-import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
+import {PlanDto} from "@harding/meals-api";
+import {CalendarEventDto} from "@harding/meals-api";
 import CalendarEvents from "./CalendarEvents.tsx";
 import {CalendarMonth, NotesRounded, RestaurantMenu, Kitchen} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import {useLinkCalendar} from "../../../../../hooks/calendar/useLinkCalendar.ts";
 import PlanEditor from "./PlanEditor.tsx";
-import {useAiGeneration} from "../../../../../hooks/plan/useAiGeneration.ts";
-import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 
 export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, meals, mealsLoading, mealsFailed}: {
@@ -26,7 +24,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
     from: string | null,
     to: string | null,
     selected: string | null,
-    meals: Meal[],
+    meals: MealDto[],
     mealsLoading: boolean,
     mealsFailed: boolean,
 }) {
@@ -35,32 +33,19 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const {calendarEvents, isAuthorized} = useCalendarEvents(from || '', to || '');
     const {authorizeCalendar} = useLinkCalendar();
-    const {generateMealPlan, loading: aiLoading, failed: aiFailed} = useAiGeneration();
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-    const [promptText, setPromptText] = useState("");
-    const selectedPlan : Plan | undefined = mealPlan.findPlan(selected)
+    const selectedPlan : PlanDto | undefined = mealPlan.findPlan(selected)
 
-    const filterEventsByPlan = (events: CalendarEvent[], plan: Plan) : CalendarEvent[] => {
-        return events.filter(event =>
-            event.time !== null && plan.date !== null &&
-            event.time.getDate() === plan.date.getDate() &&
-            event.time.getMonth() === plan.date.getMonth() &&
-            event.time.getFullYear() === plan.date.getFullYear()
-        );
-    }
-
-    const handleAiGenerate = () => {
-        if (mealPlan.plans.length === 0) return;
-        
-        const startDate = mealPlan.plans[0].date;
-        const endDate = mealPlan.plans[mealPlan.plans.length - 1].date;
-        
-        generateMealPlan(startDate, endDate, promptText, (generatedPlans) => {
-            setMealPlan(new MealPlan(generatedPlans));
-            setShowSuccessMessage(true);
-            setTimeout(() => setShowSuccessMessage(false), 3000);
+    const filterEventsByPlan = (events: CalendarEventDto[], plan: PlanDto) : CalendarEventDto[] => {
+        if (!plan.date) return [];
+        const planDate = new Date(plan.date);
+        return events.filter(event => {
+            if (!event.time) return false;
+            const eventDate = new Date(event.time);
+            return eventDate.getDate() === planDate.getDate() &&
+                   eventDate.getMonth() === planDate.getMonth() &&
+                   eventDate.getFullYear() === planDate.getFullYear();
         });
-    };
+    }
 
     const LinkCalendarButton = () =>
         <Stack direction="column" spacing={2} alignItems="center" justifyContent="center" sx={{width: isMobile ? '100%' : '40%', mt: isMobile ? 2 : 0}}>
@@ -108,17 +93,18 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
     const navigate = useNavigate();
 
     const MobileDayItem = ({ plan, calendarEvents }: {
-        plan: Plan,
-        calendarEvents: CalendarEvent[]
+        plan: PlanDto,
+        calendarEvents: CalendarEventDto[]
     }) => {
         const onClick = () => navigate(`?from=${mealPlan.from()}&to=${mealPlan.to()}&selected=${MealPlan.formatDate(plan.date)}`);
-        
-        const isToday = (plan: Plan): boolean => {
+
+        const isToday = (plan: PlanDto): boolean => {
             const today: Date = new Date();
+            const planDate = new Date(plan.date);
             return (
-                today.getFullYear() === plan.date.getFullYear() &&
-                today.getMonth() === plan.date.getMonth() &&
-                today.getDate() === plan.date.getDate()
+                today.getFullYear() === planDate.getFullYear() &&
+                today.getMonth() === planDate.getMonth() &&
+                today.getDate() === planDate.getDate()
             )
         }
 
@@ -130,6 +116,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                     p: 2,
                     cursor: 'pointer',
                     borderRadius: 3,
+                    // @ts-ignore - theme.sys is from MD3 theme
                     border: isToday(plan) ? `2px solid ${theme.sys.color.primary}` : '1px solid rgba(0,0,0,0.12)',
                     background: isToday(plan) ? 'rgba(25, 118, 210, 0.04)' : 'background.paper',
                     boxShadow: isToday(plan) ? '0 2px 8px rgba(25, 118, 210, 0.15)' : '0 1px 3px rgba(0,0,0,0.1)'
@@ -142,6 +129,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                     {/* Date Header */}
                     <Stack direction="row" alignItems="center" spacing={2}>
                         <Typography variant='h6' align="center" sx={{
+                            // @ts-ignore - theme.sys is from MD3 theme
                             backgroundColor: isToday(plan) ? theme.sys.color.primary : 'transparent',
                             width: '2rem',
                             height: '2rem',
@@ -152,17 +140,18 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                             color: isToday(plan) ? 'white' : 'text.secondary',
                             fontWeight: 'bold'
                         }}>
-                            {plan.date.getDate()}
+                            {new Date(plan.date).getDate()}
                         </Typography>
-                        <Typography 
-                            variant="h6" 
-                            sx={{ 
+                        <Typography
+                            variant="h6"
+                            sx={{
                                 fontFamily: 'Montserrat',
+                                // @ts-ignore - theme.sys is from MD3 theme
                                 color: isToday(plan) ? theme.sys.color.primary : 'text.secondary',
                                 fontWeight: 500
                             }}
                         >
-                            {plan.date.toLocaleDateString('en-gb', { weekday: 'long' })}
+                            {new Date(plan.date).toLocaleDateString('en-gb', { weekday: 'long' })}
                         </Typography>
 
                         {/* Plan Note */}
@@ -189,7 +178,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
                         <Stack spacing={1}>
                             {plan.planMeals.map((planMeal, index) => (
                                 <Card key={index} sx={{
-                                    backgroundColor: planMeal.meal.ingredients.length > 0 ? 'secondaryContainer' : 'warningContainer',
+                                    backgroundColor: (planMeal.meal.ingredients?.length ?? 0) > 0 ? 'secondaryContainer' : 'warningContainer',
                                     border: 'none',
                                     boxShadow: 'none'
                                 }}>
@@ -311,7 +300,7 @@ export default function ChooseMeals({mealPlan, from, to, selected, setMealPlan, 
               exit={{x: 100, opacity: 0 }}>
             {selectedPlan ? (
                 <PlanEditor
-                    key={selectedPlan.date.toISOString()}
+                    key={new Date(selectedPlan.date).toISOString()}
                     plan={selectedPlan}
                     mealPlan={mealPlan}
                     meals={meals}

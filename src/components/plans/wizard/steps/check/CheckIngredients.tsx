@@ -6,20 +6,25 @@ import {useEffect, useReducer} from "react";
 import Box from "@mui/material/Box";
 import {DoorSlidingOutlined, KitchenOutlined, ShoppingCartOutlined} from "@mui/icons-material";
 import ingredientChecksReducer, {SetItemsAction} from "../../../../../reducer/IngredientChecksReducer.ts";
-import ShoppingListItem, {sortShoppingListItems} from "../../../../../domain/ShoppingListItem.ts";
+import {sortShoppingListItems} from "../../../../../utils/ShoppingListUtils.ts";
 import {usePlansUpdate} from "../../../../../hooks/plan/usePlansUpdate.ts";
-import Plan from "../../../../../domain/Plan.ts";
+import {PlanDto, ShoppingListItemDto} from "@harding/meals-api";
+
+// Extended type to track which plan each shopping list item belongs to
+type ShoppingListItemWithPlanId = ShoppingListItemDto & { planId?: number };
 
 export default function CheckIngredients({mealPlan, setMealPlan} : {mealPlan: MealPlan, setMealPlan: any}) {
 
-    const initialState = (mp: MealPlan) => mp.plans
+    const initialState = (mp: MealPlan): ShoppingListItemWithPlanId[] => mp.plans
         .map(plan => {
-            plan.shoppingListItems != null &&
-                plan.shoppingListItems.forEach(item => item.planId = plan.id);
-            return plan;
+            const itemsWithPlanId: ShoppingListItemWithPlanId[] = (plan.shoppingListItems ?? []).map(item => ({
+                ...item,
+                planId: plan.id
+            }));
+            return itemsWithPlanId;
         })
-        .flatMap(plan => plan.shoppingListItems)
-        .filter(item => item?.ingredient?.name !=    null)
+        .flat()
+        .filter(item => item?.ingredient?.name != null)
         .sort(sortShoppingListItems);
 
     const [ingredientsChecked, dispatch] = useReducer(ingredientChecksReducer, mealPlan, initialState);
@@ -30,7 +35,7 @@ export default function CheckIngredients({mealPlan, setMealPlan} : {mealPlan: Me
         dispatch(new SetItemsAction(initialState(mealPlan)))
     }, [mealPlan])
 
-    const toComponents = (items: ShoppingListItem[]) => items
+    const toComponents = (items: ShoppingListItemWithPlanId[]) => items
         .map(item =>
             <IngredientCheck ingredient={item.ingredient}
                              checked={item.checked}
@@ -38,10 +43,10 @@ export default function CheckIngredients({mealPlan, setMealPlan} : {mealPlan: Me
                              syncPlans={syncPlans}/>
         )
 
-    const syncPlans = (items: ShoppingListItem[]) => {
+    const syncPlans = (items: ShoppingListItemWithPlanId[]) => {
         const groupedItems = Map.groupBy(items, item => item.planId);
 
-        const newPlans = mealPlan.plans.map(plan => ({...plan, shoppingListItems: groupedItems.get(plan.id)} as Plan));
+        const newPlans = mealPlan.plans.map(plan => ({...plan, shoppingListItems: groupedItems.get(plan.id) ?? []} as PlanDto));
 
         setMealPlan({...mealPlan, plans: newPlans});
 

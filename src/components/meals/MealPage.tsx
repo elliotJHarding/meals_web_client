@@ -30,7 +30,7 @@ export default function MealPage() {
 
     const handleDelete = () => {
         if (meal?.id) {
-            deleteMeal(meal.id, () => {
+            deleteMeal(BigInt(meal.id), () => {
                 setDeleteDialogOpen(false);
                 navigate('/meals');
             });

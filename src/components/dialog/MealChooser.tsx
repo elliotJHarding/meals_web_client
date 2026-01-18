@@ -1,4 +1,4 @@
-import Meal from "../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import {Dialog, Stack, useMediaQuery, useTheme, Typography, TextField, Select, FormControl, InputLabel, MenuItem, CircularProgress, Card, CardActionArea, CardMedia, Collapse} from "@mui/material";
 import SearchBar from "../common/SearchBar.tsx";
 import {useState, useEffect} from "react";
@@ -13,22 +13,22 @@ import IconButton from "@mui/material-next/IconButton";
 import {useMealCreate} from "../../hooks/meal/useMealCreate.ts";
 import {useTags} from "../../hooks/tags/useTags.ts";
 import {formatPrepTime} from "../common/Utils.ts";
-import Effort from "../../domain/Effort.ts";
+import {Effort} from "@harding/meals-api";
 import {AnimatePresence, motion} from "framer-motion";
 import PrepTimeChip from "../meals/chip/PrepTimeChip.tsx";
 import EffortChip from "../meals/chip/EffortChip.tsx";
 import MealPlan from "../../domain/MealPlan.ts";
-import Plan from "../../domain/Plan.ts";
+import {PlanDto} from "@harding/meals-api";
 
 export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoading, mealsFailed, mealPlan, currentPlan}: {
     open: boolean,
     setOpen: (open: boolean) => void,
-    onConfirm: (meal: Meal, servings: number, leftovers: boolean) => void,
-    meals: Meal[]
+    onConfirm: (meal: MealDto, servings: number, leftovers: boolean) => void,
+    meals: MealDto[]
     mealsLoading: boolean,
     mealsFailed: boolean,
     mealPlan?: MealPlan,
-    currentPlan?: Plan
+    currentPlan?: PlanDto
 }) {
 
     const [searchValue, setSearchValue] = useState<string>('');
@@ -40,7 +40,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
     const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     // New meal form state
-    const [newMeal, setNewMeal] = useState<Meal>({
+    const [newMeal, setNewMeal] = useState<MealDto>({
         name: '',
         description: '',
         serves: 2,
@@ -61,7 +61,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
     }, [newMeal.name]);
 
     const {tags, findTag} = useTags();
-    const {createMeal, loading: creatingMeal} = useMealCreate((createdMeal: Meal) => {
+    const {createMeal, loading: creatingMeal} = useMealCreate((createdMeal: MealDto) => {
         // Reset form
         setNewMeal({
             name: '',
@@ -74,20 +74,22 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
         setDebouncedMealName('');
         // Close dialog and notify parent
         setOpen(false);
-        onConfirm(createdMeal);
+        onConfirm(createdMeal, createdMeal.serves ?? 2, false);
         setSearchValue('');
         setTabValue(0);
         setMobileView('menu');
     });
 
-    const getPrecedingMeals = (): Meal[] => {
+    const getPrecedingMeals = (): MealDto[] => {
         if (!mealPlan || !currentPlan) return [];
 
-        const precedingPlans = mealPlan.plans.filter(p =>
-            p.date.getTime() < currentPlan.date.getTime()
-        );
+        const currentDate = new Date(currentPlan.date!);
+        const precedingPlans = mealPlan.plans.filter(p => {
+            const planDate = new Date(p.date!);
+            return planDate.getTime() < currentDate.getTime();
+        });
 
-        const mealsMap = new Map<string, Meal>();
+        const mealsMap = new Map<string, MealDto>();
         precedingPlans.forEach(plan => {
             plan.planMeals?.forEach(planMeal => {
                 if (planMeal.meal && planMeal.meal.id) {
@@ -99,17 +101,17 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
         return Array.from(mealsMap.values());
     };
 
-    const handleMealOnClick = (meal: Meal) => {
+    const handleMealOnClick = (meal: MealDto) => {
         setOpen(false);
-        onConfirm(meal, meal.serves, false);
+        onConfirm(meal, meal.serves ?? 2, false);
         setSearchValue('');
         setTabValue(0);
         setMobileView('menu');
         setLeftoverServings({});
     }
 
-    const handleLeftoverClick = (meal: Meal) => {
-        const mealId = meal.id?.toString() || meal.name;
+    const handleLeftoverClick = (meal: MealDto) => {
+        const mealId = meal.id?.toString() || meal.name!;
         const servings = leftoverServings[mealId] || 1;
         setOpen(false);
         onConfirm(meal, servings, true);
@@ -119,13 +121,13 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
         setLeftoverServings({});
     };
 
-    const getLeftoverServings = (meal: Meal): number => {
-        const mealId = meal.id?.toString() || meal.name;
+    const getLeftoverServings = (meal: MealDto): number => {
+        const mealId = meal.id?.toString() || meal.name!;
         return leftoverServings[mealId] || 1;
     };
 
-    const setLeftoverServingsForMeal = (meal: Meal, servings: number) => {
-        const mealId = meal.id?.toString() || meal.name;
+    const setLeftoverServingsForMeal = (meal: MealDto, servings: number) => {
+        const mealId = meal.id?.toString() || meal.name!;
         setLeftoverServings(prev => ({ ...prev, [mealId]: servings }));
     };
 
@@ -148,8 +150,8 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
     const handleNameChange = (newName: string) => setNewMeal({...newMeal, name: newName});
     const handleDescriptionChange = (newDesc: string) => setNewMeal({...newMeal, description: newDesc});
     const handlePrepTimeChange = (newPrepTime: number) => setNewMeal({...newMeal, prepTimeMinutes: newPrepTime});
-    const handleServesIncrease = () => newMeal.serves < 100 && setNewMeal({...newMeal, serves: newMeal.serves + 1});
-    const handleServesDecrease = () => newMeal.serves > 1 && setNewMeal({...newMeal, serves: newMeal.serves - 1});
+    const handleServesIncrease = () => (newMeal.serves ?? 2) < 100 && setNewMeal({...newMeal, serves: (newMeal.serves ?? 2) + 1});
+    const handleServesDecrease = () => (newMeal.serves ?? 2) > 1 && setNewMeal({...newMeal, serves: (newMeal.serves ?? 2) - 1});
     const handleEffortChange = (newEffort: Effort | undefined) => setNewMeal({...newMeal, effort: newEffort});
     const handleTagsChange = (tagIds: number[]) => {
         setNewMeal({...newMeal, tags: tagIds.map(id => findTag(id)).filter(tag => tag !== undefined) as typeof newMeal.tags})
@@ -249,7 +251,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                                                     {meal.name}
                                                 </Typography>
                                                 <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                                    <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'small'}/>
+                                                    <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes ?? 30} size={'small'}/>
                                                     {meal.effort && <EffortChip effort={meal.effort} size={'small'}/>}
                                                 </Box>
                                             </Box>
@@ -271,13 +273,13 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
             />
             <Stack spacing={1} direction='row' alignItems='center'>
                 <Timer/>
-                <Typography sx={{ minWidth: 60 }}>{formatPrepTime(newMeal.prepTimeMinutes)}</Typography>
+                <Typography sx={{ minWidth: 60 }}>{formatPrepTime(newMeal.prepTimeMinutes ?? 30)}</Typography>
                 <Slider
                     step={5}
                     min={5}
                     marks
                     max={120}
-                    value={newMeal.prepTimeMinutes}
+                    value={newMeal.prepTimeMinutes ?? 30}
                     onChange={(_event: Event, value: number | number[]) => handlePrepTimeChange(Array.isArray(value) ? value[0] : value)}
                     disabled={creatingMeal}
                     sx={{ flex: 1 }}
@@ -288,7 +290,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                     <Remove/>
                 </IconButton>
                 <Person/>
-                <Typography sx={{ minWidth: 20 }}>{newMeal.serves}</Typography>
+                <Typography sx={{ minWidth: 20 }}>{newMeal.serves ?? 2}</Typography>
                 <IconButton size='small' onClick={handleServesIncrease} disabled={creatingMeal}>
                     <Add/>
                 </IconButton>
@@ -316,12 +318,12 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                     multiple
                     renderValue={(selected) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selected.map((value: number) => (
+                            {(selected ?? []).map((value: number | undefined) => value !== undefined && (
                                 <Chip key={value} label={findTag(value)?.name}/>
                             ))}
                         </Box>
                     )}
-                    value={newMeal.tags.map(tag => tag.id)}
+                    value={(newMeal.tags ?? []).map(tag => tag.id)}
                     onChange={(event) => handleTagsChange(event.target.value as number[])}
                     disabled={creatingMeal}
                 >
@@ -521,7 +523,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
         }
     };
 
-    const renderLeftoverItem = (meal: Meal) => {
+    const renderLeftoverItem = (meal: MealDto) => {
         const servings = getLeftoverServings(meal);
 
         return (
@@ -570,7 +572,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                             {meal.name} Leftovers
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
-                            <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'small'}/>
+                            <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes ?? 30} size={'small'}/>
                             {meal.effort && <EffortChip effort={meal.effort} size={'small'}/>}
                         </Box>
                     </Box>

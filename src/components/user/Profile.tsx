@@ -5,10 +5,12 @@ import {GroupAdd, Groups3, Mail} from "@mui/icons-material";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import {useGroup} from "../../hooks/group/useGroup.ts";
 import Button from "@mui/material-next/Button";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import InviteDialog from "../dialog/InviteDialog.tsx";
 import {useCalendars} from "../../hooks/calendar/useCalendars.ts";
-import Calendar from "../../domain/Calendar.ts";
+import {useLinkCalendar} from "../../hooks/calendar/useLinkCalendar.ts";
+import {Calendar} from "@harding/meals-api";
+import CalendarRepository from "../../repository/CalendarRepository.ts";
 import {motion} from "framer-motion";
 
 export default function Profile() {
@@ -19,29 +21,84 @@ export default function Profile() {
 
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
-    const {calendars, setCalendars, updateActiveCalendars} = useCalendars();
+    // Check authorization status
+    const [isAuthorized, setIsAuthorized] = useState<boolean>(true);
+    const [authLoading, setAuthLoading] = useState<boolean>(true);
+    const { authorizeCalendar, authorizing } = useLinkCalendar();
+
+    const {calendars, setCalendars, loading, updateActiveCalendars} = useCalendars();
+
+    useEffect(() => {
+        const repository = new CalendarRepository();
+        repository.isAuthorized((authorized) => {
+            setIsAuthorized(authorized);
+            setAuthLoading(false);
+        });
+    }, []);
 
     const CalendarItem = ({calendar} : {calendar: Calendar}) => {
         const onClick = () => {
-            setCalendars(calendars.map(c => c.id == calendar.id ? {...c, active: !c.active} : c));
-            updateActiveCalendars(calendars.filter(c => c.active).map(c => c.id))
+            // Calculate the new calendars array with the toggled item
+            const updatedCalendars = calendars.map(c => c.id == calendar.id ? {...c, active: !c.active} : c);
+
+            // Update local state
+            setCalendars(updatedCalendars);
+
+            // Send the correct active calendar IDs to backend
+            const activeCalendarIds = updatedCalendars.filter(c => c.active).map(c => c.id);
+            updateActiveCalendars(activeCalendarIds);
         }
+
         return (
-            <Card sx={{paddingX: 1, cursor: 'pointer'}} onClick={onClick} component={motion.div}
-                  whileHover={{scale: 1.01}}
-                  whileTap={{scale: 0.99}}
-                  transition={{type: "spring", stiffness: 400, damping: 17}}>
-                <Stack direction={'row'} key={calendar.id} gap={1} alignItems={'center'}>
-                    <Box sx={{width: 20, height: 20, backgroundColor: calendar.colour, borderRadius: 99999}}/>
-                    <Typography sx={{padding: 1}}>{calendar.name}</Typography>
-                    <Box sx={{flexGrow: 1}}/>
-                    <Checkbox checked={calendar.active}/>
+            <Box
+                sx={{
+                    py: 0.75,
+                    px: 1.25,
+                    backgroundColor: calendar.active ? 'transparent' : 'grey.50',
+                    borderRadius: 2,
+                    border: '2px solid',
+                    borderColor: calendar.active ? 'tertiary' : 'grey.200',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    opacity: calendar.active ? 1 : 0.6,
+                    boxShadow: calendar.active ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
+                }}
+                onClick={onClick}
+                component={motion.div}
+                whileHover={{scale: 1.01, opacity: 1}}
+                whileTap={{scale: 0.99}}
+                transition={{type: "spring", stiffness: 400, damping: 17}}
+            >
+                <Stack direction="row" gap={1} alignItems="center">
+                    <Box sx={{
+                        width: 20,
+                        height: 20,
+                        backgroundColor: calendar.colour,
+                        borderRadius: 1,
+                        border: '2px solid',
+                        borderColor: calendar.active ? calendar.colour : 'grey.400',
+                        opacity: calendar.active ? 1 : 0.7
+                    }} />
+                    <Typography
+                        variant="body2"
+                        fontWeight={calendar.active ? "600" : "500"}
+                        color={calendar.active ? "text.primary" : "text.secondary"}
+                    >
+                        {calendar.name}
+                    </Typography>
+                    <Box sx={{flexGrow: 1}} />
+                    <Checkbox
+                        checked={calendar.active}
+                        size="small"
+                        sx={{
+                            color: calendar.active ? 'tertiary' : 'grey.400',
+                            padding: 0.5
+                        }}
+                    />
                 </Stack>
-            </Card>
+            </Box>
         )
     }
-
-    const calendarItems = calendars.map(calendar => <CalendarItem calendar={calendar}/>)
 
     const onInvite = () => {
         createGroup(uuid => setGroup({uuid: uuid, users: []}));
@@ -83,14 +140,82 @@ export default function Profile() {
             </Card>
             <Card>
                 <Box sx={{padding: 3}}>
-                    <Stack gap={1}>
-                        <Stack direction={'row'} gap={2} alignItems={'center'}>
-                            <CalendarMonthIcon/>
-                            <Typography variant={'h5'}>Linked Calendars</Typography>
+                    <Stack gap={2}>
+                        <Stack direction="row" gap={2} alignItems="center">
+                            <CalendarMonthIcon />
+                            <Typography variant="h5">Linked Calendars</Typography>
+                            <Box sx={{flexGrow: 1}} />
+                            {!authLoading && (
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <Box sx={{
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: '50%',
+                                        backgroundColor: isAuthorized ? 'success.main' : 'error.main'
+                                    }} />
+                                    <Typography variant="body2" fontWeight="600" color="text.secondary">
+                                        {isAuthorized ? 'Connected' : 'Not Connected'}
+                                    </Typography>
+                                </Stack>
+                            )}
                         </Stack>
-                        <Stack gap={1}>
-                            {calendarItems}
-                        </Stack>
+
+                        {(loading || authLoading) ? (
+                            <Box sx={{
+                                p: 2,
+                                backgroundColor: 'grey.50',
+                                borderRadius: 2,
+                                border: '2px solid',
+                                borderColor: 'grey.200'
+                            }}>
+                                <Typography variant="body2" color="text.secondary" align="center">
+                                    Loading...
+                                </Typography>
+                            </Box>
+                        ) : !isAuthorized ? (
+                            /* State 1: Not Authorized */
+                            <Box sx={{
+                                p: 2,
+                                backgroundColor: 'grey.50',
+                                borderRadius: 2,
+                                border: '2px solid',
+                                borderColor: 'grey.200'
+                            }}>
+                                <Stack spacing={2} alignItems="center">
+                                    <Typography variant="body2" color="text.secondary" align="center">
+                                        Connect your Google Calendar to link calendars and enable calendar-based features
+                                    </Typography>
+                                    <Button
+                                        variant="outlined"
+                                        size="medium"
+                                        startIcon={<CalendarMonthIcon />}
+                                        onClick={authorizeCalendar}
+                                        disabled={authorizing}
+                                        sx={{ borderRadius: 2 }}
+                                    >
+                                        {authorizing ? 'Connecting...' : 'Connect Google Calendar'}
+                                    </Button>
+                                </Stack>
+                            </Box>
+                        ) : calendars.length === 0 ? (
+                            /* State 2: Authorized but No Calendars */
+                            <Box sx={{
+                                p: 2,
+                                backgroundColor: 'grey.50',
+                                borderRadius: 2,
+                                border: '2px solid',
+                                borderColor: 'grey.200'
+                            }}>
+                                <Typography variant="body2" color="text.secondary" align="center">
+                                    No calendars found. Make sure you have calendars in your Google account.
+                                </Typography>
+                            </Box>
+                        ) : (
+                            /* State 3: Authorized with Calendars */
+                            <Stack gap={0.5}>
+                                {calendars.map(calendar => <CalendarItem key={calendar.id} calendar={calendar} />)}
+                            </Stack>
+                        )}
                     </Stack>
                 </Box>
             </Card>

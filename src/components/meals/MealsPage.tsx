@@ -10,7 +10,7 @@ import {Add, Tune} from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material-next/Button";
 import {useNavigate} from "react-router-dom";
-import Meal from "../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import NewMealDialog from "../dialog/NewMealDialog.tsx";
 
 export default function MealsPage() {
@@ -29,7 +29,7 @@ export default function MealsPage() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const handleMealOnClick = (meal: Meal) => navigate(`${meal.id}`)
+    const handleMealOnClick = (meal: MealDto) => navigate(`${meal.id}`)
 
     const handleNewMealOnClick = () => setNewMealOpen(true);
 

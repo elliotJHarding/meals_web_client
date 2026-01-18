@@ -1,9 +1,9 @@
-import Meal from "../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import {useEffect, useState} from "react";
 import MealRepository from "../../repository/MealRepository.ts";
 import { useMealsCache } from "../../contexts/MealsCacheContext.tsx";
 
-export const useMeals = () : {meals : Meal[], setMeals : any, loading : boolean, failed: boolean} => {
+export const useMeals = () : {meals : MealDto[], setMeals : any, loading : boolean, failed: boolean} => {
 
     const repository = new MealRepository();
     const { getCachedMeals, setCachedMeals, hasCachedMeals } = useMealsCache();
@@ -11,15 +11,15 @@ export const useMeals = () : {meals : Meal[], setMeals : any, loading : boolean,
     const [loading, setLoading] = useState<boolean>(!hasCachedMeals());
     const [failed, setFailed] = useState<boolean>(false);
 
-    const [meals, setMeals] : [meals : Meal[], any] = useState(getCachedMeals());
+    const [meals, setMeals] : [meals : MealDto[], any] = useState(getCachedMeals());
 
     // Helper function to compare meals arrays
-    const mealsAreEqual = (meals1: Meal[], meals2: Meal[]): boolean => {
+    const mealsAreEqual = (meals1: MealDto[], meals2: MealDto[]): boolean => {
         if (meals1.length !== meals2.length) return false;
         return meals1.every((meal1, index) => {
             const meal2 = meals2[index];
-            return meal1.id === meal2.id && 
-                   meal1.name === meal2.name && 
+            return meal1.id === meal2.id &&
+                   meal1.name === meal2.name &&
                    meal1.description === meal2.description;
         });
     };

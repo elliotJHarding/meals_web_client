@@ -1,10 +1,9 @@
-import {Ingredient, parseIngredient, shortFormat} from "../../../domain/Ingredient.ts";
 import {Card, Stack, Typography} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material-next/Button";
 import {Add, Close, ContentPaste, Edit, PlaylistAdd} from "@mui/icons-material";
 import {useState} from "react";
-import Meal from "../../../domain/Meal.ts";
+import {MealDto, IngredientDto} from "@harding/meals-api";
 import {useMealUpdate} from "../../../hooks/meal/useMealUpdate.ts";
 import IngredientList from "./IngredientList.tsx";
 import IngredientEditList from "./IngredientEditList.tsx";
@@ -12,19 +11,15 @@ import {useUnits} from "../../../hooks/unit/useUnits.ts";
 import {AnimatePresence, motion} from "framer-motion";
 import ConfirmCancelButtons from "../../common/ConfirmCancelButtons.tsx";
 import IconButton from "@mui/material/IconButton";
+import {IngredientEdit} from "../../../types/IngredientEdit.ts";
+import {parseIngredient, shortFormat} from "../../../utils/IngredientUtils.ts";
 
 const constant = {
     borderRadius: 3,
     cardPadding: 3
 }
 
-export type IngredientEdit = {
-    id?: bigint;
-    index : number,
-    input : string,
-}
-
-export default function Ingredients({meal, setMeal, initialEdit}: { meal : Meal, setMeal : any, initialEdit : boolean}) {
+export default function Ingredients({meal, setMeal, initialEdit}: { meal : MealDto, setMeal : any, initialEdit : boolean}) {
 
     const {updateMeal} = useMealUpdate(() => {
         setEdit(false);
@@ -34,11 +29,11 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : Meal,
 
     const [edit, setEdit] = useState(initialEdit)
 
-    const resetIngredientEdits = (mealToReset : Meal) => mealToReset.ingredients.map(ingredient => ({
+    const resetIngredientEdits = (mealToReset : MealDto) => mealToReset.ingredients?.map(ingredient => ({
         id: ingredient.id,
-        index: ingredient.index,
+        index: ingredient.index!,
         input: shortFormat(ingredient)
-    }));
+    })) ?? [];
 
     const [ingredientEdits, setIngredientEdits] =
         useState<IngredientEdit[]>(resetIngredientEdits(meal));
@@ -78,11 +73,11 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : Meal,
     }
 
     const handleConfirm = () => {
-        const newIngredients: Ingredient[] = ingredientEdits
+        const newIngredients: IngredientDto[] = ingredientEdits
             .filter(edit => edit.input != '')
             .map(edit => parseIngredient(edit, units, meal))
             .filter(edit => edit != null)
-            .map((ingredient, index) => ({...ingredient, index: index})) as Ingredient[];
+            .map((ingredient, index) => ({...ingredient, index: index})) as IngredientDto[];
         const newMeal = {...meal, ingredients: newIngredients};
         updateMeal(newMeal);
         setMeal(newMeal);
@@ -96,7 +91,7 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : Meal,
         }]))
     }
 
-    const displayButtons = meal.ingredients.length > 0 ?
+    const displayButtons = (meal.ingredients?.length ?? 0) > 0 ?
         <Button startIcon={<Edit/>} onClick={handleEditOnClick}>Edit</Button> :
         <Button startIcon={<PlaylistAdd/>} onClick={handleEditOnClick}>Add Ingredients</Button>;
 
@@ -121,7 +116,7 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : Meal,
                     { edit ? <ConfirmCancelButtons handleConfirm={handleConfirm} handleCancel={handleCancel}/> : displayButtons }
                 </AnimatePresence>
             </Stack>
-            {meal.ingredients.length > 0 && !edit ? <IngredientList ingredients={meal.ingredients}/> : null}
+            {(meal.ingredients?.length ?? 0) > 0 && !edit ? <IngredientList ingredients={meal.ingredients!}/> : null}
             {ingredientEdits.length > 0 && edit ? <IngredientEditList ingredientEdits={ingredientEdits} setIngredientEdits={setIngredientEdits}/> : null}
             {edit ? addButton : null}
         </Card>

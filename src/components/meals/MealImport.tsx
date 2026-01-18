@@ -1,6 +1,6 @@
 import {useMetadataLookup} from "../../hooks/useMetadataLookup.ts";
 import {useEffect, useState} from "react";
-import Meal from "../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import {Card, CardMedia, InputAdornment, Stack, TextField, Typography} from "@mui/material";
 import {Download, Link} from "@mui/icons-material";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
@@ -48,7 +48,7 @@ export default function MealImport() {
     }, [])
 
     const [recipeUrl, setRecipeUrl] = useState<string>('');
-    const [newMeal, setNewMeal] = useState<Meal>({name: '', serves: 2, prepTimeMinutes: 20, description: '', ingredients: [], tags: []});
+    const [newMeal, setNewMeal] = useState<MealDto>({name: '', serves: 2, prepTimeMinutes: 20, description: '', ingredients: [], tags: []});
 
     const handleSelectedOnChange = (text: string) => {
         setRecipeUrl(text);
@@ -71,7 +71,7 @@ export default function MealImport() {
             </Stack>
         </Card>
 
-    const ImportedMeal = ({meal} : {meal: Meal}) =>
+    const ImportedMeal = ({meal} : {meal: MealDto}) =>
         <Card sx={{padding: 3}}>
             <CardMedia
                 component='img'

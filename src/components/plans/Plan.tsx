@@ -1,12 +1,12 @@
-import Plan from "../../domain/Plan.ts";
+import {PlanDto} from "@harding/meals-api";
 import { Card, CardMedia, Stack, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { RestaurantMenu, Kitchen } from "@mui/icons-material";
-import PlanMeal from "../../domain/PlanMeal.ts";
+import {PlanMealDto} from "@harding/meals-api";
 
-export default function DayPlan({ plan }: { plan: Plan }) {
+export default function DayPlan({ plan }: { plan: PlanDto }) {
 
-    const MealItems = ({ planMeals }: { planMeals: PlanMeal[] }) => planMeals.map((planMeal, index) => {
+    const MealItems = ({ planMeals }: { planMeals: PlanMealDto[] }) => planMeals.map((planMeal, index) => {
         const meal = planMeal.meal;
         const hasIngredients = !meal || meal.ingredients?.length > 0;
 

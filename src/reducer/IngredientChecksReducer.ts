@@ -1,26 +1,30 @@
-import ShoppingListItem, {sortShoppingListItems} from "../domain/ShoppingListItem.ts";
+import {ShoppingListItemDto} from "@harding/meals-api";
+import {sortShoppingListItems} from "../utils/ShoppingListUtils.ts";
+
+// Extended type to track which plan each shopping list item belongs to
+type ShoppingListItemWithPlanId = ShoppingListItemDto & { planId?: number };
 
 interface ChecksAction {
-    apply(state: ShoppingListItem[]) : ShoppingListItem[]
+    apply(state: ShoppingListItemWithPlanId[]): ShoppingListItemWithPlanId[]
 }
 
 export class CheckItemAction implements ChecksAction {
-    id: bigint;
+    id: number;
     checked: boolean;
-    callback: (state: ShoppingListItem[]) => void;
-    
-    constructor(checked: boolean, id: bigint, callback: (state: ShoppingListItem[]) => void) {
+    callback: (state: ShoppingListItemWithPlanId[]) => void;
+
+    constructor(checked: boolean, id: number, callback: (state: ShoppingListItemWithPlanId[]) => void) {
         this.checked = checked;
         this.id = id;
         this.callback = callback;
     }
 
-    apply(state: ShoppingListItem[]): ShoppingListItem[] {
-        const item = state.find(i => i.ingredient.id == this.id);
-        const items : ShoppingListItem[] = [
-            ...state.filter(i => i.ingredient.id != this.id),
-            {...item, checked: this.checked} as ShoppingListItem
-        ].sort(sortShoppingListItems)
+    apply(state: ShoppingListItemWithPlanId[]): ShoppingListItemWithPlanId[] {
+        const item = state.find(i => i.ingredient?.id == this.id);
+        const items: ShoppingListItemWithPlanId[] = [
+            ...state.filter(i => i.ingredient?.id != this.id),
+            {...item, checked: this.checked} as ShoppingListItemWithPlanId
+        ].sort(sortShoppingListItems);
         this.callback(items);
         return items;
     }
@@ -28,17 +32,17 @@ export class CheckItemAction implements ChecksAction {
 }
 
 export class SetItemsAction implements ChecksAction {
-    items: ShoppingListItem[]
+    items: ShoppingListItemWithPlanId[]
 
-    constructor(items: ShoppingListItem[]) {
+    constructor(items: ShoppingListItemWithPlanId[]) {
         this.items = items;
     }
 
-    apply(_state: ShoppingListItem[]): ShoppingListItem[] {
+    apply(_state: ShoppingListItemWithPlanId[]): ShoppingListItemWithPlanId[] {
         return this.items;
     }
 }
 
-export default function ingredientChecksReducer(state: ShoppingListItem[], action: ChecksAction): ShoppingListItem[] {
+export default function ingredientChecksReducer(state: ShoppingListItemWithPlanId[], action: ChecksAction): ShoppingListItemWithPlanId[] {
     return action.apply(state);
 }

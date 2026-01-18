@@ -1,7 +1,7 @@
 import {Fade, Stack, TextField} from "@mui/material";
 import {Close} from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
-import {IngredientEdit} from "./Ingredients.tsx";
+import {IngredientEdit} from "../../../types/IngredientEdit.ts";
 
 const timeOut = 200;
 

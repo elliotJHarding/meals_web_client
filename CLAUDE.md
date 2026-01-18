@@ -76,6 +76,7 @@ It's relative repository is @~/elliot/IdeaProjects/meals_server
 Any changes to the client server interface should consider this repository
 
 ### UI Theme
+Any UI changes should aim to be consistent with the existing design of the UI
 
 There is some awkwardness on the theme as a mixture of material-ui and material-next is being used.
 You have a tendency to use the non MD3 theme which shows as the default blue. You should be making sure the MD3 theme is respected.

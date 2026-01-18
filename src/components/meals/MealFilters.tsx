@@ -2,7 +2,7 @@ import {Select, Stack} from "@mui/material";
 import {FormControl, InputLabel} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import MealFilter from "../../filter/MealFilter.ts";
-import Effort from "../../domain/Effort.ts";
+import {Effort} from "@harding/meals-api";
 import Box from "@mui/material/Box";
 import {Chip} from "@mui/material-next";
 

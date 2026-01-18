@@ -1,18 +1,34 @@
-import ResourceRepository from "./ResourceRepository.ts";
-import {AxiosResponse} from "axios";
-import MealTag from "../domain/MealTag.ts";
+import {TagsApi, MealTag, Configuration} from "@harding/meals-api";
+import {toastService} from "../contexts/ToastContext.tsx";
+import axios from "axios";
 
-export default class MealTagRepository extends ResourceRepository {
+export default class MealTagRepository {
+    private api: TagsApi;
 
-    getTags(onSuccess : (tags : MealTag[]) => void) : void {
-        console.info("Fetching meals")
+    constructor() {
+        const configuration = new Configuration({
+            basePath: import.meta.env.VITE_REPOSITORY_URL,
+        });
 
-        this.get(
-            "tags",
-            (response : AxiosResponse) => {
-                onSuccess(response.data);
-            }
-        )
+        const axiosInstance = axios.create({
+            withCredentials: true,
+        });
+
+        this.api = new TagsApi(configuration, import.meta.env.VITE_REPOSITORY_URL, axiosInstance);
     }
 
+    getTags(onSuccess: (tags: MealTag[]) => void): void {
+        console.info("Fetching tags");
+
+        this.api.getAllTags()
+            .then(response => {
+                console.info("Successfully fetched tags");
+                console.info(response.data);
+                onSuccess(response.data);
+            })
+            .catch(error => {
+                console.error(error);
+                toastService.showError('Failed to load tags');
+            });
+    }
 }

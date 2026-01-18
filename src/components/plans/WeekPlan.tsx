@@ -1,6 +1,6 @@
 import {Card, Stack} from "@mui/material";
 import MealPlan from "../../domain/MealPlan.ts";
-import Plan from "../../domain/Plan.ts";
+import {PlanDto} from "@harding/meals-api";
 import DayPlan from "./Plan.tsx";
 import Button from "@mui/material-next/Button";
 import {NoteAdd} from "@mui/icons-material";
@@ -13,7 +13,7 @@ export default function WeekPlan({mealPlan} : {mealPlan: MealPlan}) {
 
     const planItems = mealPlan.plans
         .filter(plan => (plan.planMeals || []).length > 0)
-        .map((plan: Plan, i) =>
+        .map((plan: PlanDto, i) =>
             <DayPlan key={i} plan={plan}/>
         );
 

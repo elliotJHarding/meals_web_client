@@ -1,4 +1,4 @@
-import Plan from "../../../../../domain/Plan.ts";
+import {PlanDto, MealDto, PlanMealDto, CalendarEventDto, SuggestedMeal} from "@harding/meals-api";
 import {Box, InputAdornment, Stack, TextField, Typography, Divider, Paper, useTheme} from "@mui/material";
 import {motion} from "framer-motion";
 import {EditNoteRounded, Add} from "@mui/icons-material";
@@ -10,14 +10,8 @@ import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
 import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
 import MealItem from "./MealItem.tsx";
 import MealChooser from "../../../../dialog/MealChooser.tsx";
-import Meal from "../../../../../domain/Meal.ts";
-import PlanMeal from "../../../../../domain/PlanMeal.ts";
-import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
 import MealPlan from "../../../../../domain/MealPlan.ts";
-import AiChatInput from "./AiChatInput.tsx";
 import SuggestedMealCard from "./SuggestedMealCard.tsx";
-import SuggestedMeal from "../../../../../domain/ai/SuggestedMeal.ts";
-import { useAiMealChat } from "../../../../../hooks/ai/useAiMealChat.ts";
 
 // Simple debounce implementation
 const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => {
@@ -29,13 +23,16 @@ const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => 
 };
 
 interface DayViewProps {
-    plan: Plan;
+    plan: PlanDto;
     mealPlan: MealPlan;
-    meals: Meal[];
+    meals: MealDto[];
     mealsLoading: boolean;
     mealsFailed: boolean;
-    onPlanUpdate: (updatedPlan: Plan) => void;
-    calendarEvents: CalendarEvent[];
+    onPlanUpdate: (updatedPlan: PlanDto) => void;
+    calendarEvents: CalendarEventDto[];
+    // AI suggestions passed from parent
+    currentSuggestions: SuggestedMeal[];
+    onRemoveSuggestion: (mealId: number | undefined) => void;
 }
 
 export default function DayView({
@@ -45,28 +42,19 @@ export default function DayView({
     mealsLoading,
     mealsFailed,
     onPlanUpdate,
-    calendarEvents
+    calendarEvents,
+    currentSuggestions,
+    onRemoveSuggestion
 }: DayViewProps) {
     const {updatePlan} = usePlanUpdate();
     const {createPlan} = usePlanCreate();
-    const [currentPlan, setCurrentPlan] = useState<Plan>({
+    const [currentPlan, setCurrentPlan] = useState<PlanDto>({
         ...plan,
         planMeals: plan.planMeals || []
     });
     const [mealChooserOpen, setMealChooserOpen] = useState(false);
 
     const theme = useTheme();
-
-    // AI Chat Hook
-    const {
-        conversationHistory,
-        currentSuggestions,
-        inputMessage,
-        isLoading: aiLoading,
-        setInputMessage,
-        sendMessage,
-        removeSuggestion
-    } = useAiMealChat(plan, mealPlan, meals, calendarEvents);
 
     // Filter calendar events to only show events on the plan date
     const filteredCalendarEvents = calendarEvents.filter(event => {
@@ -76,14 +64,14 @@ export default function DayView({
     });
 
     // Function to sync plan to backend (create or update)
-    const syncPlanToBackend = useCallback((updatedPlan: Plan) => {
+    const syncPlanToBackend = useCallback((updatedPlan: PlanDto) => {
         if (updatedPlan.id) {
             updatePlan(updatedPlan, () => {
                 onPlanUpdate(updatedPlan);
             });
         } else {
-            createPlan(updatedPlan, (createdPlan: Plan) => {
-                const planWithId : Plan = {...updatedPlan, id: createdPlan.id};
+            createPlan(updatedPlan, (createdPlan: PlanDto) => {
+                const planWithId : PlanDto = {...updatedPlan, id: createdPlan.id};
                 setCurrentPlan(planWithId);
                 onPlanUpdate(planWithId);
             });
@@ -135,8 +123,8 @@ export default function DayView({
         syncPlanToBackend(updatedPlan);
     };
 
-    const handleAddMeal = (meal: Meal, servings: number, leftovers: boolean) => {
-        const newPlanMeal: PlanMeal = {
+    const handleAddMeal = (meal: MealDto, servings: number, leftovers: boolean) => {
+        const newPlanMeal: PlanMealDto = {
             meal,
             requiredServings: servings,
             leftovers: leftovers
@@ -151,13 +139,13 @@ export default function DayView({
         syncPlanToBackend(updatedPlan);
     };
 
-    const handleSendAiMessage = () => {
-        sendMessage(inputMessage);
-    };
-
     const handleAddSuggestedMeal = (suggestedMeal: SuggestedMeal) => {
-        removeSuggestion(suggestedMeal.meal.id);
-        handleAddMeal(suggestedMeal.meal, suggestedMeal.meal.serves, false);
+        // Look up the full meal from the meals array using the mealId
+        const meal = meals.find(m => m.id === suggestedMeal.mealId);
+        if (meal) {
+            onRemoveSuggestion(suggestedMeal.mealId);
+            handleAddMeal(meal, meal.serves ?? 4, false);
+        }
     };
 
     return (
@@ -223,79 +211,25 @@ export default function DayView({
 
                             <Divider />
 
-                            {/* AI Chat Section */}
-                            <Paper
-                                elevation={0}
-                                sx={{
-                                    p: 2,
-                                    backgroundColor: 'grey.50',
-                                    borderRadius: 2,
-                                    border: '2px solid',
-                                    borderColor: 'grey.200'
-                                }}
-                            >
-                                <Stack spacing={2}>
-
-                                    {/* AI Chat Input */}
-                                    <AiChatInput
-                                        value={inputMessage}
-                                        onChange={setInputMessage}
-                                        onSend={handleSendAiMessage}
-                                        isLoading={aiLoading}
-                                    />
-
-                                    {/* Display latest AI response */}
-                                    {conversationHistory.length > 0 && (() => {
-                                        const lastAssistantMessage = [...conversationHistory]
-                                            .reverse()
-                                            .find(msg => msg.role === 'assistant');
-
-                                        return lastAssistantMessage ? (
-                                            <Box
-                                                sx={{
-                                                    p: 1.5,
-                                                    backgroundColor: 'background.paper',
-                                                    borderRadius: 1.5,
-                                                    border: '1px solid',
-                                                    borderColor: 'divider'
-                                                }}
-                                            >
-                                                <Typography
-                                                    variant="body2"
-                                                    color="text.primary"
-                                                    sx={{
-                                                        whiteSpace: 'pre-wrap'
-                                                    }}
-                                                >
-                                                    {lastAssistantMessage.content}
-                                                </Typography>
-                                            </Box>
-                                        ) : null;
-                                    })()}
-
-                                    {/* AI Suggested Meals */}
-                                    {currentSuggestions.length > 0 && (
-                                        <Stack spacing={1}>
-                                            <Typography variant="caption" fontWeight="600" color="text.secondary">
-                                                Suggested Meals
-                                            </Typography>
-                                            {currentSuggestions.map((suggestion, index) => (
-                                                <SuggestedMealCard
-                                                    key={`ai-${index}`}
-                                                    suggestedMeal={suggestion}
-                                                    onAddMeal={handleAddSuggestedMeal}
-                                                />
-                                            ))}
-                                        </Stack>
-                                    )}
+                            {/* AI Suggested Meals Section */}
+                            {currentSuggestions.length > 0 && (
+                                <Stack spacing={1}>
+                                    {currentSuggestions.map((suggestion, index) => (
+                                        <SuggestedMealCard
+                                            key={`ai-${index}`}
+                                            suggestedMeal={suggestion}
+                                            meals={meals}
+                                            onAddMeal={handleAddSuggestedMeal}
+                                        />
+                                    ))}
                                 </Stack>
-                            </Paper>
+                            )}
 
                             {/* Planned Meals Section */}
                             <Box>
-                                <Typography variant="subtitle2" fontWeight="600" color="text.secondary" sx={{ mb: 1 }}>
-                                    Planned Meals
-                                </Typography>
+                                {/*<Typography variant="subtitle2" fontWeight="600" color="text.secondary" sx={{ mb: 1 }}>*/}
+                                {/*    Planned Meals*/}
+                                {/*</Typography>*/}
 
                                 {(currentPlan.planMeals || []).length > 0 ? (
                                     <Stack spacing={1}>

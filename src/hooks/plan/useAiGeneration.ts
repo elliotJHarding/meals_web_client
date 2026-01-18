@@ -1,13 +1,13 @@
 import { useState } from "react";
 import PlanRepository from "../../repository/PlanRepository.ts";
-import Plan from "../../domain/Plan.ts";
+import {PlanDto} from "@harding/meals-api";
 
 export const useAiGeneration = () => {
     const repository = new PlanRepository();
     const [loading, setLoading] = useState<boolean>(false);
     const [failed, setFailed] = useState<boolean>(false);
 
-    const generateMealPlan = (startDate: Date, endDate: Date, prompt: string, onSuccess: (plans: Plan[]) => void) => {
+    const generateMealPlan = (startDate: Date, endDate: Date, prompt: string, onSuccess: (plans: PlanDto[]) => void) => {
         setLoading(true);
         setFailed(false);
 

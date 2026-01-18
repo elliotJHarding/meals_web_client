@@ -1,7 +1,7 @@
 import {Card, CardMedia, Stack, Typography, useMediaQuery, useTheme, Box} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
-import Plan from "../../../../../domain/Plan.ts";
-import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
+import {PlanDto} from "@harding/meals-api";
+import {CalendarEventDto} from "@harding/meals-api";
 import {motion, LayoutGroup} from "framer-motion";
 import {Kitchen, NotesRounded, RestaurantMenu} from "@mui/icons-material";
 import ServesChip from "../../../../meals/chip/ServesChip.tsx";
@@ -9,13 +9,13 @@ import EffortChip from "../../../../meals/chip/EffortChip.tsx";
 import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
 import IngredientsWarningChip from "../../../../meals/chip/IngredientsWarningChip.tsx";
 import DayItem from "./DayItem.tsx";
-import Meal from "../../../../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 
 interface WeekOverviewProps {
     mealPlan: MealPlan;
     onDayClick: (date: Date) => void;
-    calendarEvents: CalendarEvent[];
-    meals: Meal[];
+    calendarEvents: CalendarEventDto[];
+    meals: MealDto[];
     mealsLoading: boolean;
     mealsFailed: boolean;
     setMealPlan: (mealPlan: MealPlan) => void;
@@ -33,7 +33,7 @@ export default function WeekOverview({
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const filterEventsByPlan = (events: CalendarEvent[], plan: Plan): CalendarEvent[] => {
+    const filterEventsByPlan = (events: CalendarEventDto[], plan: PlanDto): CalendarEventDto[] => {
         return events.filter(event =>
             event.time !== null && plan.date !== null &&
             event.time.getDate() === plan.date.getDate() &&
@@ -42,7 +42,7 @@ export default function WeekOverview({
         );
     };
 
-    const isToday = (plan: Plan): boolean => {
+    const isToday = (plan: PlanDto): boolean => {
         const today: Date = new Date();
         return (
             today.getFullYear() === plan.date.getFullYear() &&
@@ -52,8 +52,8 @@ export default function WeekOverview({
     };
 
     const MobileDayItem = ({ plan, calendarEvents }: {
-        plan: Plan,
-        calendarEvents: CalendarEvent[]
+        plan: PlanDto,
+        calendarEvents: CalendarEventDto[]
     }) => {
         const onClick = () => onDayClick(plan.date);
 

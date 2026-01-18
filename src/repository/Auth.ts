@@ -1,13 +1,13 @@
-import User from "../domain/User.ts";
+import {AppUserDto} from "@harding/meals-api";
 
 export default class Auth {
-    private readonly user : User | null;
+    private readonly user : AppUserDto | null;
 
-    constructor(user : User | null) {
+    constructor(user : AppUserDto | null) {
         this.user = user;
     }
 
-    public getUser() : User | null {
+    public getUser() : AppUserDto | null {
         return this.user;
     }
 

@@ -1,20 +1,20 @@
 import {useEffect, useState} from "react";
 import CalendarRepository from "../../repository/CalendarRepository.ts";
-import CalendarEvent from "../../domain/CalendarEvent.ts";
+import {CalendarEventDto} from "@harding/meals-api";
 import { useCalendarEventsCache } from "../../contexts/CalendarEventsCacheContext.tsx";
 
-export const useCalendarEvents = (from : string, to : string, ttlMs?: number) => {
-    const repository : CalendarRepository = new CalendarRepository();
-    const { 
-        getCachedEvents, 
-        setCachedEvents, 
-        hasCachedEvents, 
-        getCachedAuthStatus 
+export const useCalendarEvents = (from: string, to: string, ttlMs?: number) => {
+    const repository: CalendarRepository = new CalendarRepository();
+    const {
+        getCachedEvents,
+        setCachedEvents,
+        hasCachedEvents,
+        getCachedAuthStatus
     } = useCalendarEventsCache();
 
     const [loading, setLoading] = useState<boolean>(!hasCachedEvents(from, to, ttlMs));
     const [isAuthorized, setIsAuthorized] = useState<boolean>(getCachedAuthStatus(from, to) ?? true);
-    const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(getCachedEvents(from, to) ?? []);
+    const [calendarEvents, setCalendarEvents] = useState<CalendarEventDto[]>(getCachedEvents(from, to) ?? []);
 
     useEffect(() => {
         // If we have valid cached data, use it immediately
@@ -35,12 +35,12 @@ export const useCalendarEvents = (from : string, to : string, ttlMs?: number) =>
             setIsAuthorized(authorized);
             
             if (authorized) {
-                repository.getEvents(from, to, (events: CalendarEvent[]) => {
-                    const processedEvents = events.map(event => ({ 
-                        ...event, 
-                        time: new Date(Date.parse(event.time as unknown as string)) 
-                    } as CalendarEvent));
-                    
+                repository.getEvents(from, to, (events: CalendarEventDto[]) => {
+                    const processedEvents = events.map(event => ({
+                        ...event,
+                        time: event.time
+                    } as CalendarEventDto));
+
                     setCalendarEvents(processedEvents);
                     setCachedEvents(from, to, processedEvents, authorized);
                     setLoading(false);

@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
 import GroupRepository from "../../repository/GroupRepository.ts";
-import FamilyGroup from "../../domain/FamilyGroup.ts";
+import {FamilyGroupDto} from "@harding/meals-api";
 
 export const useGroup = (): {
-    group: FamilyGroup;
-    setGroup: (group: FamilyGroup) => void;
+    group: FamilyGroupDto;
+    setGroup: (group: FamilyGroupDto) => void;
     createGroup: (onSuccess: (id: string) => void) => void;
     loading: boolean;
     failed: boolean
@@ -15,23 +15,23 @@ export const useGroup = (): {
     const [loading, setLoading] = useState<boolean>(true);
     const [failed, setFailed] = useState<boolean>(false);
 
-    const [group, setGroup] = useState<FamilyGroup>({uuid: undefined, users: []});
+    const [group, setGroup] = useState<FamilyGroupDto>({uuid: undefined, users: []});
 
     useEffect(() => {
-            repository.getGroup(
-                (fetchedGroup: FamilyGroup) => {
-                    setGroup(fetchedGroup)
-                    setLoading(false)
-                },
-                () => {
-                    setFailed(true);
-                }
-            );
-    }, [])
+        repository.getGroup(
+            (fetchedGroup: FamilyGroupDto) => {
+                setGroup(fetchedGroup);
+                setLoading(false);
+            },
+            () => {
+                setFailed(true);
+            }
+        );
+    }, []);
 
-    const createGroup = (onSuccess : (id : string) => void) : void => {
+    const createGroup = (onSuccess: (id: string) => void): void => {
         repository.createGroup(onSuccess);
-    }
+    };
 
     return {group, setGroup, createGroup, loading, failed};
 }

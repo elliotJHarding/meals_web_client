@@ -1,4 +1,4 @@
-import Meal from "../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import MealListRow from "./MealListRow.tsx";
 import Grid from "@mui/material/Unstable_Grid2";
 import Error from "../error/Error.tsx";
@@ -9,9 +9,9 @@ const constant = {
     spacing: 1
 }
 
-export default function MealList({meals, loading, failed, mealOnClick} : {meals : Meal[], loading : boolean, failed : boolean, mealOnClick: (meal: Meal) => void}) {
+export default function MealList({meals, loading, failed, mealOnClick} : {meals : MealDto[], loading : boolean, failed : boolean, mealOnClick: (meal: MealDto) => void}) {
 
-    const mealRows = meals.map((meal : Meal, index : number) => <MealListRow key={meal.id} meal={meal} index={index} onClick={mealOnClick} />);
+    const mealRows = meals.map((meal : MealDto, index : number) => <MealListRow key={meal.id} meal={meal} index={index} onClick={mealOnClick} />);
 
     const skeleton =
         <>

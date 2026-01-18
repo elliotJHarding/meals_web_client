@@ -1,12 +1,13 @@
 import {List, ListItem} from "@mui/material-next";
 import {Typography} from "@mui/material";
-import {Ingredient, shortFormat} from "../../../domain/Ingredient.ts";
+import {shortFormat} from "../../../utils/IngredientUtils.ts";
+import {IngredientDto} from "@harding/meals-api";
 import {AnimatePresence, motion} from "framer-motion";
 
-export default function IngredientList({ingredients}: { ingredients: Ingredient[] }) {
+export default function IngredientList({ingredients}: { ingredients: IngredientDto[] }) {
     const ingredientItems = ingredients
-        .sort((a, b) => a.index - b.index)
-        .map((ingredient: Ingredient) =>
+        .sort((a, b) => a.index! - b.index!)
+        .map((ingredient: IngredientDto) =>
         <ListItem key={ingredient.index} component={motion.div} layout>
             <Typography>{shortFormat(ingredient)}</Typography>
         </ListItem>

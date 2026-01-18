@@ -1,12 +1,12 @@
 import {Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography, useTheme} from "@mui/material";
 import Button from "@mui/material-next/Button";
 import {Cancel, ContentCopy} from "@mui/icons-material";
-import FamilyGroup from "../../domain/FamilyGroup.ts";
+import {FamilyGroupDto} from "@harding/meals-api";
 
 export default function InviteDialog({open, setOpen, group}: {
     open: boolean,
     setOpen: (open: boolean) => void,
-    group: FamilyGroup
+    group: FamilyGroupDto
 }) {
 
     const handleCancel = () => setOpen(false);

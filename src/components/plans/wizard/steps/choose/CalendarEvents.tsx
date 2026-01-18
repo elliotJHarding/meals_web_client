@@ -1,9 +1,9 @@
-import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
+import {CalendarEventDto} from "@harding/meals-api";
 import {Card, Stack, Typography} from "@mui/material";
 import {motion} from "framer-motion";
 
 interface CalendarEventsProps {
-    calendarEvents: CalendarEvent[]
+    calendarEvents: CalendarEventDto[]
 }
 
 export default function CalendarEvents({calendarEvents}: CalendarEventsProps) {
@@ -19,10 +19,10 @@ export default function CalendarEvents({calendarEvents}: CalendarEventsProps) {
                 if (!a.allDay && b.allDay) {
                     return 1
                 }
-                if (a.time === null || b.time === null) {
+                if (a.time === null || b.time === null || a.time === undefined || b.time === undefined) {
                     return 0;
                 } else {
-                    return a.time.getTime() - b.time.getTime();
+                    return new Date(a.time).getTime() - new Date(b.time).getTime();
                 }
             })
             .map(event =>
@@ -38,8 +38,8 @@ export default function CalendarEvents({calendarEvents}: CalendarEventsProps) {
                       component={motion.div} layout
                 >
                     <Stack direction={'row'} gap={1} component={motion.div} layout>
-                        {!event.allDay && <Typography component={motion.div} layout fontWeight={'bold'}
-                                                      color={event.textColour}>{event.time.toLocaleTimeString('en-gb', {
+                        {!event.allDay && event.time && <Typography component={motion.div} layout fontWeight={'bold'}
+                                                      color={event.textColour}>{new Date(event.time).toLocaleTimeString('en-gb', {
                             hour: "2-digit",
                             minute: "2-digit",
                             hour12: false

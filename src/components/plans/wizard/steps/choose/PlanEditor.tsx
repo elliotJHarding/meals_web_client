@@ -1,4 +1,4 @@
-import Plan from "../../../../../domain/Plan.ts";
+import {PlanDto} from "@harding/meals-api";
 import {Box, InputAdornment, Stack, TextField, Typography, Divider, useTheme} from "@mui/material";
 import {motion} from "framer-motion";
 import {useNavigate} from "react-router-dom";
@@ -11,14 +11,14 @@ import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
 import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
 import MealItem from "./MealItem.tsx";
 import MealChooser from "../../../../dialog/MealChooser.tsx";
-import Meal from "../../../../../domain/Meal.ts";
-import PlanMeal from "../../../../../domain/PlanMeal.ts";
-import CalendarEvent from "../../../../../domain/CalendarEvent.ts";
+import {MealDto} from "@harding/meals-api";
+import {PlanMealDto} from "@harding/meals-api";
+import {CalendarEventDto} from "@harding/meals-api";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import IconButton from "@mui/material-next/IconButton";
 import AiChatInput from "./AiChatInput.tsx";
 import SuggestedMealCard from "./SuggestedMealCard.tsx";
-import SuggestedMeal from "../../../../../domain/ai/SuggestedMeal.ts";
+import {SuggestedMeal} from "@harding/meals-api";
 import { useAiMealChat } from "../../../../../hooks/ai/useAiMealChat.ts";
 
 // Simple debounce implementation
@@ -31,20 +31,20 @@ const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => 
 };
 
 interface PlanEditorProps {
-    plan: Plan;
+    plan: PlanDto;
     mealPlan: MealPlan;
-    meals: Meal[];
+    meals: MealDto[];
     mealsLoading: boolean;
     mealsFailed: boolean;
-    onPlanUpdate: (updatedPlan: Plan) => void;
-    calendarEvents: CalendarEvent[];
+    onPlanUpdate: (updatedPlan: PlanDto) => void;
+    calendarEvents: CalendarEventDto[];
 }
 
 export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFailed, onPlanUpdate, calendarEvents}: PlanEditorProps) {
     const navigate = useNavigate();
     const {updatePlan} = usePlanUpdate();
     const {createPlan} = usePlanCreate();
-    const [currentPlan, setCurrentPlan] = useState<Plan>({
+    const [currentPlan, setCurrentPlan] = useState<PlanDto>({
         ...plan,
         planMeals: plan.planMeals || []
     });
@@ -69,7 +69,7 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
     });
 
     // Function to sync plan to backend (create or update)
-    const syncPlanToBackend = useCallback((updatedPlan: Plan) => {
+    const syncPlanToBackend = useCallback((updatedPlan: PlanDto) => {
         if (updatedPlan.id) {
             console.log("Updating existing plan in backend:", updatedPlan);
             updatePlan(updatedPlan, () => {
@@ -80,10 +80,10 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
             });
         } else {
             console.log("Creating new plan in backend:", updatedPlan);
-            createPlan(updatedPlan, (createdPlan: Plan) => {
+            createPlan(updatedPlan, (createdPlan: PlanDto) => {
                 console.log("Plan created successfully:", createdPlan);
                 // Update local state with the newly created plan (now has ID)
-                const planWithId : Plan = {...updatedPlan, id: createdPlan.id};
+                const planWithId : PlanDto = {...updatedPlan, id: createdPlan.id};
                 setCurrentPlan(planWithId);
                 onPlanUpdate(planWithId);
             });
@@ -137,14 +137,14 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
         syncPlanToBackend(updatedPlan);
     };
 
-    const handleAddMeal = (meal: Meal, servings: number, leftovers: boolean) => {
+    const handleAddMeal = (meal: MealDto, servings: number, leftovers: boolean) => {
         console.group('handleAddMeal called');
         console.log('Meal object:', meal);
         console.log('Servings:', servings);
         console.log('Leftovers:', leftovers);
         console.log('Current plan:', currentPlan);
 
-        const newPlanMeal: PlanMeal = {
+        const newPlanMeal: PlanMealDto = {
             meal,
             requiredServings: servings,
             leftovers: leftovers
@@ -175,13 +175,17 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
     };
 
     const handleAddSuggestedMeal = (suggestedMeal: SuggestedMeal) => {
-        // Remove from suggestions first
-        removeSuggestion(suggestedMeal.meal.id);
-        // Then add to plan
-        handleAddMeal(suggestedMeal.meal, suggestedMeal.meal.serves, false);
+        // Look up the full meal from the meals array using mealId
+        const meal = meals.find(m => m.id === suggestedMeal.mealId);
+        if (meal) {
+            // Remove from suggestions first
+            removeSuggestion(suggestedMeal.mealId);
+            // Then add to plan
+            handleAddMeal(meal, meal.serves ?? 2, false);
+        }
     };
 
-    const handleDayClick = (dayPlan: Plan) => {
+    const handleDayClick = (dayPlan: PlanDto) => {
         navigate(`?from=${mealPlan.from()}&to=${mealPlan.to()}&selected=${MealPlan.formatDate(dayPlan.date)}`);
     };
 
@@ -425,6 +429,7 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
                                             <Box key={`ai-${index}`} sx={{ position: 'relative' }}>
                                                 <SuggestedMealCard
                                                     suggestedMeal={suggestion}
+                                                    meals={meals}
                                                     onAddMeal={handleAddSuggestedMeal}
                                                 />
                                             </Box>
@@ -440,11 +445,11 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
                                 {/* Planned Meals */}
                                 {(currentPlan.planMeals || []).length > 0 && (
                                     <>
-                                        {currentSuggestions.length > 0 && (
-                                            <Typography variant="caption" fontWeight="600" color="text.secondary" sx={{ mt: 1, ml: 0.5 }}>
-                                                Planned Meals
-                                            </Typography>
-                                        )}
+                                        {/*{currentSuggestions.length > 0 && (*/}
+                                        {/*    <Typography variant="caption" fontWeight="600" color="text.secondary" sx={{ mt: 1, ml: 0.5 }}>*/}
+                                        {/*        Planned Meals*/}
+                                        {/*    </Typography>*/}
+                                        {/*)}*/}
                                         {(currentPlan.planMeals || []).map((planMeal, index) => (
                                             <MealItem
                                                 key={`planned-${index}`}

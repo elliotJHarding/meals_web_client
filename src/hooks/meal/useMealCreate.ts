@@ -1,16 +1,16 @@
-import Meal from "../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import MealRepository from "../../repository/MealRepository.ts";
 import {useState} from "react";
 
-export const useMealCreate = (onSuccess : (createdMeal: Meal) => void) : {createMeal : (meal : Meal) => void, loading : boolean} => {
+export const useMealCreate = (onSuccess: (createdMeal: MealDto) => void): {createMeal: (meal: MealDto) => void, loading: boolean} => {
 
     const repository = new MealRepository();
 
     const [loading, setLoading] = useState<boolean>(false);
 
-    const createMeal = (meal : Meal) => {
-        setLoading(true)
-        repository.createMeal(meal, (createdMeal: Meal) => {
+    const createMeal = (meal: MealDto) => {
+        setLoading(true);
+        repository.createMeal(meal, (createdMeal: MealDto) => {
             setLoading(false);
             onSuccess(createdMeal);
         });

@@ -1,4 +1,4 @@
-import Meal from "../../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 import Grid from "@mui/material/Unstable_Grid2";
 import {Card, CardActionArea, CardMedia, Fade, Typography} from "@mui/material";
 import EffortChip from "./chip/EffortChip.tsx";
@@ -15,7 +15,7 @@ const constant = {
     cardBorderRadius: 3,
 }
 
-export default function MealListRow({meal, index, onClick} : {meal : Meal, index : number, onClick: (meal : Meal) => void}) {
+export default function MealListRow({meal, index, onClick} : {meal : MealDto, index : number, onClick: (meal : MealDto) => void}) {
 
     const handleClick = () => onClick(meal);
 
@@ -49,7 +49,7 @@ export default function MealListRow({meal, index, onClick} : {meal : Meal, index
                                 {meal.name}
                             </Typography>
                             <Box sx={{display: 'flex', gap: 1}}>
-                                <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes} size={'small'}/>
+                                <PrepTimeChip prepTimeMinutes={meal.prepTimeMinutes ?? 30} size={'small'}/>
                                 <EffortChip effort={meal.effort} size={'small'}/>
                                 <IngredientsStatusChip meal={meal} size={'small'}/>
                             </Box>

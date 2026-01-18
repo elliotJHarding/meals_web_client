@@ -1,9 +1,9 @@
 import React, { createContext, useState, useContext } from "react";
-import Meal from "../domain/Meal.ts";
+import {MealDto} from "@harding/meals-api";
 
 export interface MealsCacheContextType {
-    getCachedMeals: () => Meal[];
-    setCachedMeals: (meals: Meal[]) => void;
+    getCachedMeals: () => MealDto[];
+    setCachedMeals: (meals: MealDto[]) => void;
     hasCachedMeals: () => boolean;
     invalidateCache: () => void;
 }
@@ -16,14 +16,14 @@ const MealsCacheContext = createContext<MealsCacheContextType>({
 });
 
 export function MealsCacheProvider({ children }: { children: React.ReactNode }) {
-    const [cachedMeals, setCachedMealsState] = useState<Meal[]>([]);
+    const [cachedMeals, setCachedMealsState] = useState<MealDto[]>([]);
     const [hasCache, setHasCache] = useState<boolean>(false);
 
-    const getCachedMeals = (): Meal[] => {
+    const getCachedMeals = (): MealDto[] => {
         return cachedMeals;
     };
 
-    const setCachedMeals = (meals: Meal[]): void => {
+    const setCachedMeals = (meals: MealDto[]): void => {
         setCachedMealsState(meals);
         setHasCache(true);
     };

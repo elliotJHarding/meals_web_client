@@ -1,4 +1,4 @@
-import {Box, Typography, Container, useTheme, useMediaQuery, Stack} from "@mui/material";
+import {Box, Typography, Container, Stack} from "@mui/material";
 import { motion } from "framer-motion";
 import GoogleAuth from "../common/GoogleAuth.tsx";
 

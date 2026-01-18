@@ -1,42 +1,65 @@
-
-import User from "../domain/User.ts";
+import {AuthenticationApi, AppUserDto, LoginRequest as ApiLoginRequest, Configuration} from "@harding/meals-api";
 import {Token} from "../contexts/AuthContext.tsx";
-import {AxiosResponse} from "axios";
-import ResourceRepository from "./ResourceRepository.ts";
+import {toastService} from "../contexts/ToastContext.tsx";
+import axios from "axios";
 
+// Local type to match our Token structure with API's LoginRequest
 type LoginRequest = {
     token: Token;
-}
+};
 
-export default class AuthRepository extends ResourceRepository {
+export default class AuthRepository {
+    private api: AuthenticationApi;
 
-    whoAmI(onSuccess : (user : User) => void, onAuthFailure : () => void) {
-        this.get("auth/whoami",
-            (response : AxiosResponse) => onSuccess(response.data),
-            // @ts-ignore
-            (response : AxiosResponse) => {
-                if (response.status === 403) {
-                    onAuthFailure()
+    constructor() {
+        const configuration = new Configuration({
+            basePath: import.meta.env.VITE_REPOSITORY_URL,
+        });
+
+        const axiosInstance = axios.create({
+            withCredentials: true,
+        });
+
+        this.api = new AuthenticationApi(configuration, import.meta.env.VITE_REPOSITORY_URL, axiosInstance);
+    }
+
+    whoAmI(onSuccess: (user: AppUserDto) => void, onAuthFailure: () => void) {
+        this.api.whoAmI()
+            .then(response => {
+                onSuccess(response.data);
+            })
+            .catch(error => {
+                if (error.response?.status === 403) {
+                    onAuthFailure();
                 } else {
-                    console.error(response.statusText);
+                    console.error(error);
                 }
-            },
-            true
-        )
+            });
     }
 
-    login(token : Token, onSuccess : (user: User) => void) {
-        const loginRequest: LoginRequest = {
+    login(token: Token, onSuccess: (user: AppUserDto) => void) {
+        const loginRequest: any = {
             token: token
-        }
+        };
 
-        this.post("auth/login", loginRequest, (response : AxiosResponse) => {
-            onSuccess(response.data)
-        })
+        this.api.login(loginRequest)
+            .then(response => {
+                onSuccess(response.data);
+            })
+            .catch(error => {
+                console.error(error);
+                toastService.showError('Login failed');
+            });
     }
 
-    logout(onSuccess : () => void) {
-        this.post("auth/logout", null, onSuccess);
+    logout(onSuccess: () => void) {
+        this.api.logout()
+            .then(() => {
+                onSuccess();
+            })
+            .catch(error => {
+                console.error(error);
+                toastService.showError('Logout failed');
+            });
     }
-
 }

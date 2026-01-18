@@ -2,10 +2,10 @@ import PlanRepository from "../../repository/PlanRepository.ts";
 import {useEffect, useState} from "react";
 import MealPlan from "../../domain/MealPlan.ts";
 
-export const usePlans = (start : Date, end : Date) => {
+export const usePlans = (start: Date, end: Date) => {
     const repository = new PlanRepository();
 
-    const [mealPlan, setMealPlan] = useState<MealPlan>(new MealPlan([]))
+    const [mealPlan, setMealPlan] = useState<MealPlan>(new MealPlan([]));
 
     const [loading, setLoading] = useState<boolean>(true);
     const [failed, setFailed] = useState<boolean>(false);
@@ -21,7 +21,7 @@ export const usePlans = (start : Date, end : Date) => {
                 setFailed(true);
                 setLoading(false);
             })
-    ,[])
+    , []);
 
-    return {mealPlan, setMealPlan, loading, failed}
+    return {mealPlan, setMealPlan, loading, failed};
 }

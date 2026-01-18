@@ -1,6 +1,7 @@
-import {TextField, InputAdornment, CircularProgress, Box, useTheme} from "@mui/material";
-import {ArrowForward, Send, SmartToy} from "@mui/icons-material";
+import {TextField, InputAdornment, Box, useTheme} from "@mui/material";
+import {ArrowForward} from "@mui/icons-material";
 import IconButton from "@mui/material-next/IconButton";
+import 'ldrs/quantum'
 
 interface AiChatInputProps {
     value: string;
@@ -8,9 +9,10 @@ interface AiChatInputProps {
     onSend: () => void;
     isLoading: boolean;
     disabled?: boolean;
+    error?: boolean;
 }
 
-export default function AiChatInput({ value, onChange, onSend, isLoading, disabled }: AiChatInputProps) {
+export default function AiChatInput({ value, onChange, onSend, isLoading, disabled, error }: AiChatInputProps) {
 
     const theme = useTheme();
 
@@ -37,7 +39,7 @@ export default function AiChatInput({ value, onChange, onSend, isLoading, disabl
                     endAdornment: (
                         <InputAdornment position="end">
                             {isLoading ? (
-                                <CircularProgress size={20} />
+                                <l-quantum color={theme.sys.color.tertiary} size={30}></l-quantum>
                             ) : (
                                 <IconButton
                                     size="small"
@@ -64,10 +66,10 @@ export default function AiChatInput({ value, onChange, onSend, isLoading, disabl
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                     '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                            borderColor: 'transparent',
+                            borderColor: error ? 'error.main' : 'transparent',
                         },
                         '&.Mui-focused fieldset': {
-                            borderColor: theme.sys.color.tertiary,
+                            borderColor: error ? 'error.main' : theme.sys.color.tertiary,
                         },
                     },
                 }}

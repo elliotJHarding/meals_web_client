@@ -1,9 +1,9 @@
-import Plan from "../../domain/Plan.ts";
+import {PlanDto} from "@harding/meals-api";
 import PlanRepository from "../../repository/PlanRepository.ts";
 import {useState} from "react";
 
 export const usePlanCreate = (): {
-    createPlan: (plan: Plan, onSuccess: (createdPlan: Plan) => void) => void,
+    createPlan: (plan: PlanDto, onSuccess: (createdPlan: PlanDto) => void) => void,
     loading: boolean
 } => {
 
@@ -11,9 +11,9 @@ export const usePlanCreate = (): {
 
     const [loading, setLoading] = useState<boolean>(false);
 
-    const createPlan = (plan : Plan, onSuccess : (createdPlan: Plan) => void) => {
-        setLoading(true)
-        repository.createPlan(plan, (createdPlan: Plan) => {
+    const createPlan = (plan: PlanDto, onSuccess: (createdPlan: PlanDto) => void) => {
+        setLoading(true);
+        repository.createPlan(plan, (createdPlan: PlanDto) => {
             setLoading(false);
             onSuccess(createdPlan);
         });

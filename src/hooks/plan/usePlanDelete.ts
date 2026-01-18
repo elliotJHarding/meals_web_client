@@ -1,15 +1,15 @@
 import {useState} from "react";
-import Plan from "../../domain/Plan.ts";
+import {PlanDto} from "@harding/meals-api";
 import PlanRepository from "../../repository/PlanRepository.ts";
 
-export const usePlanDelete= (): { deletePlan: (plan: Plan, onSuccess: () => void) => void, loading: boolean } => {
+export const usePlanDelete = (): {deletePlan: (plan: PlanDto, onSuccess: () => void) => void, loading: boolean} => {
 
     const repository = new PlanRepository();
 
     const [loading, setLoading] = useState(false);
 
-    const deletePlan = (plan : Plan, onSuccess: () => void) => {
-        setLoading(true)
+    const deletePlan = (plan: PlanDto, onSuccess: () => void) => {
+        setLoading(true);
         repository.deletePlan(plan, () => {
             setLoading(false);
             onSuccess();

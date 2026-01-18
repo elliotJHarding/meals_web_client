@@ -1,19 +1,19 @@
 import {useEffect, useState} from "react";
-import MealTag from "../../domain/MealTag.ts";
+import {MealTag} from "@harding/meals-api";
 import TagsService from "../../services/TagsService.ts";
 
-export const useTags = () : {
-    tags : MealTag[],
-    setTags : any,
+export const useTags = (): {
+    tags: MealTag[],
+    setTags: any,
     findTag: (id: number) => MealTag | undefined,
-    loading : boolean,
+    loading: boolean,
     refreshTags: () => void
 } => {
 
     const tagsService = TagsService.getInstance();
 
     const [loading, setLoading] = useState(!tagsService.isCached());
-    const [tags, setTags] : [tags : MealTag[], any] = useState(tagsService.getCachedTags() || []);
+    const [tags, setTags]: [tags: MealTag[], any] = useState(tagsService.getCachedTags() || []);
 
     const findTag = (id: number) : MealTag | undefined => tags.find(tag => tag.id == id)
 

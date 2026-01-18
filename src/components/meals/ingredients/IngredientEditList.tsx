@@ -1,6 +1,6 @@
 import {List, ListItem} from "@mui/material-next";
 import IngredientEditRow from "./IngredientEditRow.tsx";
-import {IngredientEdit} from "./Ingredients.tsx";
+import {IngredientEdit} from "../../../types/IngredientEdit.ts";
 import {AnimatePresence, motion} from "framer-motion";
 
 export default function IngredientEditList({ingredientEdits, setIngredientEdits}: { ingredientEdits: IngredientEdit[] , setIngredientEdits : any}) {
