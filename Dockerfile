@@ -1,7 +1,9 @@
 FROM --platform=linux/amd64 node:23.4
 WORKDIR /app
 
-COPY package.json .
+ARG NPM_TOKEN
+
+COPY package.json .npmrc ./
 
 RUN npm install
 

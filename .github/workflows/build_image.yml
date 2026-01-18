@@ -31,6 +31,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: grubplanner.co.uk:32000/meals_web_client:latest
+          build-args: |
+            NPM_TOKEN=${{ secrets.GITHUB_TOKEN }}
   deploy:
     needs: build_image
     runs-on: ubuntu-latest
