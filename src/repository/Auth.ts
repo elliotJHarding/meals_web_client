@@ -1,4 +1,4 @@
-import {AppUserDto} from "@harding/meals-api";
+import {AppUserDto} from "@elliotJHarding/meals-api";
 
 export default class Auth {
     private readonly user : AppUserDto | null;

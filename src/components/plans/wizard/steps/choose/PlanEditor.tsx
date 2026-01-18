@@ -1,4 +1,4 @@
-import {PlanDto} from "@harding/meals-api";
+import {PlanDto} from "@elliotJHarding/meals-api";
 import {Box, InputAdornment, Stack, TextField, Typography, Divider, useTheme} from "@mui/material";
 import {motion} from "framer-motion";
 import {useNavigate} from "react-router-dom";
@@ -11,14 +11,14 @@ import {usePlanUpdate} from "../../../../../hooks/plan/usePlanUpdate.ts";
 import {usePlanCreate} from "../../../../../hooks/plan/usePlanCreate.ts";
 import MealItem from "./MealItem.tsx";
 import MealChooser from "../../../../dialog/MealChooser.tsx";
-import {MealDto} from "@harding/meals-api";
-import {PlanMealDto} from "@harding/meals-api";
-import {CalendarEventDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
+import {PlanMealDto} from "@elliotJHarding/meals-api";
+import {CalendarEventDto} from "@elliotJHarding/meals-api";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import IconButton from "@mui/material-next/IconButton";
 import AiChatInput from "./AiChatInput.tsx";
 import SuggestedMealCard from "./SuggestedMealCard.tsx";
-import {SuggestedMeal} from "@harding/meals-api";
+import {SuggestedMeal} from "@elliotJHarding/meals-api";
 import { useAiMealChat } from "../../../../../hooks/ai/useAiMealChat.ts";
 
 // Simple debounce implementation

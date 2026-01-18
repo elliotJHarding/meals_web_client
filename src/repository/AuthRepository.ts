@@ -1,4 +1,4 @@
-import {AuthenticationApi, AppUserDto, LoginRequest as ApiLoginRequest, Configuration} from "@harding/meals-api";
+import {AuthenticationApi, AppUserDto, LoginRequest as ApiLoginRequest, Configuration} from "@elliotJHarding/meals-api";
 import {Token} from "../contexts/AuthContext.tsx";
 import {toastService} from "../contexts/ToastContext.tsx";
 import axios from "axios";

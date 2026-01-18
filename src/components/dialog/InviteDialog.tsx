@@ -1,7 +1,7 @@
 import {Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography, useTheme} from "@mui/material";
 import Button from "@mui/material-next/Button";
 import {Cancel, ContentCopy} from "@mui/icons-material";
-import {FamilyGroupDto} from "@harding/meals-api";
+import {FamilyGroupDto} from "@elliotJHarding/meals-api";
 
 export default function InviteDialog({open, setOpen, group}: {
     open: boolean,

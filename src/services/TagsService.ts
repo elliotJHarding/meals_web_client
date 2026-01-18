@@ -1,5 +1,5 @@
 import MealTagRepository from "../repository/MealTagRepository.ts";
-import {MealTag} from "@harding/meals-api";
+import {MealTag} from "@elliotJHarding/meals-api";
 
 /**
  * Singleton service for managing meal tags with in-memory caching.

@@ -1,6 +1,6 @@
 import {Card, Stack} from "@mui/material";
 import MealPlan from "../../domain/MealPlan.ts";
-import {PlanDto} from "@harding/meals-api";
+import {PlanDto} from "@elliotJHarding/meals-api";
 import DayPlan from "./Plan.tsx";
 import Button from "@mui/material-next/Button";
 import {NoteAdd} from "@mui/icons-material";

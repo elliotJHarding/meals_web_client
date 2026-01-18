@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {PlanDto} from "@harding/meals-api";
+import {PlanDto} from "@elliotJHarding/meals-api";
 import PlanRepository from "../../repository/PlanRepository.ts";
 
 export const usePlansUpdate = (): {updatePlans: (plans: PlanDto[], onSuccess: () => void) => void, loading: boolean} => {

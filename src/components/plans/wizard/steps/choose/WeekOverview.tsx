@@ -1,7 +1,7 @@
 import {Card, CardMedia, Stack, Typography, useMediaQuery, useTheme, Box} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
-import {PlanDto} from "@harding/meals-api";
-import {CalendarEventDto} from "@harding/meals-api";
+import {PlanDto} from "@elliotJHarding/meals-api";
+import {CalendarEventDto} from "@elliotJHarding/meals-api";
 import {motion, LayoutGroup} from "framer-motion";
 import {Kitchen, NotesRounded, RestaurantMenu} from "@mui/icons-material";
 import ServesChip from "../../../../meals/chip/ServesChip.tsx";
@@ -9,7 +9,7 @@ import EffortChip from "../../../../meals/chip/EffortChip.tsx";
 import PrepTimeChip from "../../../../meals/chip/PrepTimeChip.tsx";
 import IngredientsWarningChip from "../../../../meals/chip/IngredientsWarningChip.tsx";
 import DayItem from "./DayItem.tsx";
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 
 interface WeekOverviewProps {
     mealPlan: MealPlan;

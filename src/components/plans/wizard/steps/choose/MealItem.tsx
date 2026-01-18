@@ -2,7 +2,7 @@ import { Card, CardMedia, IconButton, Stack, TextField, Typography, InputAdornme
 import {Add, Remove, Delete, NotesRounded, Person, RestaurantMenu, Kitchen} from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import {PlanMealDto} from "@harding/meals-api";
+import {PlanMealDto} from "@elliotJHarding/meals-api";
 import { useNavigate } from "react-router-dom";
 
 interface MealItemProps {

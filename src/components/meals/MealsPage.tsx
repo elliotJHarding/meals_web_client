@@ -10,7 +10,7 @@ import {Add, Tune} from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material-next/Button";
 import {useNavigate} from "react-router-dom";
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 import NewMealDialog from "../dialog/NewMealDialog.tsx";
 
 export default function MealsPage() {

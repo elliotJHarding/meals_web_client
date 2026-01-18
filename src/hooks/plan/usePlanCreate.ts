@@ -1,4 +1,4 @@
-import {PlanDto} from "@harding/meals-api";
+import {PlanDto} from "@elliotJHarding/meals-api";
 import PlanRepository from "../../repository/PlanRepository.ts";
 import {useState} from "react";
 

@@ -1,5 +1,5 @@
 import Filter from "./Filter.tsx";
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 import MealFilterCriteria from "./MealFilterCriteria.ts";
 
 export default class MealFilter implements Filter<MealDto> {

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback } from "react";
-import {PlanDto, MealDto, CalendarEventDto, ChatMessage, SuggestedMeal, DayMealPlanChatRequest} from "@harding/meals-api";
+import {PlanDto, MealDto, CalendarEventDto, ChatMessage, SuggestedMeal, DayMealPlanChatRequest} from "@elliotJHarding/meals-api";
 import MealPlan from "../../domain/MealPlan.ts";
 import AiRepository from "../../repository/AiRepository.ts";
 

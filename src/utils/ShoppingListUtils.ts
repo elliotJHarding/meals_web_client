@@ -1,4 +1,4 @@
-import {ShoppingListItemDto} from "@harding/meals-api";
+import {ShoppingListItemDto} from "@elliotJHarding/meals-api";
 
 export function sortShoppingListItems(a: ShoppingListItemDto | undefined, b: ShoppingListItemDto | undefined): number {
     const textA = a?.ingredient?.name?.toUpperCase() ?? '';

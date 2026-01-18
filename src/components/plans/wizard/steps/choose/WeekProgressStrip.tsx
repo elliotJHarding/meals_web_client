@@ -1,7 +1,7 @@
 import {Box, Stack, Typography, useMediaQuery, useTheme, Avatar} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import {CalendarViewWeek, RestaurantMenu, Kitchen} from "@mui/icons-material";
-import {PlanMealDto} from "@harding/meals-api";
+import {PlanMealDto} from "@elliotJHarding/meals-api";
 import {motion} from "framer-motion";
 
 interface WeekProgressStripProps {

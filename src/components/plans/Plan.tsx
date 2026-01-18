@@ -1,8 +1,8 @@
-import {PlanDto} from "@harding/meals-api";
+import {PlanDto} from "@elliotJHarding/meals-api";
 import { Card, CardMedia, Stack, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { RestaurantMenu, Kitchen } from "@mui/icons-material";
-import {PlanMealDto} from "@harding/meals-api";
+import {PlanMealDto} from "@elliotJHarding/meals-api";
 
 export default function DayPlan({ plan }: { plan: PlanDto }) {
 

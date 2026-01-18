@@ -1,5 +1,5 @@
 import {Chip} from "@mui/material-next";
-import {Effort} from "@harding/meals-api";
+import {Effort} from "@elliotJHarding/meals-api";
 import {OverridableStringUnion} from "@mui/types";
 import {ChipPropsColorOverrides, ChipPropsSizeOverrides} from "@mui/material-next/Chip/Chip.types";
 

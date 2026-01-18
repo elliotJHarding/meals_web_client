@@ -1,6 +1,6 @@
 import {Card} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
-import {MealDto, PlanDto} from "@harding/meals-api";
+import {MealDto, PlanDto} from "@elliotJHarding/meals-api";
 import {motion, AnimatePresence, PanInfo, useMotionValue, useSpring} from "framer-motion";
 import {useState, useEffect, useRef, useCallback} from "react";
 import {useNavigate} from "react-router-dom";

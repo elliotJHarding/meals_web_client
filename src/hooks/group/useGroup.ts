@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import GroupRepository from "../../repository/GroupRepository.ts";
-import {FamilyGroupDto} from "@harding/meals-api";
+import {FamilyGroupDto} from "@elliotJHarding/meals-api";
 
 export const useGroup = (): {
     group: FamilyGroupDto;

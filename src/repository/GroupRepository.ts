@@ -1,4 +1,4 @@
-import {FamilyGroupApi, FamilyGroupDto, Configuration} from "@harding/meals-api";
+import {FamilyGroupApi, FamilyGroupDto, Configuration} from "@elliotJHarding/meals-api";
 import {toastService} from "../contexts/ToastContext.tsx";
 import axios from "axios";
 

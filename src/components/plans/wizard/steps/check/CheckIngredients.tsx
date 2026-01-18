@@ -8,7 +8,7 @@ import {DoorSlidingOutlined, KitchenOutlined, ShoppingCartOutlined} from "@mui/i
 import ingredientChecksReducer, {SetItemsAction} from "../../../../../reducer/IngredientChecksReducer.ts";
 import {sortShoppingListItems} from "../../../../../utils/ShoppingListUtils.ts";
 import {usePlansUpdate} from "../../../../../hooks/plan/usePlansUpdate.ts";
-import {PlanDto, ShoppingListItemDto} from "@harding/meals-api";
+import {PlanDto, ShoppingListItemDto} from "@elliotJHarding/meals-api";
 
 // Extended type to track which plan each shopping list item belongs to
 type ShoppingListItemWithPlanId = ShoppingListItemDto & { planId?: number };

@@ -1,4 +1,4 @@
-import {UnitDto} from "@harding/meals-api";
+import {UnitDto} from "@elliotJHarding/meals-api";
 
 export function parseUnit(units: UnitDto[], input: string): UnitDto | null {
     let matchingUnit = units.find((unit) => {

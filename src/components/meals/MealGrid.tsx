@@ -1,4 +1,4 @@
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 import MealGridCard from "./MealGridCard.tsx";
 import Grid from "@mui/material/Unstable_Grid2";
 import Error from "../error/Error.tsx";

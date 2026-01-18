@@ -1,4 +1,4 @@
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 import {useEffect, useState} from "react";
 import MealRepository from "../../repository/MealRepository.ts";
 import {useLocation} from "react-router-dom";

@@ -1,6 +1,6 @@
 import {useMetadataLookup} from "../../hooks/useMetadataLookup.ts";
 import {useEffect, useState} from "react";
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 import {Card, CardMedia, InputAdornment, Stack, TextField, Typography} from "@mui/material";
 import {Download, Link} from "@mui/icons-material";
 import RestaurantIcon from "@mui/icons-material/Restaurant";

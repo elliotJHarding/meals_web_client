@@ -2,7 +2,7 @@ import {useContext} from "react";
 import {AuthContext, Token} from "../contexts/AuthContext.tsx";
 import Auth from "../repository/Auth.ts";
 import AuthRepository from "../repository/AuthRepository.ts";
-import {AppUserDto} from "@harding/meals-api";
+import {AppUserDto} from "@elliotJHarding/meals-api";
 import {useNavigate, useLocation} from "react-router-dom";
 
 export const useAuth = (protect: boolean) => {

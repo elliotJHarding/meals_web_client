@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material-next/Button";
 import {Add, Close, ContentPaste, Edit, PlaylistAdd} from "@mui/icons-material";
 import {useState} from "react";
-import {MealDto, IngredientDto} from "@harding/meals-api";
+import {MealDto, IngredientDto} from "@elliotJHarding/meals-api";
 import {useMealUpdate} from "../../../hooks/meal/useMealUpdate.ts";
 import IngredientList from "./IngredientList.tsx";
 import IngredientEditList from "./IngredientEditList.tsx";

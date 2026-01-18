@@ -1,4 +1,4 @@
-import {PlansApi, PlanDto, Configuration} from "@harding/meals-api";
+import {PlansApi, PlanDto, Configuration} from "@elliotJHarding/meals-api";
 import {toastService} from "../contexts/ToastContext.tsx";
 import axios from "axios";
 import {axiosInstance} from "./Client.ts";

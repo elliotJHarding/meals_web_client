@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import CalendarRepository from "../../repository/CalendarRepository.ts";
-import {CalendarEventDto} from "@harding/meals-api";
+import {CalendarEventDto} from "@elliotJHarding/meals-api";
 import { useCalendarEventsCache } from "../../contexts/CalendarEventsCacheContext.tsx";
 
 export const useCalendarEvents = (from: string, to: string, ttlMs?: number) => {

@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import Button from "@mui/material-next/Button";
 import {Cancel, Check, Language, Link} from "@mui/icons-material";
 import {InputAdornment, Skeleton, Stack, TextField, Typography} from "@mui/material";
-import {MealDto, RecipeDto} from "@harding/meals-api";
+import {MealDto, RecipeDto} from "@elliotJHarding/meals-api";
 import IconButton from "@mui/material-next/IconButton";
 import {MetaData} from "../../../repository/MetaDataRepository.ts";
 import {useMetadataLookup} from "../../../hooks/useMetadataLookup.ts";

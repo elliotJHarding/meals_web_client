@@ -1,4 +1,4 @@
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 import Grid from "@mui/material/Unstable_Grid2";
 import {Card, CardActionArea, CardMedia, Fade, Typography} from "@mui/material";
 import EffortChip from "./chip/EffortChip.tsx";

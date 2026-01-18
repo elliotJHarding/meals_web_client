@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import UnitRepository from "../../repository/UnitRepository.ts";
-import {UnitDto} from "@harding/meals-api";
+import {UnitDto} from "@elliotJHarding/meals-api";
 
 export const useUnits = (): {units: UnitDto[], setUnits: any, loading: boolean} => {
 

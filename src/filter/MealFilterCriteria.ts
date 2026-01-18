@@ -1,5 +1,5 @@
 import FilterCriteria from "./FilterCriteria.ts";
-import {Effort} from "@harding/meals-api";
+import {Effort} from "@elliotJHarding/meals-api";
 
 export default interface MealFilterCriteria extends FilterCriteria {
     name: string | null;

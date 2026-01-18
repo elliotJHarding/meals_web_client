@@ -1,4 +1,4 @@
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 import {Dialog, Stack, useMediaQuery, useTheme, Typography, TextField, Select, FormControl, InputLabel, MenuItem, CircularProgress, Card, CardActionArea, CardMedia, Collapse} from "@mui/material";
 import SearchBar from "../common/SearchBar.tsx";
 import {useState, useEffect} from "react";
@@ -13,12 +13,12 @@ import IconButton from "@mui/material-next/IconButton";
 import {useMealCreate} from "../../hooks/meal/useMealCreate.ts";
 import {useTags} from "../../hooks/tags/useTags.ts";
 import {formatPrepTime} from "../common/Utils.ts";
-import {Effort} from "@harding/meals-api";
+import {Effort} from "@elliotJHarding/meals-api";
 import {AnimatePresence, motion} from "framer-motion";
 import PrepTimeChip from "../meals/chip/PrepTimeChip.tsx";
 import EffortChip from "../meals/chip/EffortChip.tsx";
 import MealPlan from "../../domain/MealPlan.ts";
-import {PlanDto} from "@harding/meals-api";
+import {PlanDto} from "@elliotJHarding/meals-api";
 
 export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoading, mealsFailed, mealPlan, currentPlan}: {
     open: boolean,

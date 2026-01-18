@@ -1,7 +1,7 @@
 import {Card, CardMedia, Stack, Typography, Box, Chip, useTheme} from "@mui/material";
 import { RestaurantMenu, Add } from "@mui/icons-material";
 import { motion } from "framer-motion";
-import {SuggestedMeal, MealDto} from "@harding/meals-api";
+import {SuggestedMeal, MealDto} from "@elliotJHarding/meals-api";
 import IconButton from "@mui/material-next/IconButton";
 
 interface SuggestedMealCardProps {

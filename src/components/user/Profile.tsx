@@ -9,7 +9,7 @@ import {useState, useEffect} from "react";
 import InviteDialog from "../dialog/InviteDialog.tsx";
 import {useCalendars} from "../../hooks/calendar/useCalendars.ts";
 import {useLinkCalendar} from "../../hooks/calendar/useLinkCalendar.ts";
-import {Calendar} from "@harding/meals-api";
+import {Calendar} from "@elliotJHarding/meals-api";
 import CalendarRepository from "../../repository/CalendarRepository.ts";
 import {motion} from "framer-motion";
 

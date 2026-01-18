@@ -1,7 +1,7 @@
 import {Box, Typography, Stack} from "@mui/material";
 import Button from "@mui/material-next/Button";
 import {CalendarMonth} from "@mui/icons-material";
-import {PlanDto, ChatMessage} from "@harding/meals-api";
+import {PlanDto, ChatMessage} from "@elliotJHarding/meals-api";
 import {useLinkCalendar} from "../../../../../hooks/calendar/useLinkCalendar.ts";
 import AiChatInput from "./AiChatInput.tsx";
 

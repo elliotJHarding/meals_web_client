@@ -1,4 +1,4 @@
-import {MealsApi, MealDto, Configuration} from "@harding/meals-api";
+import {MealsApi, MealDto, Configuration} from "@elliotJHarding/meals-api";
 import {toastService} from "../contexts/ToastContext.tsx";
 import axios from "axios";
 

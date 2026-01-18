@@ -1,4 +1,4 @@
-import {PlanDto} from "@harding/meals-api";
+import {PlanDto} from "@elliotJHarding/meals-api";
 
 export default class MealPlan {
     plans: PlanDto[];

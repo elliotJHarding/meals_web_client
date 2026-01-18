@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {MealTag} from "@harding/meals-api";
+import {MealTag} from "@elliotJHarding/meals-api";
 import TagsService from "../../services/TagsService.ts";
 
 export const useTags = (): {

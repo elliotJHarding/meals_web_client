@@ -1,4 +1,4 @@
-import {IngredientDto, UnitDto, MealDto} from "@harding/meals-api";
+import {IngredientDto, UnitDto, MealDto} from "@elliotJHarding/meals-api";
 import {parseUnit} from "./UnitUtils.ts";
 import {IngredientEdit} from "../types/IngredientEdit.ts";
 

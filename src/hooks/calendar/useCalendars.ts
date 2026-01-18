@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import CalendarRepository from "../../repository/CalendarRepository.ts";
-import {Calendar} from "@harding/meals-api";
+import {Calendar} from "@elliotJHarding/meals-api";
 
 export const useCalendars = () => {
     const repository: CalendarRepository = new CalendarRepository();

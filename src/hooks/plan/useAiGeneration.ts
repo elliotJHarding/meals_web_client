@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PlanRepository from "../../repository/PlanRepository.ts";
-import {PlanDto} from "@harding/meals-api";
+import {PlanDto} from "@elliotJHarding/meals-api";
 
 export const useAiGeneration = () => {
     const repository = new PlanRepository();

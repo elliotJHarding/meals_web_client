@@ -2,7 +2,7 @@ import {Chip} from "@mui/material-next";
 import {WarningAmber, WarningAmberRounded} from "@mui/icons-material";
 import {OverridableStringUnion} from "@mui/types";
 import {ChipPropsSizeOverrides} from "@mui/material-next/Chip/Chip.types";
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 
 export default function IngredientsWarningChip({meal, size} : {
     meal: MealDto | undefined,

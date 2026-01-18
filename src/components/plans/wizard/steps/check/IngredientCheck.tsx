@@ -1,5 +1,5 @@
 import {Card, Checkbox, Stack, Typography} from "@mui/material";
-import {IngredientDto} from "@harding/meals-api";
+import {IngredientDto} from "@elliotJHarding/meals-api";
 import {CheckItemAction} from "../../../../../reducer/IngredientChecksReducer.ts";
 import {motion} from "framer-motion";
 

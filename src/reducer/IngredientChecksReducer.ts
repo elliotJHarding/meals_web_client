@@ -1,4 +1,4 @@
-import {ShoppingListItemDto} from "@harding/meals-api";
+import {ShoppingListItemDto} from "@elliotJHarding/meals-api";
 import {sortShoppingListItems} from "../utils/ShoppingListUtils.ts";
 
 // Extended type to track which plan each shopping list item belongs to

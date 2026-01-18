@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 
 export interface MealsCacheContextType {
     getCachedMeals: () => MealDto[];

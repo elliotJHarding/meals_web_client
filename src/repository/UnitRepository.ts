@@ -1,4 +1,4 @@
-import {UnitsApi, UnitDto, Configuration, UnitsResponse} from "@harding/meals-api";
+import {UnitsApi, UnitDto, Configuration, UnitsResponse} from "@elliotJHarding/meals-api";
 import {toastService} from "../contexts/ToastContext.tsx";
 import axios from "axios";
 

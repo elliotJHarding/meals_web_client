@@ -1,4 +1,4 @@
-import {PlanDto, MealDto, PlanMealDto, CalendarEventDto, SuggestedMeal} from "@harding/meals-api";
+import {PlanDto, MealDto, PlanMealDto, CalendarEventDto, SuggestedMeal} from "@elliotJHarding/meals-api";
 import {Box, InputAdornment, Stack, TextField, Typography, Divider, Paper, useTheme} from "@mui/material";
 import {motion} from "framer-motion";
 import {EditNoteRounded, Add} from "@mui/icons-material";

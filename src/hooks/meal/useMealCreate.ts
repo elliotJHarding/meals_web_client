@@ -1,4 +1,4 @@
-import {MealDto} from "@harding/meals-api";
+import {MealDto} from "@elliotJHarding/meals-api";
 import MealRepository from "../../repository/MealRepository.ts";
 import {useState} from "react";
 

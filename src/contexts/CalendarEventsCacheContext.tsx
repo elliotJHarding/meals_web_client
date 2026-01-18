@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
-import {CalendarEventDto} from "@harding/meals-api";
+import {CalendarEventDto} from "@elliotJHarding/meals-api";
 
 interface CachedCalendarEvents {
     events: CalendarEventDto[];

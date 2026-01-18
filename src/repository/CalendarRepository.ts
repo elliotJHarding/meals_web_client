@@ -1,4 +1,4 @@
-import {CalendarApi, CalendarEventDto, Calendar, Configuration} from "@harding/meals-api";
+import {CalendarApi, CalendarEventDto, Calendar, Configuration} from "@elliotJHarding/meals-api";
 import {toastService} from "../contexts/ToastContext.tsx";
 import {axiosInstance} from "./Client.ts";
 

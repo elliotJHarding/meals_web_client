@@ -1,4 +1,4 @@
-import {CalendarEventDto} from "@harding/meals-api";
+import {CalendarEventDto} from "@elliotJHarding/meals-api";
 import {Card, Stack, Typography} from "@mui/material";
 import {motion} from "framer-motion";
 

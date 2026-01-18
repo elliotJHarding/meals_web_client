@@ -1,4 +1,4 @@
-import {MealPlanningApi, DayMealPlanChatRequest, DayMealPlanChatResponse, Configuration} from "@harding/meals-api";
+import {MealPlanningApi, DayMealPlanChatRequest, DayMealPlanChatResponse, Configuration} from "@elliotJHarding/meals-api";
 import {toastService} from "../contexts/ToastContext.tsx";
 import axios from "axios";
 
