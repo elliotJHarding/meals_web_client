@@ -67,9 +67,9 @@ export default function ChooseMealsV2({
     // Find the plan for the selected date (if one is selected)
     const selectedPlan = selectedDate ? mealPlan.plans.find(plan => {
         const planDate = new Date(plan.date);
-        return planDate.getFullYear() === selectedDate.getFullYear() &&
-            planDate.getMonth() === selectedDate.getMonth() &&
-            planDate.getDate() === selectedDate.getDate();
+        return planDate.getUTCFullYear() === selectedDate.getUTCFullYear() &&
+            planDate.getUTCMonth() === selectedDate.getUTCMonth() &&
+            planDate.getUTCDate() === selectedDate.getUTCDate();
     }) ?? null : null;
 
     // AI Chat hook - called at this level to share state between AiChatSection and DayView
@@ -292,10 +292,10 @@ export default function ChooseMealsV2({
                             setMealPlan={setMealPlan}
                         />
                     </motion.div>
-                ) : selectedPlan && (
+                ) : (
                     <motion.div
                         ref={dayViewRef}
-                        key={new Date(selectedPlan.date).toISOString()}
+                        key={selectedDate.toISOString()}
                         style={{ x: smoothOffsetX }}
                         initial={{
                             opacity: 0,
@@ -322,17 +322,19 @@ export default function ChooseMealsV2({
                             trackpadOffsetX.set(0);
                         }}
                     >
-                        <DayView
-                            plan={selectedPlan}
-                            mealPlan={mealPlan}
-                            meals={meals}
-                            mealsLoading={mealsLoading}
-                            mealsFailed={mealsFailed}
-                            onPlanUpdate={handlePlanUpdate}
-                            calendarEvents={calendarEvents}
-                            currentSuggestions={aiChat.currentSuggestions}
-                            onRemoveSuggestion={aiChat.removeSuggestion}
-                        />
+                        {selectedPlan && (
+                            <DayView
+                                plan={selectedPlan}
+                                mealPlan={mealPlan}
+                                meals={meals}
+                                mealsLoading={mealsLoading}
+                                mealsFailed={mealsFailed}
+                                onPlanUpdate={handlePlanUpdate}
+                                calendarEvents={calendarEvents}
+                                currentSuggestions={aiChat.currentSuggestions}
+                                onRemoveSuggestion={aiChat.removeSuggestion}
+                            />
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>

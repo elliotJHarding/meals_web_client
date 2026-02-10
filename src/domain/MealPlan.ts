@@ -4,7 +4,7 @@ export default class MealPlan {
     plans: PlanDto[];
 
     static formatDate(date: Date) {
-        return `${date.getUTCFullYear()}-${date.toLocaleDateString('en-gb', {month: '2-digit'})}-${date.toLocaleDateString('en-gb', {day: '2-digit'})}`;
+        return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
     }
 
     findPlan(date: string | null): PlanDto | undefined {
