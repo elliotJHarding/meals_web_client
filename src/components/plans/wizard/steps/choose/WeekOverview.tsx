@@ -231,11 +231,13 @@ export default function WeekOverview({
     );
 
     return (
-        <Stack id="WeekOverview" spacing={2} sx={{padding: 2}} component={motion.div} layout>
+        <Stack id="WeekOverview" spacing={2} sx={{padding: 2}}>
             {isMobile ? (
-                <Stack spacing={2}>
-                    {dayItemsMobile}
-                </Stack>
+                <LayoutGroup>
+                    <Stack spacing={2}>
+                        {dayItemsMobile}
+                    </Stack>
+                </LayoutGroup>
             ) : (
                 <Box sx={{width: '100%'}} component={motion.div} layout id="DayItems">
                     <LayoutGroup>
