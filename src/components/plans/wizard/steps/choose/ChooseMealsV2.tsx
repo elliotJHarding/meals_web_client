@@ -42,26 +42,33 @@ export default function ChooseMealsV2({
     // AI Chat state - persists across day switches for continuous week planning conversation
     const [aiChatState, setAiChatState] = useState<AiChatState>(initialAiChatState);
 
-    // Gate AI auto-init during AnimatePresence exit animations to prevent
-    // setChatState re-renders that disrupt the transition (blank DayView bug).
-    // AiChatSection props are NOT gated — height changes alone are fine.
+    // Gate AI auto-init AND AiChatSection height changes during AnimatePresence
+    // exit animations. Without this, AiChatSection's height change (from "Select
+    // a day" to full chat UI) triggers layout conflicts with exiting motion
+    // elements, preventing onExitComplete from firing (blank DayView bug).
     const isFirstRender = useRef(true);
     const [readyForAi, setReadyForAi] = useState(true);
+    const [transitioning, setTransitioning] = useState(false);
     const aiReadyTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
-    // Synchronously block AI init when selectedDate changes (except on mount).
-    // useLayoutEffect runs before useAiMealChat's useEffect, preventing a race.
+    // Synchronously block AI init and AiChatSection expansion when selectedDate
+    // changes (except on mount). useLayoutEffect runs before paint, preventing
+    // a flash of the expanded chat UI during the exit animation.
     useLayoutEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
             return;
         }
         setReadyForAi(false);
+        setTransitioning(true);
 
         // Fallback: re-enable after animation duration + buffer,
         // in case onExitComplete doesn't fire (e.g. no exit animation)
         if (aiReadyTimerRef.current) clearTimeout(aiReadyTimerRef.current);
-        aiReadyTimerRef.current = setTimeout(() => setReadyForAi(true), 400);
+        aiReadyTimerRef.current = setTimeout(() => {
+            setReadyForAi(true);
+            setTransitioning(false);
+        }, 400);
 
         return () => {
             if (aiReadyTimerRef.current) clearTimeout(aiReadyTimerRef.current);
@@ -279,6 +286,7 @@ export default function ChooseMealsV2({
             <AiChatSection
                 selectedDate={selectedDate}
                 selectedPlan={selectedPlan}
+                transitioning={transitioning}
                 mealsLoading={mealsLoading}
                 isAuthorized={isAuthorized}
                 conversationHistory={aiChat.conversationHistory}
@@ -300,6 +308,7 @@ export default function ChooseMealsV2({
             <AnimatePresence mode="wait" onExitComplete={() => {
                 if (aiReadyTimerRef.current) clearTimeout(aiReadyTimerRef.current);
                 setReadyForAi(true);
+                setTransitioning(false);
             }}>
                 {selectedDate === null ? (
                     <motion.div

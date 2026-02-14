@@ -8,6 +8,7 @@ import AiChatInput from "./AiChatInput.tsx";
 interface AiChatSectionProps {
     selectedDate: Date | null;
     selectedPlan: PlanDto | null;
+    transitioning: boolean;
     mealsLoading: boolean;
     isAuthorized: boolean;
     // AI chat data passed from parent
@@ -22,6 +23,7 @@ interface AiChatSectionProps {
 export default function AiChatSection({
     selectedDate,
     selectedPlan,
+    transitioning,
     mealsLoading,
     isAuthorized,
     conversationHistory,
@@ -31,7 +33,8 @@ export default function AiChatSection({
     setInputMessage,
     sendMessage
 }: AiChatSectionProps) {
-    const isDaySelected = selectedDate !== null && selectedPlan !== null;
+    // During transitions, keep height stable by showing "Select a day" state
+    const isDaySelected = !transitioning && selectedDate !== null && selectedPlan !== null;
     const { authorizeCalendar, authorizing } = useLinkCalendar();
 
     const handleSendMessage = () => {

@@ -36,6 +36,17 @@ export function useAiMealChat(
 ) {
     const aiRepository = useRef(new AiRepository()).current;
 
+    // Ref to track which date has been initialized, preventing the runaway loop
+    // that occurs when using chatState.lastInitializedDate in useEffect deps.
+    // The loop happens because: AI response → setChatState → sendMessage ref changes
+    // → initializeChat ref changes → useEffect re-fires → initializeChat() again.
+    const lastInitDateRef = useRef<string | null>(chatState.lastInitializedDate);
+
+    // Keep ref in sync when chatState updates from outside (e.g. reset)
+    if (chatState.lastInitializedDate === null && lastInitDateRef.current !== null) {
+        lastInitDateRef.current = null;
+    }
+
     // Filter calendar events to only show events on the plan date
     const filteredCalendarEvents = plan ? calendarEvents.filter(event => {
         const eventDate = new Date(event.time!);
@@ -64,6 +75,11 @@ export function useAiMealChat(
             })) || []
         }));
     }, [meals]);
+
+    // Use a ref for sendMessage to break the dependency cycle in the auto-init effect.
+    // sendMessage changes ref on every chatState update (conversationHistory, chatContext,
+    // isLoading), which would cascade through initializeChat → useEffect → re-init.
+    const sendMessageRef = useRef<(message: string, isSystemMessage: boolean) => void>(() => {});
 
     const sendMessage = useCallback((message: string, isSystemMessage: boolean = false) => {
         if (!plan) return;
@@ -123,16 +139,22 @@ export function useAiMealChat(
     }, [plan, chatState.conversationHistory, chatState.chatContext, chatState.isLoading,
         filteredCalendarEvents, mealPlan.plans, recentPlans, cleanMeals, aiRepository, setChatState]);
 
+    // Keep ref current so the auto-init effect always calls the latest sendMessage
+    sendMessageRef.current = sendMessage;
+
     // Auto-suggest when a new day is selected
     const initializeChat = useCallback(() => {
         if (!plan) return;
 
         const planDateStr = new Date(plan.date!).toISOString().split('T')[0];
 
-        // Don't re-initialize if we already did for this date
-        if (chatState.lastInitializedDate === planDateStr) return;
+        // Don't re-initialize if we already did for this date (use ref, not state)
+        if (lastInitDateRef.current === planDateStr) return;
 
-        // Mark this date as initialized
+        // Mark this date as initialized immediately via ref (prevents re-entry)
+        lastInitDateRef.current = planDateStr;
+
+        // Also update state for external consumers
         setChatState(prev => ({
             ...prev,
             lastInitializedDate: planDateStr,
@@ -145,19 +167,22 @@ export function useAiMealChat(
 
         // Send system message to get initial suggestions
         const initMessage = `I'm now planning meals for ${dayName}, ${dateStr}. Please suggest some meals for this day.`;
-        sendMessage(initMessage, true);
-    }, [plan, chatState.lastInitializedDate, sendMessage, setChatState]);
+        sendMessageRef.current(initMessage, true);
+    }, [plan, setChatState]);
 
-    // Auto-initialize when day changes (if authorized and meals are loaded)
-    // readyToInit gates this to prevent firing during AnimatePresence exit animations
+    // Auto-initialize when day changes (if authorized and meals are loaded).
+    // readyToInit gates this to prevent firing during AnimatePresence exit animations.
+    // Dependencies are intentionally minimal — sendMessage is accessed via ref to
+    // prevent the cascade: AI response → setChatState → sendMessage changes →
+    // initializeChat changes → useEffect re-fires → infinite loop.
     useEffect(() => {
-        if (readyToInit && plan && meals.length > 0 && !chatState.isLoading) {
+        if (readyToInit && plan && meals.length > 0) {
             const planDateStr = new Date(plan.date!).toISOString().split('T')[0];
-            if (chatState.lastInitializedDate !== planDateStr) {
+            if (lastInitDateRef.current !== planDateStr) {
                 initializeChat();
             }
         }
-    }, [readyToInit, plan, meals.length, chatState.isLoading, chatState.lastInitializedDate, initializeChat]);
+    }, [readyToInit, plan, meals.length, initializeChat]);
 
     const setInputMessage = useCallback((message: string) => {
         setChatState(prev => ({ ...prev, inputMessage: message }));

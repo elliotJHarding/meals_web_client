@@ -60,7 +60,6 @@ export default function WeekOverview({
         return (
             <Card
                 component={motion.div}
-                layout
                 sx={{
                     p: 2,
                     cursor: 'pointer',
@@ -233,11 +232,9 @@ export default function WeekOverview({
     return (
         <Stack id="WeekOverview" spacing={2} sx={{padding: 2}}>
             {isMobile ? (
-                <LayoutGroup>
-                    <Stack spacing={2}>
-                        {dayItemsMobile}
-                    </Stack>
-                </LayoutGroup>
+                <Stack spacing={2}>
+                    {dayItemsMobile}
+                </Stack>
             ) : (
                 <Box sx={{width: '100%'}} component={motion.div} layout id="DayItems">
                     <LayoutGroup>
