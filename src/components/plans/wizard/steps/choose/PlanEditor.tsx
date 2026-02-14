@@ -19,7 +19,7 @@ import IconButton from "@mui/material-next/IconButton";
 import AiChatInput from "./AiChatInput.tsx";
 import SuggestedMealCard from "./SuggestedMealCard.tsx";
 import {SuggestedMeal} from "@elliotJHarding/meals-api";
-import { useAiMealChat } from "../../../../../hooks/ai/useAiMealChat.ts";
+import {useAiMealChat, AiChatState, initialAiChatState} from "../../../../../hooks/ai/useAiMealChat.ts";
 
 // Simple debounce implementation
 const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => {
@@ -49,6 +49,7 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
         planMeals: plan.planMeals || []
     });
     const [mealChooserOpen, setMealChooserOpen] = useState(false);
+    const [aiChatState, setAiChatState] = useState<AiChatState>(initialAiChatState);
 
     // AI Chat Hook
     const {
@@ -59,7 +60,7 @@ export default function PlanEditor({plan, mealPlan, meals, mealsLoading, mealsFa
         setInputMessage,
         sendMessage,
         removeSuggestion
-    } = useAiMealChat(plan, mealPlan, meals, calendarEvents);
+    } = useAiMealChat(plan, mealPlan, meals, calendarEvents, [], aiChatState, setAiChatState, true);
 
     // Filter calendar events to only show events on the plan date
     const filteredCalendarEvents = calendarEvents.filter(event => {

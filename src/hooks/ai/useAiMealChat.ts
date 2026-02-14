@@ -31,7 +31,8 @@ export function useAiMealChat(
     recentPlans: PlanDto[],
     // External state management for persistence across day switches
     chatState: AiChatState,
-    setChatState: React.Dispatch<React.SetStateAction<AiChatState>>
+    setChatState: React.Dispatch<React.SetStateAction<AiChatState>>,
+    readyToInit: boolean
 ) {
     const aiRepository = useRef(new AiRepository()).current;
 
@@ -148,14 +149,15 @@ export function useAiMealChat(
     }, [plan, chatState.lastInitializedDate, sendMessage, setChatState]);
 
     // Auto-initialize when day changes (if authorized and meals are loaded)
+    // readyToInit gates this to prevent firing during AnimatePresence exit animations
     useEffect(() => {
-        if (plan && meals.length > 0 && !chatState.isLoading) {
+        if (readyToInit && plan && meals.length > 0 && !chatState.isLoading) {
             const planDateStr = new Date(plan.date!).toISOString().split('T')[0];
             if (chatState.lastInitializedDate !== planDateStr) {
                 initializeChat();
             }
         }
-    }, [plan, meals.length, chatState.isLoading, chatState.lastInitializedDate, initializeChat]);
+    }, [readyToInit, plan, meals.length, chatState.isLoading, chatState.lastInitializedDate, initializeChat]);
 
     const setInputMessage = useCallback((message: string) => {
         setChatState(prev => ({ ...prev, inputMessage: message }));

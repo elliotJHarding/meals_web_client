@@ -2,7 +2,7 @@ import {Card} from "@mui/material";
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import {MealDto, PlanDto} from "@elliotJHarding/meals-api";
 import {motion, AnimatePresence, PanInfo, useMotionValue, useSpring} from "framer-motion";
-import {useState, useEffect, useRef, useCallback} from "react";
+import {useState, useEffect, useLayoutEffect, useRef, useCallback} from "react";
 import {useNavigate} from "react-router-dom";
 import WeekProgressStrip from "./WeekProgressStrip.tsx";
 import DayView from "./DayView.tsx";
@@ -42,6 +42,16 @@ export default function ChooseMealsV2({
     // AI Chat state - persists across day switches for continuous week planning conversation
     const [aiChatState, setAiChatState] = useState<AiChatState>(initialAiChatState);
 
+    // Track AnimatePresence transition completion to prevent AI auto-init during exit animations.
+    const [transitionComplete, setTransitionComplete] = useState(true);
+
+    // useLayoutEffect ensures transitionComplete is false BEFORE useAiMealChat's useEffect runs.
+    // This prevents AI auto-init from firing during AnimatePresence exit animations,
+    // which would cause state updates that disrupt the transition (blank DayView bug).
+    useLayoutEffect(() => {
+        setTransitionComplete(false);
+    }, [selectedDate]);
+
     // Recent meal plans for AI to avoid repetition (previous 3 weeks)
     const [recentPlans, setRecentPlans] = useState<PlanDto[]>([]);
     const planRepository = useRef(new PlanRepository()).current;
@@ -80,7 +90,8 @@ export default function ChooseMealsV2({
         calendarEvents,
         recentPlans,
         aiChatState,
-        setAiChatState
+        setAiChatState,
+        transitionComplete
     );
 
     // Motion values for trackpad swiping
@@ -250,8 +261,8 @@ export default function ChooseMealsV2({
         >
             {/* AI Chat Section - Above Week Strip */}
             <AiChatSection
-                selectedDate={selectedDate}
-                selectedPlan={selectedPlan}
+                selectedDate={transitionComplete ? selectedDate : null}
+                selectedPlan={transitionComplete ? selectedPlan : null}
                 mealsLoading={mealsLoading}
                 isAuthorized={isAuthorized}
                 conversationHistory={aiChat.conversationHistory}
@@ -270,7 +281,7 @@ export default function ChooseMealsV2({
             />
 
             {/* Conditional Rendering: Week Overview or Day View - With scale/fade transition */}
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" onExitComplete={() => setTransitionComplete(true)}>
                 {selectedDate === null ? (
                     <motion.div
                         key="week-overview"
