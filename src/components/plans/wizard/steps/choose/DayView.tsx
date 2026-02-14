@@ -1,6 +1,6 @@
 import {PlanDto, MealDto, PlanMealDto, CalendarEventDto, SuggestedMeal} from "@elliotJHarding/meals-api";
 import {Box, InputAdornment, Stack, TextField, Typography, Divider, Paper, useTheme} from "@mui/material";
-import {motion} from "framer-motion";
+
 import {EditNoteRounded, Add} from "@mui/icons-material";
 import Button from "@mui/material-next/Button";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -149,7 +149,7 @@ export default function DayView({
     };
 
     return (
-        <Box component={motion.div} layout width={'100%'}>
+        <Box width={'100%'}>
             <Box sx={{ px: 2, pb: 2, pt: 3 }}>
                 {/* Day Header */}
                 <Stack spacing={2} sx={{ mb: 3 }}>

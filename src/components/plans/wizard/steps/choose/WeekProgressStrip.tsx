@@ -2,7 +2,7 @@ import {Box, Stack, Typography, useMediaQuery, useTheme, Avatar} from "@mui/mate
 import MealPlan from "../../../../../domain/MealPlan.ts";
 import {CalendarViewWeek, RestaurantMenu, Kitchen} from "@mui/icons-material";
 import {PlanMealDto} from "@elliotJHarding/meals-api";
-import {motion} from "framer-motion";
+
 
 interface WeekProgressStripProps {
     mealPlan: MealPlan;
@@ -141,7 +141,6 @@ export default function WeekProgressStrip({
 
     return (
         <Box
-            component={motion.div} layout
             sx={{
                 width: '100%',
                 bgcolor: 'transparent',
@@ -159,7 +158,6 @@ export default function WeekProgressStrip({
             <Stack
                 direction="row"
                 spacing={{ xs: 0.3, md: 0.5 }}
-                component={motion.div} layout
                 sx={{
                     p: { xs: 1.5, md: 2 },
                     minWidth: 'fit-content',
@@ -171,7 +169,6 @@ export default function WeekProgressStrip({
                     <Box
                         key={index}
                         onClick={() => onDaySelect(item.date)}
-                        component={motion.div} layout
                         sx={{
                             cursor: 'pointer',
                             minWidth: { xs: 50, md: 50 },
@@ -245,7 +242,6 @@ export default function WeekProgressStrip({
                 {/* Week Overview Button */}
                 <Box
                     onClick={() => onDaySelect(null)}
-                    component={motion.div} layout
                     sx={{
                         cursor: 'pointer',
                         minWidth: { xs: 50, md: 80 },
