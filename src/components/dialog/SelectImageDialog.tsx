@@ -46,7 +46,7 @@ export default function SelectImageDialog({query, open, setOpen, onConfirm} : {q
         if (query && tabValue === 'stock') {
             setLoading(true);
             getStockPhotos(query, (response: ImageSearchResponse) => {
-                setImages(response.imageUrls);
+                setImages(response.imageUrls ?? []);
                 setLoading(false);
             });
         }
