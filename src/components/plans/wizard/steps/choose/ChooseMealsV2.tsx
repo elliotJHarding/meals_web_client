@@ -42,14 +42,30 @@ export default function ChooseMealsV2({
     // AI Chat state - persists across day switches for continuous week planning conversation
     const [aiChatState, setAiChatState] = useState<AiChatState>(initialAiChatState);
 
-    // Track AnimatePresence transition completion to prevent AI auto-init during exit animations.
-    const [transitionComplete, setTransitionComplete] = useState(true);
+    // Gate AI auto-init during AnimatePresence exit animations to prevent
+    // setChatState re-renders that disrupt the transition (blank DayView bug).
+    // AiChatSection props are NOT gated — height changes alone are fine.
+    const isFirstRender = useRef(true);
+    const [readyForAi, setReadyForAi] = useState(true);
+    const aiReadyTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
-    // useLayoutEffect ensures transitionComplete is false BEFORE useAiMealChat's useEffect runs.
-    // This prevents AI auto-init from firing during AnimatePresence exit animations,
-    // which would cause state updates that disrupt the transition (blank DayView bug).
+    // Synchronously block AI init when selectedDate changes (except on mount).
+    // useLayoutEffect runs before useAiMealChat's useEffect, preventing a race.
     useLayoutEffect(() => {
-        setTransitionComplete(false);
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        setReadyForAi(false);
+
+        // Fallback: re-enable after animation duration + buffer,
+        // in case onExitComplete doesn't fire (e.g. no exit animation)
+        if (aiReadyTimerRef.current) clearTimeout(aiReadyTimerRef.current);
+        aiReadyTimerRef.current = setTimeout(() => setReadyForAi(true), 400);
+
+        return () => {
+            if (aiReadyTimerRef.current) clearTimeout(aiReadyTimerRef.current);
+        };
     }, [selectedDate]);
 
     // Recent meal plans for AI to avoid repetition (previous 3 weeks)
@@ -91,7 +107,7 @@ export default function ChooseMealsV2({
         recentPlans,
         aiChatState,
         setAiChatState,
-        transitionComplete
+        readyForAi
     );
 
     // Motion values for trackpad swiping
@@ -261,8 +277,8 @@ export default function ChooseMealsV2({
         >
             {/* AI Chat Section - Above Week Strip */}
             <AiChatSection
-                selectedDate={transitionComplete ? selectedDate : null}
-                selectedPlan={transitionComplete ? selectedPlan : null}
+                selectedDate={selectedDate}
+                selectedPlan={selectedPlan}
                 mealsLoading={mealsLoading}
                 isAuthorized={isAuthorized}
                 conversationHistory={aiChat.conversationHistory}
@@ -281,7 +297,10 @@ export default function ChooseMealsV2({
             />
 
             {/* Conditional Rendering: Week Overview or Day View - With scale/fade transition */}
-            <AnimatePresence mode="wait" onExitComplete={() => setTransitionComplete(true)}>
+            <AnimatePresence mode="wait" onExitComplete={() => {
+                if (aiReadyTimerRef.current) clearTimeout(aiReadyTimerRef.current);
+                setReadyForAi(true);
+            }}>
                 {selectedDate === null ? (
                     <motion.div
                         key="week-overview"
