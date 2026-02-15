@@ -1,5 +1,4 @@
-import {MealPlanningApi, DayMealPlanChatRequest, DayMealPlanChatResponse, Configuration} from "@elliotJHarding/meals-api";
-import {toastService} from "../contexts/ToastContext.tsx";
+import {MealPlanningApi, DayMealPlanChatRequest, DayMealPlanChatResponse, SuggestIngredientsRequest, SuggestIngredientsResponse, Configuration} from "@elliotJHarding/meals-api";
 import axios from "axios";
 
 export default class AiRepository {
@@ -33,7 +32,27 @@ export default class AiRepository {
             })
             .catch(error => {
                 console.error(error);
-                // toastService.showError('Failed to get AI meal suggestions');
+                if (onFailure) {
+                    onFailure();
+                }
+            });
+    }
+
+    suggestIngredients(
+        request: SuggestIngredientsRequest,
+        onSuccess: (response: SuggestIngredientsResponse) => void,
+        onFailure?: () => void
+    ): void {
+        console.info("Calling AI suggest ingredients endpoint");
+
+        this.api.suggestIngredientsProxy(request)
+            .then(response => {
+                const suggestResponse: SuggestIngredientsResponse = response.data;
+                console.info("AI suggest ingredients response:", suggestResponse);
+                onSuccess(suggestResponse);
+            })
+            .catch(error => {
+                console.error(error);
                 if (onFailure) {
                     onFailure();
                 }

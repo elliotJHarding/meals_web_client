@@ -22,7 +22,7 @@ export default function PlanWizard() {
 
     const {fromDate, toDate} = {fromDate: new Date(from ?? ''), toDate: new Date(to ?? '')}
 
-    const {mealPlan, setMealPlan} = usePlans(fromDate, toDate);
+    const {mealPlan, setMealPlan, refetch} = usePlans(fromDate, toDate);
 
     const navigate = useNavigate();
 
@@ -52,7 +52,8 @@ export default function PlanWizard() {
             next: "shopping",
             back: "choose",
             component: <CheckIngredients mealPlan={mealPlan}
-                                         setMealPlan={setMealPlan}/>,
+                                         setMealPlan={setMealPlan}
+                                         refetchPlans={refetch}/>,
         },
         {
             label: "Shopping List",

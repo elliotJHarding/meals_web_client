@@ -7,6 +7,10 @@ export function parseUnit(units: UnitDto[], input: string): UnitDto | null {
             unit.shortStem ?? '',
         ];
 
+        if (unit.code) {
+            matchers.push(unit.code);
+        }
+
         if (unit.longPluralise && unit.longStem) {
             matchers.push(`${unit.longStem}s`);
         }

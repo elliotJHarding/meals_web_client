@@ -1,4 +1,4 @@
-import {MealDto} from "@elliotJHarding/meals-api";
+import {MealDto, IngredientDto, SuggestedIngredient} from "@elliotJHarding/meals-api";
 import {Dialog, Stack, useMediaQuery, useTheme, Typography, TextField, Select, FormControl, InputLabel, MenuItem, CircularProgress, Card, CardActionArea, CardMedia, Collapse} from "@mui/material";
 import SearchBar from "../common/SearchBar.tsx";
 import {useState, useEffect} from "react";
@@ -7,16 +7,20 @@ import MealGrid from "../meals/MealGrid.tsx";
 import {Box} from "@mui/material";
 import Button from "@mui/material-next/Button";
 import {Tab, Tabs, Slider, Chip} from "@mui/material-next"
-import {RestaurantMenu, Kitchen, Add, ArrowBack, Remove, Person, Timer} from "@mui/icons-material";
+import {RestaurantMenu, Kitchen, Add, ArrowBack, Remove, Person, Timer, AutoAwesome} from "@mui/icons-material";
 import Grid from "@mui/material/Unstable_Grid2";
 import IconButton from "@mui/material-next/IconButton";
 import {useMealCreate} from "../../hooks/meal/useMealCreate.ts";
 import {useTags} from "../../hooks/tags/useTags.ts";
+import {useUnits} from "../../hooks/unit/useUnits.ts";
+import {useAiSuggestIngredients} from "../../hooks/ai/useAiSuggestIngredients.ts";
 import {formatPrepTime} from "../common/Utils.ts";
+import {parseUnit} from "../../utils/UnitUtils.ts";
 import {Effort} from "@elliotJHarding/meals-api";
 import {AnimatePresence, motion} from "framer-motion";
 import PrepTimeChip from "../meals/chip/PrepTimeChip.tsx";
 import EffortChip from "../meals/chip/EffortChip.tsx";
+import SuggestedIngredientsList from "../meals/ingredients/SuggestedIngredientsList.tsx";
 import MealPlan from "../../domain/MealPlan.ts";
 import {PlanDto} from "@elliotJHarding/meals-api";
 
@@ -61,6 +65,34 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
     }, [newMeal.name]);
 
     const {tags, findTag} = useTags();
+    const {units} = useUnits();
+    const {suggestions, reasoning, isLoading: aiSuggestLoading, suggestIngredients, clearSuggestions, removeSuggestion} = useAiSuggestIngredients();
+
+    const suggestedIngredientToDto = (s: SuggestedIngredient): IngredientDto => {
+        const unit = s.unitCode ? parseUnit(units, s.unitCode) : null;
+        return {
+            name: s.name,
+            amount: s.amount,
+            unit: unit ?? undefined,
+        };
+    };
+
+    const handleAcceptSuggestion = (suggestion: SuggestedIngredient, index: number) => {
+        const dto = suggestedIngredientToDto(suggestion);
+        setNewMeal(prev => ({...prev, ingredients: [...(prev.ingredients ?? []), dto]}));
+        removeSuggestion(index);
+    };
+
+    const handleAcceptAllSuggestions = () => {
+        const dtos = suggestions.map(suggestedIngredientToDto);
+        setNewMeal(prev => ({...prev, ingredients: [...(prev.ingredients ?? []), ...dtos]}));
+        clearSuggestions();
+    };
+
+    const handleSuggestIngredients = () => {
+        suggestIngredients(newMeal);
+    };
+
     const {createMeal, loading: creatingMeal} = useMealCreate((createdMeal: MealDto) => {
         // Reset form
         setNewMeal({
@@ -182,6 +214,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
             tags: []
         });
         setDebouncedMealName('');
+        clearSuggestions();
         // Go back to menu in mobile or switch to first tab in desktop
         if (isMobileScreen) {
             setMobileView('menu');
@@ -330,6 +363,39 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                     {tags.map(tag => <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>)}
                 </Select>
             </FormControl>
+            <Button
+                variant='outlined'
+                fullWidth
+                startIcon={aiSuggestLoading ? <CircularProgress size={16}/> : <AutoAwesome/>}
+                onClick={handleSuggestIngredients}
+                disabled={newMeal.name.trim().length === 0 || aiSuggestLoading}
+            >
+                {aiSuggestLoading ? 'Suggesting...' : 'Suggest Ingredients'}
+            </Button>
+            <AnimatePresence>
+                {suggestions.length > 0 && (
+                    <SuggestedIngredientsList
+                        suggestions={suggestions}
+                        reasoning={reasoning}
+                        onAccept={handleAcceptSuggestion}
+                        onAcceptAll={handleAcceptAllSuggestions}
+                        onDismiss={removeSuggestion}
+                        onDismissAll={clearSuggestions}
+                    />
+                )}
+            </AnimatePresence>
+            {(newMeal.ingredients?.length ?? 0) > 0 && (
+                <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
+                    {newMeal.ingredients!.map((ing, i) => (
+                        <Chip
+                            key={`${ing.name}-${i}`}
+                            label={`${ing.amount ? ing.amount + ' ' : ''}${ing.unit?.shortStem ? ing.unit.shortStem + ' ' : ''}${ing.name}`}
+                            size="small"
+                            variant="outlined"
+                        />
+                    ))}
+                </Box>
+            )}
             <Stack direction='row' gap={2} justifyContent='flex-end' sx={{ mt: 2 }}>
                 <Button
                     variant='text'
@@ -701,6 +767,7 @@ export default function MealChooser({open, setOpen, onConfirm, meals, mealsLoadi
                     tags: []
                 })
                 setDebouncedMealName('')
+                clearSuggestions()
             }}
             PaperProps={{
                 sx: {

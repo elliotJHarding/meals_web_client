@@ -1,6 +1,6 @@
 import {Stack} from "@mui/material";
 import CircularProgress from "@mui/material-next/CircularProgress";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import Error from "../error/Error.tsx";
 import {useSearchParams} from "react-router-dom";
 import {useLinkCalendar} from "../../hooks/calendar/useLinkCalendar.ts";
@@ -12,8 +12,11 @@ export default function LinkCalendar() {
     const {linkCalendar} = useLinkCalendar();
 
     const [error, setError] = useState<boolean>(false);
+    const calledRef = useRef(false);
 
     useEffect(() => {
+        if (calledRef.current) return;
+        calledRef.current = true;
         const code = searchParams.get('code');
         if (code != null) {
             linkCalendar(code);

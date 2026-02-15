@@ -1,13 +1,15 @@
-import {Card, Stack, Typography} from "@mui/material";
+import {Card, CircularProgress, Stack, Typography} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material-next/Button";
-import {Add, Close, ContentPaste, Edit, PlaylistAdd} from "@mui/icons-material";
+import {Add, AutoAwesome, Close, ContentPaste, Edit, PlaylistAdd} from "@mui/icons-material";
 import {useState} from "react";
-import {MealDto, IngredientDto} from "@elliotJHarding/meals-api";
+import {MealDto, IngredientDto, SuggestedIngredient} from "@elliotJHarding/meals-api";
 import {useMealUpdate} from "../../../hooks/meal/useMealUpdate.ts";
 import IngredientList from "./IngredientList.tsx";
 import IngredientEditList from "./IngredientEditList.tsx";
+import SuggestedIngredientsList from "./SuggestedIngredientsList.tsx";
 import {useUnits} from "../../../hooks/unit/useUnits.ts";
+import {useAiSuggestIngredients} from "../../../hooks/ai/useAiSuggestIngredients.ts";
 import {AnimatePresence, motion} from "framer-motion";
 import ConfirmCancelButtons from "../../common/ConfirmCancelButtons.tsx";
 import IconButton from "@mui/material/IconButton";
@@ -26,6 +28,7 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : MealD
     });
 
     const {units} = useUnits()
+    const {suggestions, reasoning, isLoading: aiLoading, suggestIngredients, clearSuggestions, removeSuggestion} = useAiSuggestIngredients();
 
     const [edit, setEdit] = useState(initialEdit)
 
@@ -91,9 +94,53 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : MealD
         }]))
     }
 
-    const displayButtons = (meal.ingredients?.length ?? 0) > 0 ?
-        <Button startIcon={<Edit/>} onClick={handleEditOnClick}>Edit</Button> :
-        <Button startIcon={<PlaylistAdd/>} onClick={handleEditOnClick}>Add Ingredients</Button>;
+    const formatSuggestionAsEdit = (s: SuggestedIngredient): string => {
+        const parts: string[] = [];
+        if (s.amount) parts.push(String(s.amount));
+        if (s.unitCode) parts.push(s.unitCode);
+        parts.push(s.name);
+        return parts.join(' ');
+    }
+
+    const handleAcceptSuggestion = (suggestion: SuggestedIngredient, index: number) => {
+        setEdit(true);
+        const newEdit: IngredientEdit = {
+            index: ingredientEdits.length,
+            input: formatSuggestionAsEdit(suggestion),
+        };
+        const filterBlanks = (edits: IngredientEdit[]) => edits.filter(e => e.input !== '');
+        setIngredientEdits([...filterBlanks(ingredientEdits), newEdit]);
+        removeSuggestion(index);
+    }
+
+    const handleAcceptAllSuggestions = () => {
+        setEdit(true);
+        const filterBlanks = (edits: IngredientEdit[]) => edits.filter(e => e.input !== '');
+        const existing = filterBlanks(ingredientEdits);
+        const newEdits: IngredientEdit[] = suggestions.map((s, i) => ({
+            index: existing.length + i,
+            input: formatSuggestionAsEdit(s),
+        }));
+        setIngredientEdits([...existing, ...newEdits]);
+        clearSuggestions();
+    }
+
+    const suggestButton = (
+        <Button
+            startIcon={aiLoading ? <CircularProgress size={16}/> : <AutoAwesome/>}
+            onClick={() => suggestIngredients(meal)}
+            disabled={!meal.name?.trim() || aiLoading}
+        >
+            Suggest
+        </Button>
+    );
+
+    const displayButtons = <>
+        {suggestButton}
+        {(meal.ingredients?.length ?? 0) > 0 ?
+            <Button startIcon={<Edit/>} onClick={handleEditOnClick}>Edit</Button> :
+            <Button startIcon={<PlaylistAdd/>} onClick={handleEditOnClick}>Add Ingredients</Button>}
+    </>;
 
     const addButton =
         <Stack direction='row' sx={{width: {xs: '100%', md: '50%'}}}>
@@ -119,6 +166,18 @@ export default function Ingredients({meal, setMeal, initialEdit}: { meal : MealD
             {(meal.ingredients?.length ?? 0) > 0 && !edit ? <IngredientList ingredients={meal.ingredients!}/> : null}
             {ingredientEdits.length > 0 && edit ? <IngredientEditList ingredientEdits={ingredientEdits} setIngredientEdits={setIngredientEdits}/> : null}
             {edit ? addButton : null}
+            <AnimatePresence>
+                {suggestions.length > 0 && (
+                    <SuggestedIngredientsList
+                        suggestions={suggestions}
+                        reasoning={reasoning}
+                        onAccept={handleAcceptSuggestion}
+                        onAcceptAll={handleAcceptAllSuggestions}
+                        onDismiss={removeSuggestion}
+                        onDismissAll={clearSuggestions}
+                    />
+                )}
+            </AnimatePresence>
         </Card>
     )
 }

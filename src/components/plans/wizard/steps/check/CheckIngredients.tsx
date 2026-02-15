@@ -1,89 +1,137 @@
 import MealPlan from "../../../../../domain/MealPlan.ts";
-import {Card, Stack, Typography} from "@mui/material";
+import {Card, Divider} from "@mui/material";
 import {motion} from "framer-motion";
-import IngredientCheck from "./IngredientCheck.tsx";
-import {useEffect, useReducer} from "react";
 import Box from "@mui/material/Box";
-import {DoorSlidingOutlined, KitchenOutlined, ShoppingCartOutlined} from "@mui/icons-material";
-import ingredientChecksReducer, {SetItemsAction} from "../../../../../reducer/IngredientChecksReducer.ts";
-import {sortShoppingListItems} from "../../../../../utils/ShoppingListUtils.ts";
+import {Longevity, MealDto, PlanDto, ShoppingListItemDto} from "@elliotJHarding/meals-api";
 import {usePlansUpdate} from "../../../../../hooks/plan/usePlansUpdate.ts";
-import {PlanDto, ShoppingListItemDto} from "@elliotJHarding/meals-api";
+import MealIngredientsSection from "./MealIngredientsSection.tsx";
+import {useEffect, useRef} from "react";
 
-// Extended type to track which plan each shopping list item belongs to
-type ShoppingListItemWithPlanId = ShoppingListItemDto & { planId?: number };
+interface MealGroup {
+    meal: MealDto;
+    dayLabels: string[];
+    shoppingListItems: ShoppingListItemDto[];
+}
 
-export default function CheckIngredients({mealPlan, setMealPlan} : {mealPlan: MealPlan, setMealPlan: any}) {
+function buildMealGroups(mealPlan: MealPlan): MealGroup[] {
+    const groups = new Map<number, MealGroup>();
 
-    const initialState = (mp: MealPlan): ShoppingListItemWithPlanId[] => mp.plans
-        .map(plan => {
-            const itemsWithPlanId: ShoppingListItemWithPlanId[] = (plan.shoppingListItems ?? []).map(item => ({
-                ...item,
-                planId: plan.id
-            }));
-            return itemsWithPlanId;
-        })
-        .flat()
-        .filter(item => item?.ingredient?.name != null)
-        .sort(sortShoppingListItems);
+    for (const plan of mealPlan.plans) {
+        const dayLabel = new Date(plan.date).toLocaleDateString('en-gb', {weekday: 'short'});
 
-    const [ingredientsChecked, dispatch] = useReducer(ingredientChecksReducer, mealPlan, initialState);
+        for (const planMeal of plan.planMeals ?? []) {
+            if (planMeal.leftovers) continue;
 
+            const mealId = planMeal.meal.id;
+            if (mealId == null) continue;
+
+            const mealIngredientIds = new Set(
+                (planMeal.meal.ingredients ?? []).map(ing => ing.id).filter((id): id is number => id != null)
+            );
+
+            const matchingItems = (plan.shoppingListItems ?? []).filter(
+                item => item.ingredient?.id != null && mealIngredientIds.has(item.ingredient.id)
+            );
+
+            const existing = groups.get(mealId);
+            if (existing) {
+                if (!existing.dayLabels.includes(dayLabel)) {
+                    existing.dayLabels.push(dayLabel);
+                }
+                const existingIngIds = new Set(existing.shoppingListItems.map(i => i.ingredient?.id));
+                for (const item of matchingItems) {
+                    if (!existingIngIds.has(item.ingredient?.id)) {
+                        existing.shoppingListItems.push(item);
+                    }
+                }
+            } else {
+                groups.set(mealId, {
+                    meal: planMeal.meal,
+                    dayLabels: [dayLabel],
+                    shoppingListItems: [...matchingItems],
+                });
+            }
+        }
+    }
+
+    return Array.from(groups.values());
+}
+
+export default function CheckIngredients({mealPlan, setMealPlan, refetchPlans}: {
+    mealPlan: MealPlan,
+    setMealPlan: any,
+    refetchPlans: () => void,
+}) {
     const {updatePlans} = usePlansUpdate();
+    const hasAutoChecked = useRef(false);
 
     useEffect(() => {
-        dispatch(new SetItemsAction(initialState(mealPlan)))
-    }, [mealPlan])
+        if (hasAutoChecked.current || mealPlan.plans.length === 0) return;
 
-    const toComponents = (items: ShoppingListItemWithPlanId[]) => items
-        .map(item =>
-            <IngredientCheck ingredient={item.ingredient}
-                             checked={item.checked}
-                             dispatch={dispatch}
-                             syncPlans={syncPlans}/>
-        )
+        let changed = false;
+        const newPlans: PlanDto[] = mealPlan.plans.map(plan => ({
+            ...plan,
+            shoppingListItems: (plan.shoppingListItems ?? []).map(item => {
+                if (!item.checked && item.ingredient?.metadata?.longevity === Longevity.FRESH) {
+                    changed = true;
+                    return {...item, checked: true};
+                }
+                return item;
+            }),
+        }));
 
-    const syncPlans = (items: ShoppingListItemWithPlanId[]) => {
-        const groupedItems = Map.groupBy(items, item => item.planId);
+        hasAutoChecked.current = true;
 
-        const newPlans = mealPlan.plans.map(plan => ({...plan, shoppingListItems: groupedItems.get(plan.id) ?? []} as PlanDto));
+        if (changed) {
+            const newMealPlan = new MealPlan(newPlans);
+            setMealPlan(newMealPlan);
+            updatePlans(newPlans, () => console.info('Auto-checked fresh items'));
+        }
+    }, [mealPlan]);
 
-        setMealPlan({...mealPlan, plans: newPlans});
+    const mealGroups = buildMealGroups(mealPlan);
 
-        updatePlans(
-            newPlans,
-            () => console.info('plans updated')
-        );
-    }
+    const handleCheckToggle = (ingredientId: number) => {
+        const newPlans: PlanDto[] = mealPlan.plans.map(plan => ({
+            ...plan,
+            shoppingListItems: (plan.shoppingListItems ?? []).map(item =>
+                item.ingredient?.id === ingredientId
+                    ? {...item, checked: !item.checked}
+                    : item
+            ),
+        }));
+
+        const newMealPlan = new MealPlan(newPlans);
+        setMealPlan(newMealPlan);
+
+        updatePlans(newPlans, () => console.info('plans updated'));
+    };
+
+    const handleMealUpdated = () => {
+        updatePlans(mealPlan.plans, () => {
+            refetchPlans();
+        });
+    };
 
     return (
         <Card component={motion.div}
-              initial={{x:200, opacity: 0 }}
-              animate={{x:0, opacity: 1 }}
-              exit={{x: -200, opacity: 0 }}>
+              initial={{x: 200, opacity: 0}}
+              animate={{x: 0, opacity: 1}}
+              exit={{x: -200, opacity: 0}}>
             <Box sx={{padding: 3}} component={motion.div} layout>
-                <Stack gap={1} direction='row' alignItems='center' component={motion.div} layout>
-                    <KitchenOutlined/>
-                    <Typography variant='h6'>Fresh</Typography>
-                </Stack>
-                <Stack gap={1}>
-                    {toComponents(ingredientsChecked.filter(item => item.ingredient?.metadata?.longevity == 'FRESH').sort(sortShoppingListItems))}
-                </Stack>
-                <Stack gap={1} direction='row' alignItems='center'>
-                    <DoorSlidingOutlined/>
-                    <Typography variant='h6'>Cupboard</Typography>
-                </Stack>
-                <Stack gap={1}>
-                    {toComponents(ingredientsChecked.filter(item => item.ingredient?.metadata?.longevity == 'CUPBOARD').sort(sortShoppingListItems))}
-                </Stack>
-                <Stack gap={1} direction='row' alignItems='center'>
-                    <ShoppingCartOutlined/>
-                    <Typography variant='h6'>Other</Typography>
-                </Stack>
-                <Stack gap={1}>
-                    {toComponents(ingredientsChecked.filter(item => item.ingredient?.metadata?.longevity == null).sort(sortShoppingListItems))}
-                </Stack>
+                {mealGroups.map((group, index) => (
+                    <Box key={group.meal.id}>
+                        {index > 0 && <Divider sx={{my: 1}}/>}
+                        <MealIngredientsSection
+                            meal={group.meal}
+                            dayLabels={group.dayLabels}
+                            shoppingListItems={group.shoppingListItems}
+                            onCheckToggle={handleCheckToggle}
+                            onMealUpdated={handleMealUpdated}
+                        />
+                    </Box>
+                ))}
             </Box>
         </Card>
-    )
+    );
 }
